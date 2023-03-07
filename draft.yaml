@@ -1,0 +1,274 @@
+models:
+  PartnerShipPlans:
+    PlanTitle: string
+    Objective: text
+    Process: text
+    Report: text
+    DeliveryMode: text
+    Limitations: text
+    PlanTitleAr: string
+    ObjectiveAr: text
+    ProcessAr: text
+    ReportAr: text
+    DeliveryModeAr: text
+    LimitationsAr: text
+    Audience: integer
+    TamplatePath: string
+    Price: double
+    PaymentMethod: integer
+    Status: boolean default(1)
+    relationships:
+      hasMany: Functions
+  Functions:
+    FunctionTitle: string
+    FunctionTitleAr: string
+    PlanId: integer
+    Respondent: text
+    Status: boolean default(1)
+    relationships:
+      belongsTo: PartnerShipPlans
+      hasMany: FunctionPractice
+  FunctionPractice:
+    PracticeTitle: string
+    PracticeTitleAr: string
+    FunctionId: integer
+    Status: boolean default(1)
+    relationships:
+      belongsTo: Functions
+      hasMany: PracticeQuestions
+  PracticeQuestions:
+    Question: string
+    QuestionAr: string
+    PracticeId: integer
+    Respondent: integer
+    Status: boolean default(1)
+    relationships:
+      belongsTo: FunctionPractice
+  Clients:
+    ClientName: string
+    ClientEmail: string
+    ClientPhone: string
+    CilentFPName: string
+    CilentFPEmil: string
+    CilentFPPhone: string
+    relationships:
+      hasMany: Surveys, Emails
+  Emails:
+    ClientId: integer
+    Email: string
+    EmployeeType: integer
+    AddedBy: integer
+    relationships:
+      belongsTo: Clients
+  Surveys:
+    ClientId: integer
+    SurveyTitle: string
+    SurveyDes: text
+    SurveyStat: boolean
+    relationships:
+      belongsTo: Clients
+      hasMany: SurveyAnswers, PrioritiesAnswers
+  SurveyAnswers:
+    SurveyId: integer
+    QuestionId: integer
+    AnswerValue: integer
+    AnsweredBy: integer
+    relationships:
+      belongsTo: Surveys
+  PrioritiesAnswers:
+    SurveyId: integer
+    QuestionId: integer
+    AnswerValue: integer
+    AnsweredBy: integer
+    relationships:
+      belongsTo: Surveys
+controllers:
+  PartnerShipPlans:
+    index:
+      query: all:PartnerShipPlans
+      render: PartnerShipPlans.index with:PartnerShipPlans
+    create:
+      render: PartnerShipPlans.create
+    store:
+      validate: PartnerShipPlan
+      save: PartnerShipPlan
+      redirect: PartnerShipPlan.index
+    show:
+      render: PartnerShipPlans.show with:PartnerShipPlan
+    edit:
+      render: PartnerShipPlans.edit with:PartnerShipPlan
+    update:
+      validate: PartnerShipPlan
+      update: PartnerShipPlan
+      redirect: PartnerShipPlan.index
+    destroy:
+      delete: PartnerShipPlan
+      redirect: PartnerShipPlan.index
+  Functions:
+    index:
+      query: all:Functions
+      render: Functions.index with:Functions
+    create:
+      render: Functions.create
+    store:
+      validate: Function
+      save: Function
+      redirect: Function.index
+    show:
+      render: Functions.show with:Function
+    edit:
+      render: Functions.edit with:Function
+    update:
+      validate: Function
+      update: Function
+      redirect: Function.index
+    destroy:
+      delete: Function
+      redirect: Function.index
+  FunctionPractice:
+    index:
+      query: all:FunctionPractice
+      render: FunctionPractice.index with:FunctionPractice
+    create:
+      render: FunctionPractice.create
+    store:
+      validate: FunctionPractice
+      save: FunctionPractice
+      redirect: FunctionPractice.index
+    show:
+      render: FunctionPractice.show with:FunctionPractice
+    edit:
+      render: FunctionPractice.edit with:FunctionPractice
+    update:
+      validate: FunctionPractice
+      update: FunctionPractice
+      redirect: FunctionPractice.index
+    destroy:
+      delete: FunctionPractice
+      redirect: FunctionPractice.index
+  PracticeQuestions:
+    index:
+      query: all:PracticeQuestions
+      render: PracticeQuestions.index with:PracticeQuestions
+    create:
+      render: PracticeQuestions.create
+    store:
+      validate: PracticeQuestion
+      save: PracticeQuestion
+      redirect: PracticeQuestions.index
+    show:
+      render: PracticeQuestions.show with:PracticeQuestion
+    edit:
+      render: PracticeQuestions.edit with:PracticeQuestion
+    update:
+      validate: PracticeQuestion
+      update: PracticeQuestion
+      redirect: PracticeQuestions.index
+    destroy:
+      delete: PracticeQuestion
+      redirect: PracticeQuestions.index
+  Clients:
+    index:
+      query: all:Clients
+      render: Clients.index with:Clients
+    create:
+      render: Clients.create
+    store:
+      validate: Client
+      save: Client
+      redirect: Clients.index
+    show:
+      render: Clients.show with:Client
+    edit:
+      render: Clients.edit with:Client
+    update:
+      validate: Client
+      update: Client
+      redirect: Clients.index
+    destroy:
+      delete: Client
+      redirect: Clients.index
+  Emails:
+    index:
+      query: all:Emails
+      render: Emails.index with:Emails
+    create:
+      render: Emails.create
+    store:
+      validate: Email
+      save: Email
+      redirect: Emails.index
+    show:
+      render: Emails.show with:Email
+    edit:
+      render: Emails.edit with:Email
+    update:
+      validate: Email
+      update: Email
+      redirect: Emails.index
+    destroy:
+      delete: Email
+      redirect: Emails.index
+  Surveys:
+    index:
+      query: all:Surveys
+      render: Surveys.index with:Surveys
+    create:
+      render: Surveys.create
+    store:
+      validate: Survey
+      save: Survey
+      redirect: Surveys.index
+    show:
+      render: Surveys.show with:Survey
+    edit:
+      render: Surveys.edit with:Survey
+    update:
+      validate: Survey
+      update: Survey
+      redirect: Surveys.index
+    destroy:
+      delete: Survey
+      redirect: Surveys.index
+  SurveyAnswers:
+    index:
+      query: all:SurveyAnswers
+      render: SurveyAnswers.index with:SurveyAnswers
+    create:
+      render: SurveyAnswers.create
+    store:
+      validate: SurveyAnswer
+      save: SurveyAnswer
+      redirect: SurveyAnswers.index
+    show:
+      render: SurveyAnswers.show with:SurveyAnswer
+    edit:
+      render: SurveyAnswers.edit with:SurveyAnswer
+    update:
+      validate: SurveyAnswer
+      update: SurveyAnswer
+      redirect: SurveyAnswers.index
+    destroy:
+      delete: SurveyAnswer
+      redirect: SurveyAnswers.index
+  PrioritiesAnswers:
+    index:
+      query: all:PrioritiesAnswers
+      render: PrioritiesAnswers.index with:PrioritiesAnswers
+    create:
+      render: PrioritiesAnswers.create
+    store:
+      validate: PrioritiesAnswer
+      save: PrioritiesAnswer
+      redirect: PrioritiesAnswers.index
+    show:
+      render: PrioritiesAnswers.show with:PrioritiesAnswer
+    edit:
+      render: PrioritiesAnswers.edit with:PrioritiesAnswer
+    update:
+      validate: PrioritiesAnswer
+      update: PrioritiesAnswer
+      redirect: PrioritiesAnswers.index
+    destroy:
+      delete: PrioritiesAnswer
+      redirect: PrioritiesAnswers.index

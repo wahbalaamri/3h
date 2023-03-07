@@ -1,0 +1,232 @@
+﻿
+.slider {
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    margin: auto;
+    padding: 0; /*20px 0 20px;*/
+}
+
+.slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-points-x: repeat(300px);
+    scroll-snap-type: mandatory;
+}
+
+.slide {
+    padding: 0 0 10px 0 !important;
+}
+
+.slide img {
+    object-fit: fill;
+}
+
+.slides::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.slides::-webkit-scrollbar-thumb {
+    background: black;
+}
+
+.slides::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.slides > div {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 200px;
+    height: 330px;
+  /*  background: #eee;*/
+    transform-origin: center center;
+    transform: scale(1);
+    transition: transform 0.5s;
+    margin: 5px 20px 20px 0;
+    border: 1px solid #e7e7e7;
+    display: inline-block;
+    float: none;
+    text-align: center;
+}
+
+    .slides > div:hover {
+        margin: 12px;
+        border: 2px outset #2cbae1;
+    }
+
+    .slides > div:target {
+        /*   transform: scale(0.8); */
+    }
+
+.Course-info {
+    background-color: transparent;
+    /*color: #ff6a00;*/
+    padding: 0px;
+    text-align: center;
+    display: block;
+    position: relative;
+    /*bottom: 0;*/
+    left: 0;
+    width: 100%;
+    height: 25%;
+    margin: 23px 0 0 0;
+}
+
+    .Course-info .CourseName {
+        font-size: 12px;
+        padding-top: 0px;
+        /*color: black;*/
+    }
+
+    .Course-info .category {
+        font-size: 10px;
+    }
+
+    .Course-info a {
+        color: blue;
+    }
+
+.imgSlide {
+    object-fit: fill;
+    /*object-fit: contain;*/
+    position: relative;
+    margin: 0px;
+    /*top: 0;
+  left: 0;*/
+    width: 100%;
+    height: 50%;
+    display: block;
+}
+
+.avatar {
+    background-color: gray;
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    width: 50px;
+    height: 50px;
+    border: 2px outset #FFF;
+    border-radius: 50%;
+}
+.expert-avatar {
+    background-color: white;
+    /*position: absolute;
+     left: 40%;
+     right:40%;*/
+    /*top: 40%;*/
+    width: 200px;
+    height: 200px;
+    border: 2px outset #FFF;
+    border-radius: 50%;
+}
+
+.slider > .slide-footer {
+    position: relative;
+    bottom: 10px !important;
+    margin: 0 0 10px 0 !important;
+    /*padding-bottom: 10px !important;*/
+    padding: 0 30px !important;
+}
+
+.slider > a {
+    display: inline-flex;
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(to bottom, #74ABE2, #5563DE);
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+}
+
+    .slider > a:active {
+        top: 1px;
+    }
+
+    .slider > a:focus {
+        background: #000;
+    }
+
+/* Don't need button navigation */
+@supports (scroll-snap-type) {
+    .slider > a {
+        display: none;
+    }
+}
+
+
+
+.row-centered {
+    text-align: center;
+}
+
+.col-centered {
+    display: inline-block;
+    float: none;
+    /* reset the text-align */
+    text-align: left;
+    /* inline-block space fix */
+    margin-right: -4px;
+    text-align: center;
+    /*border: 1px solid #ddd;*/
+}
+
+
+#itemslider h4 {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    margin: 10px auto 3px;
+    flex: 1 0 auto;
+}
+
+#itemslider h5 {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0px auto 2px;
+    /*color: #808080;*/
+}
+
+#itemslider h6 {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    margin: 2px auto 5px;
+}
+
+#slider-control img {
+    padding-top: 150%;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 992px) {
+    #slider-control img {
+        padding-top: 170px;
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .jumbotron {
+        margin: 20px 0 0 0 !important;
+        padding: 5px 10px 0px 0;
+    }
+
+    .tCompanyName {
+        font-family: 'Traditional Arabic';
+    }
+
+    .tLogoScript {
+        margin-top: -15px;
+        padding-right: 50px;
+        font-size: 10px;
+    }
+}

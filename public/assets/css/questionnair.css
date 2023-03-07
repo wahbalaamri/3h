@@ -1,0 +1,100 @@
+/* Code By Webdevtrick ( https://webdevtrick.com ) */
+
+
+/* html, body {
+    min-height: 100%;
+  }
+
+  body {
+    font-family: sans-serif;
+    background: #f3f3f3;
+    color: rgba(255,255,255,.5);
+  } */
+
+.Qcontainer {
+    width: 80%;
+    min-width: 420px;
+    margin: 50px auto;
+    padding: 1.3em;
+    background: #20253d !important;
+    border-radius: .75em;
+    color: #fff;
+}
+
+p {
+    font-size: .9em;
+}
+
+.rb {
+    height: 50px;
+    line-height: 38px;
+    text-align: center;
+    background: rgba(255, 255, 255, .03);
+    border-radius: .3em;
+}
+
+.tab {
+    display: inline-block;
+    position: relative;
+    width: 15%;
+    font-size: 40px;
+}
+
+.txt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: .5em;
+    color: #FFFFFF;
+}
+
+.spot {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .3);
+    border-radius: 100%;
+    cursor: pointer;
+    transition: ease .5s;
+}
+
+.activeTab .spot {
+    background: rgba(0, 0, 0, .35);
+    border: 2px solid rgb(253, 0, 51, 0.6);
+}
+
+.button-box {
+    padding: 10px 0;
+    text-align: center;
+}
+
+button {
+    display: inline-block;
+    width: 80%;
+    margin-top: 1.2em;
+    padding: 1em;
+    max-width: 220px;
+    font-size: .9em;
+    color: #fd0033;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: .15em;
+    background: white;
+    border: none;
+    outline: none;
+    border-radius: 5em;
+    box-shadow: 0 15px 20px -10px rgba(0, 0, 0, 0.3);
+    transition: color 0.6s, box-shadow 0.3s, transform 0.3s;
+    cursor: pointer;
+}
+
+button:hover {
+    box-shadow: 0 3px 5px -5px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    background-color: #fd0033;
+}

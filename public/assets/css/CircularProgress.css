@@ -1,0 +1,1875 @@
+    .card-footer {
+        color: #376092;
+    }
+    
+    .legend-result {
+        font-size: 17px;
+    }
+    
+    .legend-result .legend-levels {
+        font-size: 14px;
+    }
+    
+    .function-lable {
+        border-right: 1px solid #a6a8aa;
+        padding-right: 3px;
+        background-color: #fff;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .function-progress {
+        padding-left: 3px;
+        background-color: #fff;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .circle-wrap {
+        display: grid;
+        grid-template-columns: repeat(1, 160px);
+        grid-gap: 80px;
+        margin-top: 100px;
+        margin-left: 25px;
+        width: 180px;
+        height: 180px;
+        background: #d9d7da;
+        border-radius: 50%;
+    }
+    
+    .circle-wrap .circle .mask,
+    .circle-wrap .circle .fill-1,
+    .circle-wrap .circle .fill-2,
+    .circle-wrap .circle .fill-3,
+    .circle-wrap .circle .fill-4,
+    .circle-wrap .circle .fill-5,
+    .circle-wrap .circle .fill-6,
+    .circle-wrap .circle .fill-7,
+    .circle-wrap .circle .fill-8,
+    .circle-wrap .circle .fill-9,
+    .circle-wrap .circle .fill-10,
+    .circle-wrap .circle .fill-11,
+    .circle-wrap .circle .fill-12,
+    .circle-wrap .circle .fill-13,
+    .circle-wrap .circle .fill-14,
+    .circle-wrap .circle .fill-15,
+    .circle-wrap .circle .fill-16,
+    .circle-wrap .circle .fill-17,
+    .circle-wrap .circle .fill-18,
+    .circle-wrap .circle .fill-19,
+    .circle-wrap .circle .fill-20,
+    .circle-wrap .circle .fill-21,
+    .circle-wrap .circle .fill-22,
+    .circle-wrap .circle .fill-23,
+    .circle-wrap .circle .fill-24,
+    .circle-wrap .circle .fill-25,
+    .circle-wrap .circle .fill-26,
+    .circle-wrap .circle .fill-27,
+    .circle-wrap .circle .fill-28,
+    .circle-wrap .circle .fill-29,
+    .circle-wrap .circle .fill-30,
+    .circle-wrap .circle .fill-31,
+    .circle-wrap .circle .fill-32,
+    .circle-wrap .circle .fill-33,
+    .circle-wrap .circle .fill-34,
+    .circle-wrap .circle .fill-35,
+    .circle-wrap .circle .fill-36,
+    .circle-wrap .circle .fill-37,
+    .circle-wrap .circle .fill-38,
+    .circle-wrap .circle .fill-39,
+    .circle-wrap .circle .fill-40,
+    .circle-wrap .circle .fill-41,
+    .circle-wrap .circle .fill-42,
+    .circle-wrap .circle .fill-43,
+    .circle-wrap .circle .fill-44,
+    .circle-wrap .circle .fill-45,
+    .circle-wrap .circle .fill-46,
+    .circle-wrap .circle .fill-47,
+    .circle-wrap .circle .fill-48,
+    .circle-wrap .circle .fill-49,
+    .circle-wrap .circle .fill-50,
+    .circle-wrap .circle .fill-51,
+    .circle-wrap .circle .fill-52,
+    .circle-wrap .circle .fill-53,
+    .circle-wrap .circle .fill-54,
+    .circle-wrap .circle .fill-55,
+    .circle-wrap .circle .fill-56,
+    .circle-wrap .circle .fill-57,
+    .circle-wrap .circle .fill-58,
+    .circle-wrap .circle .fill-59,
+    .circle-wrap .circle .fill-60,
+    .circle-wrap .circle .fill-61,
+    .circle-wrap .circle .fill-62,
+    .circle-wrap .circle .fill-63,
+    .circle-wrap .circle .fill-64,
+    .circle-wrap .circle .fill-65,
+    .circle-wrap .circle .fill-66,
+    .circle-wrap .circle .fill-67,
+    .circle-wrap .circle .fill-68,
+    .circle-wrap .circle .fill-69,
+    .circle-wrap .circle .fill-70,
+    .circle-wrap .circle .fill-71,
+    .circle-wrap .circle .fill-72,
+    .circle-wrap .circle .fill-73,
+    .circle-wrap .circle .fill-74,
+    .circle-wrap .circle .fill-75,
+    .circle-wrap .circle .fill-76,
+    .circle-wrap .circle .fill-77,
+    .circle-wrap .circle .fill-78,
+    .circle-wrap .circle .fill-79,
+    .circle-wrap .circle .fill-80,
+    .circle-wrap .circle .fill-81,
+    .circle-wrap .circle .fill-82,
+    .circle-wrap .circle .fill-83,
+    .circle-wrap .circle .fill-84,
+    .circle-wrap .circle .fill-85,
+    .circle-wrap .circle .fill-86,
+    .circle-wrap .circle .fill-87,
+    .circle-wrap .circle .fill-88,
+    .circle-wrap .circle .fill-89,
+    .circle-wrap .circle .fill-90,
+    .circle-wrap .circle .fill-91,
+    .circle-wrap .circle .fill-92,
+    .circle-wrap .circle .fill-93,
+    .circle-wrap .circle .fill-94,
+    .circle-wrap .circle .fill-95,
+    .circle-wrap .circle .fill-96,
+    .circle-wrap .circle .fill-97,
+    .circle-wrap .circle .fill-98,
+    .circle-wrap .circle .fill-99,
+    .circle-wrap .circle .fill-100 {
+        width: 180px;
+        height: 180px;
+        position: absolute;
+        border-radius: 50%;
+    }
+    
+    .circle-wrap .circle .mask {
+        clip: rect(0px, 180px, 180px, 85px);
+    }
+    
+    .circle-wrap .inside-circle {
+        width: 149px;
+        height: 149px;
+        border-radius: 50%;
+        background: #DCE6F2;
+        /* background: #212020; */
+        line-height: 85px;
+        text-align: center;
+        margin-top: 15px;
+        margin-left: 15px;
+        color: #376092;
+        position: absolute;
+        z-index: 100;
+        font-weight: 700;
+        font-size: 2.6rem;
+    }
+    
+    .circle-wrap .inside-circle p {
+        line-height: 17px;
+        font-size: 1.0rem;
+        font-weight: 800;
+        color: #000;
+        letter-spacing: 2px;
+    }
+    
+    .mask .fill-0,
+    .mask .fill-1,
+    .mask .fill-2,
+    .mask .fill-3,
+    .mask .fill-4,
+    .mask .fill-5,
+    .mask .fill-6,
+    .mask .fill-7,
+    .mask .fill-8,
+    .mask .fill-9,
+    .mask .fill-10,
+    .mask .fill-11,
+    .mask .fill-12,
+    .mask .fill-13,
+    .mask .fill-14,
+    .mask .fill-15,
+    .mask .fill-16,
+    .mask .fill-17,
+    .mask .fill-18,
+    .mask .fill-19,
+    .mask .fill-20,
+    .mask .fill-21,
+    .mask .fill-22,
+    .mask .fill-23,
+    .mask .fill-24,
+    .mask .fill-25,
+    .mask .fill-26,
+    .mask .fill-27,
+    .mask .fill-28,
+    .mask .fill-29,
+    .mask .fill-30,
+    .mask .fill-31,
+    .mask .fill-32,
+    .mask .fill-33,
+    .mask .fill-34,
+    .mask .fill-35,
+    .mask .fill-36,
+    .mask .fill-37,
+    .mask .fill-38,
+    .mask .fill-39,
+    .mask .fill-40,
+    .mask .fill-41,
+    .mask .fill-42,
+    .mask .fill-43,
+    .mask .fill-44,
+    .mask .fill-45,
+    .mask .fill-46,
+    .mask .fill-47,
+    .mask .fill-48,
+    .mask .fill-49,
+    .mask .fill-50,
+    .mask .fill-51,
+    .mask .fill-52,
+    .mask .fill-53,
+    .mask .fill-54,
+    .mask .fill-55,
+    .mask .fill-56,
+    .mask .fill-57,
+    .mask .fill-58,
+    .mask .fill-59,
+    .mask .fill-60 {
+        clip: rect(0px, 85px, 180px, 0px);
+        background-color: #dc3545;
+    }
+    
+    .mask .fill-61,
+    .mask .fill-62,
+    .mask .fill-63,
+    .mask .fill-64,
+    .mask .fill-65,
+    .mask .fill-66,
+    .mask .fill-67,
+    .mask .fill-68,
+    .mask .fill-69,
+    .mask .fill-70,
+    .mask .fill-71,
+    .mask .fill-72,
+    .mask .fill-73,
+    .mask .fill-74,
+    .mask .fill-75,
+    .mask .fill-76,
+    .mask .fill-77,
+    .mask .fill-78,
+    .mask .fill-79,
+    .mask .fill-80 {
+        clip: rect(0px, 85px, 180px, 0px);
+        background-color: #ffc107;
+    }
+    
+    .mask .fill-81,
+    .mask .fill-82,
+    .mask .fill-83,
+    .mask .fill-84,
+    .mask .fill-85,
+    .mask .fill-86,
+    .mask .fill-87,
+    .mask .fill-88,
+    .mask .fill-89,
+    .mask .fill-90,
+    .mask .fill-91,
+    .mask .fill-92,
+    .mask .fill-93,
+    .mask .fill-94,
+    .mask .fill-95,
+    .mask .fill-96,
+    .mask .fill-97,
+    .mask .fill-98,
+    .mask .fill-99,
+    .mask .fill-100 {
+        clip: rect(0px, 85px, 180px, 0px);
+        background-color: #198754;
+    }
+    
+    .circle-wrap .circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .mask.full-0,
+    .circle .fill-0 {
+        animation: fill-1 ease-in-out 3s;
+        transform: rotate(0deg);
+    }
+    
+    .mask.full-1,
+    .circle .fill-1 {
+        animation: fill-1 ease-in-out 3s;
+        transform: rotate(1deg);
+    }
+    
+    .mask.full-2,
+    .circle .fill-2 {
+        animation: fill-2 ease-in-out 3s;
+        transform: rotate(3.6deg);
+    }
+    
+    .mask.full-3,
+    .circle .fill-3 {
+        animation: fill-3 ease-in-out 3s;
+        transform: rotate(5.4deg);
+    }
+    
+    .mask.full-4,
+    .circle .fill-4 {
+        animation: fill-4 ease-in-out 3s;
+        transform: rotate(7.2deg);
+    }
+    
+    .mask.full-5,
+    .circle .fill-5 {
+        animation: fill-5 ease-in-out 3s;
+        transform: rotate(9deg);
+    }
+    
+    .mask.full-6,
+    .circle .fill-6 {
+        animation: fill-6 ease-in-out 3s;
+        transform: rotate(10.8);
+    }
+    
+    .mask.full-7,
+    .circle .fill-7 {
+        animation: fill-7 ease-in-out 3s;
+        transform: rotate(12.8);
+    }
+    
+    .mask.full-8,
+    .circle .fill-8 {
+        animation: fill-8 ease-in-out 3s;
+        transform: rotate(14.4deg);
+    }
+    
+    .mask.full-9,
+    .circle .fill-9 {
+        animation: fill-9 ease-in-out 3s;
+        transform: rotate(16.6deg);
+    }
+    
+    .mask.full-10,
+    .circle .fill-10 {
+        animation: fill-10 ease-in-out 3s;
+        transform: rotate(18deg);
+    }
+    
+    .mask.full-11,
+    .circle .fill-11 {
+        animation: fill-11 ease-in-out 3s;
+        transform: rotate(19.8deg);
+    }
+    
+    .mask.full-12,
+    .circle .fill-12 {
+        animation: fill-12 ease-in-out 3s;
+        transform: rotate(21.6deg);
+    }
+    
+    .mask.full-13,
+    .circle .fill-13 {
+        animation: fill-13 ease-in-out 3s;
+        transform: rotate(23.4deg);
+    }
+    
+    .mask.full-14,
+    .circle .fill-14 {
+        animation: fill-14 ease-in-out 3s;
+        transform: rotate(25.2deg);
+    }
+    
+    .mask.full-15,
+    .circle .fill-15 {
+        animation: fill-15 ease-in-out 3s;
+        transform: rotate(27deg);
+    }
+    
+    .mask.full-16,
+    .circle .fill-16 {
+        animation: fill-16 ease-in-out 3s;
+        transform: rotate(28.8deg);
+    }
+    
+    .mask.full-17,
+    .circle .fill-17 {
+        animation: fill-17 ease-in-out 3s;
+        transform: rotate(30.6deg);
+    }
+    
+    .mask.full-18,
+    .circle .fill-18 {
+        animation: fill-18 ease-in-out 3s;
+        transform: rotate(32.4deg);
+    }
+    
+    .mask.full-19,
+    .circle .fill-19 {
+        animation: fill-19 ease-in-out 3s;
+        transform: rotate(34.2deg);
+    }
+    
+    .mask.full-20,
+    .circle .fill-20 {
+        animation: fill-20 ease-in-out 3s;
+        transform: rotate(36deg);
+    }
+    
+    .mask.full-21,
+    .circle .fill-21 {
+        animation: fill-21 ease-in-out 3s;
+        transform: rotate(37.8deg);
+    }
+    
+    .mask.full-22,
+    .circle .fill-22 {
+        animation: fill-22 ease-in-out 3s;
+        transform: rotate(39.6deg);
+    }
+    
+    .mask.full-23,
+    .circle .fill-23 {
+        animation: fill-23 ease-in-out 3s;
+        transform: rotate(41.4deg);
+    }
+    
+    .mask.full-24,
+    .circle .fill-24 {
+        animation: fill-24 ease-in-out 3s;
+        transform: rotate(43.2deg);
+    }
+    
+    .mask.full-25,
+    .circle .fill-25 {
+        animation: fill-25 ease-in-out 3s;
+        transform: rotate(45deg);
+    }
+    
+    .mask.full-26,
+    .circle .fill-26 {
+        animation: fill-26 ease-in-out 3s;
+        transform: rotate(47.8deg);
+    }
+    
+    .mask.full-27,
+    .circle .fill-27 {
+        animation: fill-27 ease-in-out 3s;
+        transform: rotate(49.6deg);
+    }
+    
+    .mask.full-28,
+    .circle .fill-28 {
+        animation: fill-28 ease-in-out 3s;
+        transform: rotate(51.4deg);
+    }
+    
+    .mask.full-29,
+    .circle .fill-29 {
+        animation: fill-29 ease-in-out 3s;
+        transform: rotate(29deg);
+    }
+    
+    .mask.full-30,
+    .circle .fill-30 {
+        animation: fill-30 ease-in-out 3s;
+        transform: rotate(55deg);
+    }
+    
+    .mask.full-31,
+    .circle .fill-31 {
+        animation: fill-31 ease-in-out 3s;
+        transform: rotate(56.8deg);
+    }
+    
+    .mask.full-32,
+    .circle .fill-32 {
+        animation: fill-32 ease-in-out 3s;
+        transform: rotate(58.6deg);
+    }
+    
+    .mask.full-33,
+    .circle .fill-33 {
+        animation: fill-33 ease-in-out 3s;
+        transform: rotate(60.4deg);
+    }
+    
+    .mask.full-34,
+    .circle .fill-34 {
+        animation: fill-34 ease-in-out 3s;
+        transform: rotate(62.2deg);
+    }
+    
+    .mask.full-35,
+    .circle .fill-35 {
+        animation: fill-35 ease-in-out 3s;
+        transform: rotate(115.2deg);
+    }
+    
+    .mask.full-36,
+    .circle .fill-36 {
+        animation: fill-36 ease-in-out 3s;
+        transform: rotate(65.8deg);
+    }
+    
+    .mask.full-37,
+    .circle .fill-37 {
+        animation: fill-37 ease-in-out 3s;
+        transform: rotate(67.6deg);
+    }
+    
+    .mask.full-38,
+    .circle .fill-38 {
+        animation: fill-38 ease-in-out 3s;
+        transform: rotate(69.4deg);
+    }
+    
+    .mask.full-39,
+    .circle .fill-39 {
+        animation: fill-39 ease-in-out 3s;
+        transform: rotate(70.2deg);
+    }
+    
+    .mask.full-40,
+    .circle .fill-40 {
+        animation: fill-40 ease-in-out 3s;
+        transform: rotate(72deg);
+    }
+    
+    .mask.full-41,
+    .circle .fill-41 {
+        animation: fill-41 ease-in-out 3s;
+        transform: rotate(73.8deg);
+    }
+    
+    .mask.full-42,
+    .circle .fill-42 {
+        animation: fill-42 ease-in-out 3s;
+        transform: rotate(75.6deg);
+    }
+    
+    .mask.full-43,
+    .circle .fill-43 {
+        animation: fill-43 ease-in-out 3s;
+        transform: rotate(77.4deg);
+    }
+    
+    .mask.full-44,
+    .circle .fill-44 {
+        animation: fill-44 ease-in-out 3s;
+        transform: rotate(79.2deg);
+    }
+    
+    .mask.full-45,
+    .circle .fill-45 {
+        animation: fill-45 ease-in-out 3s;
+        transform: rotate(81deg);
+    }
+    
+    .mask.full-46,
+    .circle .fill-46 {
+        animation: fill-46 ease-in-out 3s;
+        transform: rotate(82.8deg);
+    }
+    
+    .mask.full-47,
+    .circle .fill-47 {
+        animation: fill-47 ease-in-out 3s;
+        transform: rotate(84.6deg);
+    }
+    
+    .mask.full-48,
+    .circle .fill-48 {
+        animation: fill-48 ease-in-out 3s;
+        transform: rotate(86.4deg);
+    }
+    
+    .mask.full-49,
+    .circle .fill-49 {
+        animation: fill-49 ease-in-out 3s;
+        transform: rotate(88.2deg);
+    }
+    
+    .mask.full-50,
+    .circle .fill-50 {
+        animation: fill-50 ease-in-out 3s;
+        transform: rotate(90deg);
+    }
+    
+    .mask.full-51,
+    .circle .fill-51 {
+        animation: fill-51 ease-in-out 3s;
+        transform: rotate(91.8deg);
+    }
+    
+    .mask.full-52,
+    .circle .fill-52 {
+        animation: fill-52 ease-in-out 3s;
+        transform: rotate(93.6deg);
+    }
+    
+    .mask.full-53,
+    .circle .fill-53 {
+        animation: fill-53 ease-in-out 3s;
+        transform: rotate(95.4deg);
+    }
+    
+    .mask.full-54,
+    .circle .fill-54 {
+        animation: fill-54 ease-in-out 3s;
+        transform: rotate(97.2deg);
+    }
+    
+    .mask.full-55,
+    .circle .fill-55 {
+        animation: fill-55 ease-in-out 3s;
+        transform: rotate(99deg);
+    }
+    
+    .mask.full-56,
+    .circle .fill-56 {
+        animation: fill-56 ease-in-out 3s;
+        transform: rotate(100.8deg);
+    }
+    
+    .mask.full-57,
+    .circle .fill-57 {
+        animation: fill-57 ease-in-out 3s;
+        transform: rotate(102.6deg);
+    }
+    
+    .mask.full-58,
+    .circle .fill-58 {
+        animation: fill-58 ease-in-out 3s;
+        transform: rotate(104.4deg);
+    }
+    
+    .mask.full-59,
+    .circle .fill-59 {
+        animation: fill-59 ease-in-out 3s;
+        transform: rotate(106.2deg);
+    }
+    
+    .mask.full-60,
+    .circle .fill-60 {
+        animation: fill-60 ease-in-out 3s;
+        transform: rotate(108deg);
+    }
+    
+    .mask.full-61,
+    .circle .fill-61 {
+        animation: fill-61 ease-in-out 3s;
+        transform: rotate(109.8deg);
+    }
+    
+    .mask.full-62,
+    .circle .fill-62 {
+        animation: fill-62 ease-in-out 3s;
+        transform: rotate(111.6deg);
+    }
+    
+    .mask.full-63,
+    .circle .fill-63 {
+        animation: fill-63 ease-in-out 3s;
+        transform: rotate(113.4deg);
+    }
+    
+    .mask.full-64,
+    .circle .fill-64 {
+        animation: fill-64 ease-in-out 3s;
+        transform: rotate(115deg);
+    }
+    
+    .mask.full-65,
+    .circle .fill-65 {
+        animation: fill-65 ease-in-out 3s;
+        transform: rotate(117deg);
+    }
+    
+    .mask.full-66,
+    .circle .fill-66 {
+        animation: fill-66 ease-in-out 3s;
+        transform: rotate(118.8deg);
+    }
+    
+    .mask.full-67,
+    .circle .fill-67 {
+        animation: fill-67 ease-in-out 3s;
+        transform: rotate(120.6deg);
+    }
+    
+    .mask.full-68,
+    .circle .fill-68 {
+        animation: fill-68 ease-in-out 3s;
+        transform: rotate(122.4deg);
+    }
+    
+    .mask.full-69,
+    .circle .fill-69 {
+        animation: fill-69 ease-in-out 3s;
+        transform: rotate(124.2deg);
+    }
+    
+    .mask.full-70,
+    .circle .fill-70 {
+        animation: fill-70 ease-in-out 3s;
+        transform: rotate(126deg);
+    }
+    
+    .mask.full-71,
+    .circle .fill-71 {
+        animation: fill-71 ease-in-out 3s;
+        transform: rotate(127.8deg);
+    }
+    
+    .mask.full-72,
+    .circle .fill-72 {
+        animation: fill-72 ease-in-out 3s;
+        transform: rotate(129.6deg);
+    }
+    
+    .mask.full-73,
+    .circle .fill-73 {
+        animation: fill-73 ease-in-out 3s;
+        transform: rotate(131.4deg);
+    }
+    
+    .mask.full-74,
+    .circle .fill-74 {
+        animation: fill-74 ease-in-out 3s;
+        transform: rotate(133.2deg);
+    }
+    
+    .mask.full-75,
+    .circle .fill-75 {
+        animation: fill-75 ease-in-out 3s;
+        transform: rotate(135deg);
+    }
+    
+    .mask.full-76,
+    .circle .fill-76 {
+        animation: fill-76 ease-in-out 3s;
+        transform: rotate(136.8deg);
+    }
+    
+    .mask.full-77,
+    .circle .fill-77 {
+        animation: fill-77 ease-in-out 3s;
+        transform: rotate(138.6deg);
+    }
+    
+    .mask.full-78,
+    .circle .fill-78 {
+        animation: fill-78 ease-in-out 3s;
+        transform: rotate(140.4deg);
+    }
+    
+    .mask.full-79,
+    .circle .fill-79 {
+        animation: fill-79 ease-in-out 3s;
+        transform: rotate(142.2deg);
+    }
+    
+    .mask.full-80,
+    .circle .fill-80 {
+        animation: fill-80 ease-in-out 3s;
+        transform: rotate(144deg);
+    }
+    
+    .mask.full-81,
+    .circle .fill-81 {
+        animation: fill-81 ease-in-out 3s;
+        transform: rotate(145.8deg);
+    }
+    
+    .mask.full-82,
+    .circle .fill-82 {
+        animation: fill-82 ease-in-out 3s;
+        transform: rotate(147.6deg);
+    }
+    
+    .mask.full-83,
+    .circle .fill-83 {
+        animation: fill-83 ease-in-out 3s;
+        transform: rotate(149.4deg);
+    }
+    
+    .mask.full-84,
+    .circle .fill-84 {
+        animation: fill-84 ease-in-out 3s;
+        transform: rotate(151.2deg);
+    }
+    
+    .mask.full-85,
+    .circle .fill-85 {
+        animation: fill-85 ease-in-out 3s;
+        transform: rotate(153deg);
+    }
+    
+    .mask.full-86,
+    .circle .fill-86 {
+        animation: fill-86 ease-in-out 3s;
+        transform: rotate(154.8deg);
+    }
+    
+    .mask.full-87,
+    .circle .fill-87 {
+        animation: fill-87 ease-in-out 3s;
+        transform: rotate(156.6deg);
+    }
+    
+    .mask.full-88,
+    .circle .fill-88 {
+        animation: fill-88 ease-in-out 3s;
+        transform: rotate(158.4deg);
+    }
+    
+    .mask.full-89,
+    .circle .fill-89 {
+        animation: fill-89 ease-in-out 3s;
+        transform: rotate(160.2deg);
+    }
+    
+    .mask.full-90,
+    .circle .fill-90 {
+        animation: fill-90 ease-in-out 3s;
+        transform: rotate(162deg);
+    }
+    
+    .mask.full-91,
+    .circle .fill-91 {
+        animation: fill-91 ease-in-out 3s;
+        transform: rotate(163.8deg);
+    }
+    
+    .mask.full-92,
+    .circle .fill-92 {
+        animation: fill-92 ease-in-out 3s;
+        transform: rotate(165.6deg);
+    }
+    
+    .mask.full-93,
+    .circle .fill-93 {
+        animation: fill-93 ease-in-out 3s;
+        transform: rotate(167.4deg);
+    }
+    
+    .mask.full-94,
+    .circle .fill-94 {
+        animation: fill-94 ease-in-out 3s;
+        transform: rotate(169.2deg);
+    }
+    
+    .mask.full-95,
+    .circle .fill-95 {
+        animation: fill-95 ease-in-out 3s;
+        transform: rotate(171deg);
+    }
+    
+    .mask.full-96,
+    .circle .fill-96 {
+        animation: fill-96 ease-in-out 3s;
+        transform: rotate(172.8deg);
+    }
+    
+    .mask.full-97,
+    .circle .fill-97 {
+        animation: fill-97 ease-in-out 3s;
+        transform: rotate(174.6deg);
+    }
+    
+    .mask.full-98,
+    .circle .fill-98 {
+        animation: fill-98 ease-in-out 3s;
+        transform: rotate(176.4deg);
+    }
+    
+    .mask.full-99,
+    .circle .fill-99 {
+        animation: fill-99 ease-in-out 3s;
+        transform: rotate(178.2deg);
+    }
+    
+    .mask.full-100,
+    .circle .fill-100 {
+        animation: fill-100 ease-in-out 3s;
+        transform: rotate(180deg);
+    }
+    
+    @keyframes fill-0 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+    
+    @keyframes fill-1 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(1.8deg);
+        }
+    }
+    
+    @keyframes fill-2 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(3.6deg);
+        }
+    }
+    
+    @keyframes fill-3 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(5.4deg);
+        }
+    }
+    
+    @keyframes fill-4 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(7.2deg);
+        }
+    }
+    
+    @keyframes fill-5 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(9deg);
+        }
+    }
+    
+    @keyframes fill-6 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(10.8);
+        }
+    }
+    
+    @keyframes fill-7 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(12.8);
+        }
+    }
+    
+    @keyframes fill-8 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(14.4deg);
+        }
+    }
+    
+    @keyframes fill-9 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(16.2deg);
+        }
+    }
+    
+    @keyframes fill-10 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(32.4deg);
+        }
+    }
+    
+    @keyframes fill-11 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(19.8deg);
+        }
+    }
+    
+    @keyframes fill-12 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(21.6deg);
+        }
+    }
+    
+    @keyframes fill-13 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(23.4deg);
+        }
+    }
+    
+    @keyframes fill-14 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(25.2deg);
+        }
+    }
+    
+    @keyframes fill-15 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(27deg);
+        }
+    }
+    
+    @keyframes fill-16 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(28.8deg);
+        }
+    }
+    
+    @keyframes fill-17 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(30.6deg);
+        }
+    }
+    
+    @keyframes fill-18 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(32.4deg);
+        }
+    }
+    
+    @keyframes fill-19 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(34.2deg);
+        }
+    }
+    
+    @keyframes fill-20 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(36deg);
+        }
+    }
+    
+    @keyframes fill-21 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(37.8deg);
+        }
+    }
+    
+    @keyframes fill-22 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(39.6deg);
+        }
+    }
+    
+    @keyframes fill-23 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(41.4deg);
+        }
+    }
+    
+    @keyframes fill-24 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(43.2deg);
+        }
+    }
+    
+    @keyframes fill-25 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(45deg);
+        }
+    }
+    
+    @keyframes fill-26 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(47.8deg);
+        }
+    }
+    
+    @keyframes fill-27 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(49.6deg);
+        }
+    }
+    
+    @keyframes fill-28 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(51.4deg);
+        }
+    }
+    
+    @keyframes fill-29 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(53.2deg);
+        }
+    }
+    
+    @keyframes fill-30 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(55deg);
+        }
+    }
+    
+    @keyframes fill-31 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(56.8deg);
+        }
+    }
+    
+    @keyframes fill-32 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(58.6deg);
+        }
+    }
+    
+    @keyframes fill-33 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(60.4deg);
+        }
+    }
+    
+    @keyframes fill-34 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(62.2deg);
+        }
+    }
+    
+    @keyframes fill-35 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(115.2deg);
+        }
+    }
+    
+    @keyframes fill-36 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(65.8deg);
+        }
+    }
+    
+    @keyframes fill-37 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(67.6deg);
+        }
+    }
+    
+    @keyframes fill-38 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(69.4deg);
+        }
+    }
+    
+    @keyframes fill-39 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(70.2deg);
+        }
+    }
+    
+    @keyframes fill-40 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(72deg);
+        }
+    }
+    
+    @keyframes fill-41 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(73.8deg);
+        }
+    }
+    
+    @keyframes fill-42 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(75.6deg);
+        }
+    }
+    
+    @keyframes fill-43 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(77.4deg);
+        }
+    }
+    
+    @keyframes fill-44 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(79.2deg);
+        }
+    }
+    
+    @keyframes fill-45 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(81deg);
+        }
+    }
+    
+    @keyframes fill-46 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(82.8deg);
+        }
+    }
+    
+    @keyframes fill-47 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(84.6deg);
+        }
+    }
+    
+    @keyframes fill-48 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(86.4deg);
+        }
+    }
+    
+    @keyframes fill-49 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(88.2deg);
+        }
+    }
+    
+    @keyframes fill-50 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(90deg);
+        }
+    }
+    
+    @keyframes fill-51 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(91.8deg);
+        }
+    }
+    
+    @keyframes fill-52 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(93.6deg);
+        }
+    }
+    
+    @keyframes fill-53 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(95.4deg);
+        }
+    }
+    
+    @keyframes fill-54 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(97.2deg);
+        }
+    }
+    
+    @keyframes fill-55 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(99deg);
+        }
+    }
+    
+    @keyframes fill-56 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(100.8deg);
+        }
+    }
+    
+    @keyframes fill-57 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(102.6deg);
+        }
+    }
+    
+    @keyframes fill-58 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(104.4deg);
+        }
+    }
+    
+    @keyframes fill-59 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(106.2deg);
+        }
+    }
+    
+    @keyframes fill-60 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(108deg);
+        }
+    }
+    
+    @keyframes fill-61 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(109.8deg);
+        }
+    }
+    
+    @keyframes fill-62 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(111.6deg);
+        }
+    }
+    
+    @keyframes fill-63 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(113.4deg);
+        }
+    }
+    
+    @keyframes fill-64 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(115deg);
+        }
+    }
+    
+    @keyframes fill-65 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(117deg);
+        }
+    }
+    
+    @keyframes fill-66 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(118.8deg);
+        }
+    }
+    
+    @keyframes fill-67 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(120.6deg);
+        }
+    }
+    
+    @keyframes fill-68 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(122.4deg);
+        }
+    }
+    
+    @keyframes fill-69 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(124.2deg);
+        }
+    }
+    
+    @keyframes fill-70 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(126deg);
+        }
+    }
+    
+    @keyframes fill-71 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(127.8deg);
+        }
+    }
+    
+    @keyframes fill-72 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(129.6deg);
+        }
+    }
+    
+    @keyframes fill-73 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(131.4deg);
+        }
+    }
+    
+    @keyframes fill-74 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(133.2deg);
+        }
+    }
+    
+    @keyframes fill-75 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(135deg);
+        }
+    }
+    
+    @keyframes fill-76 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(136.8deg);
+        }
+    }
+    
+    @keyframes fill-77 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(138.6deg);
+        }
+    }
+    
+    @keyframes fill-78 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(140.4deg);
+        }
+    }
+    
+    @keyframes fill-79 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(142.2deg);
+        }
+    }
+    
+    @keyframes fill-80 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(144deg);
+        }
+    }
+    
+    @keyframes fill-81 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(145.8deg);
+        }
+    }
+    
+    @keyframes fill-82 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(147.6deg);
+        }
+    }
+    
+    @keyframes fill-83 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(149.4deg);
+        }
+    }
+    
+    @keyframes fill-84 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(151.2deg);
+        }
+    }
+    
+    @keyframes fill-85 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(153deg);
+        }
+    }
+    
+    @keyframes fill-86 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(154.8deg);
+        }
+    }
+    
+    @keyframes fill-87 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(156.6deg);
+        }
+    }
+    
+    @keyframes fill-88 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(158.4deg);
+        }
+    }
+    
+    @keyframes fill-89 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(160.2deg);
+        }
+    }
+    
+    @keyframes fill-90 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(162deg);
+        }
+    }
+    
+    @keyframes fill-91 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(163.8deg);
+        }
+    }
+    
+    @keyframes fill-92 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(165.6deg);
+        }
+    }
+    
+    @keyframes fill-93 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(167.4deg);
+        }
+    }
+    
+    @keyframes fill-94 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(169.2deg);
+        }
+    }
+    
+    @keyframes fill-95 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(171deg);
+        }
+    }
+    
+    @keyframes fill-96 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(172.8deg);
+        }
+    }
+    
+    @keyframes fill-97 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(174.6deg);
+        }
+    }
+    
+    @keyframes fill-98 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(176.4deg);
+        }
+    }
+    
+    @keyframes fill-99 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(178.2deg);
+        }
+    }
+    
+    @keyframes fill-100 {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(180deg);
+        }
+    }
+    /* fhff */
+    
+    .heat-map {
+        background-color: #fff;
+    }
+    
+    .heat-map-priority {
+        border-right: 4px solid #376092;
+    }
+    
+    .heat-map-priority:first-child {
+        border-right: 50%;
+    }
+    
+    .heat-map-priority-v {
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+    
+    .heat-map-priority-lable {
+        border-right: 4px solid #376092;
+        font-size: 1.5rem;
+        min-height: 190px;
+        display: flex;
+        justify-content: end;
+        align-items: center;
+    }
+    /* .heat-map-priority-lable span {
+        writing-mode: vertical-lr;
+        transform: rotate(-180deg);
+    } */
+    
+    .heat-map-result {
+        min-height: 190px;
+        width: 32%;
+    }
+    
+    .heat-map-last-level {
+        margin-bottom: 4px !important;
+    }
+    
+    .heat-map-result:first-child {
+        margin: 4px 2px 2px 4px;
+    }
+    
+    .heat-map-result:last-child {
+        margin: 4px 2px 2px 4px;
+    }
+    
+    .heat-map-result:nth-child(2) {
+        margin: 4px 2px 2px 2px;
+    }
+    
+    .heat-map-bottom-label {
+        width: 33.33%;
+        border-top: 4px solid #376092;
+        font-size: 1.5rem;
+        min-height: auto;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .heat-map-bottom-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+    }

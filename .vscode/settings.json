@@ -1,0 +1,6 @@
+{
+    "bladeFormatter.format.noPhpSyntaxCheck": false,
+    "bladeFormatter.format.sortTailwindcssClasses": true,
+    "bladeFormatter.format.sortHtmlAttributes": "code-guide",
+    "emmet.triggerExpansionOnTab": true
+}

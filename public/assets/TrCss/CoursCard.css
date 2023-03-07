@@ -1,0 +1,122 @@
+﻿
+.slider {
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    margin: auto;
+    padding: 0; /*20px 0 20px;*/
+}
+
+ 
+ 
+
+    .slide img {
+        object-fit: fill;
+    }
+ 
+
+.cours-card::-webkit-scrollbar-thumb {
+    background: black;
+}
+
+.cours-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cours-card > div {
+    width: 200px;
+    height: 330px;
+    /*   background: #eee;*/
+    margin: 5px 20px 20px 0;
+    border: 1px solid #e7e7e7;
+    display: inline-block;
+    text-align: center;
+}
+
+    .cours-card > div:hover {
+      /*  margin: 12px;*/
+        border: 2px outset #2cbae1;
+    }
+
+    
+
+.Course-info {
+    background-color: transparent;
+    /*color: #ff6a00;*/
+    padding: 0px;
+    text-align: center;
+    display: block;
+    position: relative;
+    /*bottom: 0;*/
+    left: 0;
+    width: 100%;
+    height: 25%;
+    margin: 23px 0 0 0;
+}
+
+    .Course-info .CourseName {
+        font-size: 12px;
+        padding-top: 0px;
+        /*color: black;*/
+    }
+
+    .Course-info .category {
+        font-size: 10px;
+    }
+
+    .Course-info a {
+        color: blue;
+    }
+
+.imgSlide {
+    object-fit: fill;
+    /*object-fit: contain;*/
+    position: relative;
+    margin: 0px;
+    /*top: 0;
+  left: 0;*/
+    width: 100%;
+    height: 50%;
+    display: block;
+}
+
+.avatar {
+    background-color: gray;
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    width: 50px;
+    height: 50px;
+    border: 2px outset #FFF;
+    border-radius: 50%;
+}
+
+.slider > .slide-footer {
+    position: relative;
+    bottom: 10px !important;
+    margin: 0 0 10px 0 !important;
+    /*padding-bottom: 10px !important;*/
+    padding: 0 30px !important;
+}
+
+.slider > a {
+    display: inline-flex;
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(to bottom, #74ABE2, #5563DE);
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+}
+
+    .slider > a:active {
+        top: 1px;
+    }
+
+    .slider > a:focus {
+        background: #000;
+    }
+ 

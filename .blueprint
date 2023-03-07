@@ -1,0 +1,113 @@
+created:
+    - app/Http/Controllers/PartnerShipPlansController.php
+    - app/Http/Controllers/FunctionsController.php
+    - app/Http/Controllers/FunctionPracticeController.php
+    - app/Http/Controllers/PracticeQuestionsController.php
+    - app/Http/Controllers/ClientsController.php
+    - app/Http/Controllers/EmailsController.php
+    - app/Http/Controllers/SurveysController.php
+    - app/Http/Controllers/SurveyAnswersController.php
+    - app/Http/Controllers/PrioritiesAnswersController.php
+    - database/factories/PartnerShipPlansFactory.php
+    - database/factories/FunctionsFactory.php
+    - database/factories/FunctionPracticeFactory.php
+    - database/factories/PracticeQuestionsFactory.php
+    - database/factories/ClientsFactory.php
+    - database/factories/EmailsFactory.php
+    - database/factories/SurveysFactory.php
+    - database/factories/SurveyAnswersFactory.php
+    - database/factories/PrioritiesAnswersFactory.php
+    - database/migrations/2022_10_04_133129_create_partner_ship_plans_table.php
+    - database/migrations/2022_10_04_133130_create_functions_table.php
+    - database/migrations/2022_10_04_133131_create_function_practices_table.php
+    - database/migrations/2022_10_04_133132_create_practice_questions_table.php
+    - database/migrations/2022_10_04_133133_create_clients_table.php
+    - database/migrations/2022_10_04_133134_create_emails_table.php
+    - database/migrations/2022_10_04_133135_create_surveys_table.php
+    - database/migrations/2022_10_04_133136_create_survey_answers_table.php
+    - database/migrations/2022_10_04_133137_create_priorities_answers_table.php
+    - app/Models/PartnerShipPlans.php
+    - app/Models/Functions.php
+    - app/Models/FunctionPractice.php
+    - app/Models/PracticeQuestions.php
+    - app/Models/Clients.php
+    - app/Models/Emails.php
+    - app/Models/Surveys.php
+    - app/Models/SurveyAnswers.php
+    - app/Models/PrioritiesAnswers.php
+    - tests/Feature/Http/Controllers/PartnerShipPlansControllerTest.php
+    - tests/Feature/Http/Controllers/FunctionsControllerTest.php
+    - tests/Feature/Http/Controllers/FunctionPracticeControllerTest.php
+    - tests/Feature/Http/Controllers/PracticeQuestionsControllerTest.php
+    - tests/Feature/Http/Controllers/ClientsControllerTest.php
+    - tests/Feature/Http/Controllers/EmailsControllerTest.php
+    - tests/Feature/Http/Controllers/SurveysControllerTest.php
+    - tests/Feature/Http/Controllers/SurveyAnswersControllerTest.php
+    - tests/Feature/Http/Controllers/PrioritiesAnswersControllerTest.php
+    - app/Http/Requests/PartnerShipPlanStoreRequest.php
+    - app/Http/Requests/PartnerShipPlanUpdateRequest.php
+    - app/Http/Requests/FunctionStoreRequest.php
+    - app/Http/Requests/FunctionUpdateRequest.php
+    - app/Http/Requests/FunctionPracticeStoreRequest.php
+    - app/Http/Requests/FunctionPracticeUpdateRequest.php
+    - app/Http/Requests/PracticeQuestionStoreRequest.php
+    - app/Http/Requests/PracticeQuestionUpdateRequest.php
+    - app/Http/Requests/ClientStoreRequest.php
+    - app/Http/Requests/ClientUpdateRequest.php
+    - app/Http/Requests/EmailStoreRequest.php
+    - app/Http/Requests/EmailUpdateRequest.php
+    - app/Http/Requests/SurveyStoreRequest.php
+    - app/Http/Requests/SurveyUpdateRequest.php
+    - app/Http/Requests/SurveyAnswerStoreRequest.php
+    - app/Http/Requests/SurveyAnswerUpdateRequest.php
+    - app/Http/Requests/PrioritiesAnswerStoreRequest.php
+    - app/Http/Requests/PrioritiesAnswerUpdateRequest.php
+    - resources/views/PartnerShipPlans/index.blade.php
+    - resources/views/PartnerShipPlans/create.blade.php
+    - resources/views/PartnerShipPlans/show.blade.php
+    - resources/views/PartnerShipPlans/edit.blade.php
+    - resources/views/Functions/index.blade.php
+    - resources/views/Functions/create.blade.php
+    - resources/views/Functions/show.blade.php
+    - resources/views/Functions/edit.blade.php
+    - resources/views/FunctionPractice/index.blade.php
+    - resources/views/FunctionPractice/create.blade.php
+    - resources/views/FunctionPractice/show.blade.php
+    - resources/views/FunctionPractice/edit.blade.php
+    - resources/views/PracticeQuestions/index.blade.php
+    - resources/views/PracticeQuestions/create.blade.php
+    - resources/views/PracticeQuestions/show.blade.php
+    - resources/views/PracticeQuestions/edit.blade.php
+    - resources/views/Clients/index.blade.php
+    - resources/views/Clients/create.blade.php
+    - resources/views/Clients/show.blade.php
+    - resources/views/Clients/edit.blade.php
+    - resources/views/Emails/index.blade.php
+    - resources/views/Emails/create.blade.php
+    - resources/views/Emails/show.blade.php
+    - resources/views/Emails/edit.blade.php
+    - resources/views/Surveys/index.blade.php
+    - resources/views/Surveys/create.blade.php
+    - resources/views/Surveys/show.blade.php
+    - resources/views/Surveys/edit.blade.php
+    - resources/views/SurveyAnswers/index.blade.php
+    - resources/views/SurveyAnswers/create.blade.php
+    - resources/views/SurveyAnswers/show.blade.php
+    - resources/views/SurveyAnswers/edit.blade.php
+    - resources/views/PrioritiesAnswers/index.blade.php
+    - resources/views/PrioritiesAnswers/create.blade.php
+    - resources/views/PrioritiesAnswers/show.blade.php
+    - resources/views/PrioritiesAnswers/edit.blade.php
+updated:
+    - routes/web.php
+models:
+    User: { company_id: 'integer nullable', user_type: string, name: string, email: string, email_verified_at: 'datetime nullable', password: string, remember_token: 'string:100 nullable' }
+    PartnerShipPlans: { PlanTitle: string, Objective: text, Process: text, Report: text, DeliveryMode: text, Limitations: text, PlanTitleAr: string, ObjectiveAr: text, ProcessAr: text, ReportAr: text, DeliveryModeAr: text, LimitationsAr: text, Audience: integer, TamplatePath: string, Price: double, PaymentMethod: integer, Status: 'boolean default(1)', relationships: { hasMany: Functions } }
+    Functions: { FunctionTitle: string, FunctionTitleAr: string, PlanId: integer, Respondent: text, Status: 'boolean default(1)', relationships: { belongsTo: PartnerShipPlans, hasMany: FunctionPractice } }
+    FunctionPractice: { PracticeTitle: string, PracticeTitleAr: string, FunctionId: integer, Status: 'boolean default(1)', relationships: { belongsTo: Functions, hasMany: PracticeQuestions } }
+    PracticeQuestions: { Question: string, QuestionAr: string, PracticeId: integer, Respondent: integer, Status: 'boolean default(1)', relationships: { belongsTo: FunctionPractice } }
+    Clients: { ClientName: string, ClientEmail: string, ClientPhone: string, CilentFPName: string, CilentFPEmil: string, CilentFPPhone: string, relationships: { hasMany: 'Surveys, Emails' } }
+    Emails: { ClientId: integer, Email: string, EmployeeType: integer, AddedBy: integer, relationships: { belongsTo: Clients } }
+    Surveys: { ClientId: integer, SurveyTitle: string, SurveyDes: text, SurveyStat: boolean, relationships: { belongsTo: Clients, hasMany: 'SurveyAnswers, PrioritiesAnswers' } }
+    SurveyAnswers: { SurveyId: integer, QuestionId: integer, AnswerValue: integer, AnsweredBy: integer, relationships: { belongsTo: Surveys } }
+    PrioritiesAnswers: { SurveyId: integer, QuestionId: integer, AnswerValue: integer, AnsweredBy: integer, relationships: { belongsTo: Surveys } }
