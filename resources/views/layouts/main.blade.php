@@ -109,6 +109,7 @@
     <script src="{{ asset('assets/Scripts/jquery.blockUI.js') }}"></script>
     @vite(['resources/js/app.js'])
     @stack('styles')
+    @yield('style')
 </head>
 
 <body class="background-white">
