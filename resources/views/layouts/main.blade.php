@@ -120,7 +120,13 @@
         <div class="background-grey-2 padding-tb-5px position-relative">
             <div class="container" style="max-width: 98%">
                 <div class="row">
-                    <div class="col-6 text-white float-start">{{-- العربية --}}</div>
+                    <div class="col-6 text-white float-start">
+                        @if( app()->getLocale()=='en')
+                        <a class="text-white" href="{{ route('lang.swap','ar') }}" style="text-decoration: none">العربية</a>
+                        @else
+                        <a class="text-white" href="{{ route('lang.swap','en') }}" style="text-decoration: none">English</a>
+                        @endif
+                    </div>
                     <div class="col-6 text-white text-end">
                         <div class="row">
                             <div class="col-6"></div>
@@ -163,7 +169,7 @@
                     <div class="col-xl-2 col-lg-2">
                         <a id="logo" href="https://www.hrfactoryapp.com/" class="d-inline-block margin-top-20px">
 
-                            <img src="{{ asset('assets/img/logo-1.png') }}" alt="" height="40">
+                            <img src="{{ asset('assets/img/logo-1.png') }}" alt="" height="">
 
                         </a>
 
@@ -188,11 +194,11 @@
                     <div class="col-xl-4 col-lg-4">
                         <div class="float-lg-right margin-top-0px">
                             <ul id="menu-main" class="float-lg-left nav-menu dropdown-dark">
-                                <li><a href="/">Home</a></li>
+                                <li><a href="/">{{ __('Home') }}</a></li>
                                 @if (Auth()->check())
 
                                 @if (Auth()->user()->user_type == 'admin' ||Auth()->user()->user_type == 'superadmin')
-                                <li><a href="{{ route('partner-ship-plans.index') }}">Control Panel</a> </li>
+                                <li><a href="{{ route('partner-ship-plans.index') }}">{{ __('Control Panel') }}</a> </li>
                                 @endif
                                 @endif
                                 {{-- <li><a href="/TrainingHome#learnOnline">تعلم</a> </li>
@@ -212,25 +218,7 @@
 
 
                     </div>
-                    {{--
-                    <!-- // Social -->
-                    <div class="col-xl-2 col-lg-2 padding-social">
-                        <div class="d-none d-lg-block pull-right model-link">
-                            <ul class="list-inline text-center margin-0px social">
-                                <li class="list-inline-item"><a class="twitter cms" data-contentId="105"
-                                        href="https://twitter.com/HRFactory4"><i class="fab fa-twitter"></i></a></li>
-                                <li class="list-inline-item">
-                                    <a class="youtube cms" data-contentId="106"
-                                        href="https://www.instagram.com/hrfactoryapp/">
-                                        <i class="fab fa-instagram"></i></a>
-                                </li>
-                                <li class="list-inline-item"><a class="linkedin cms" data-contentId="107"
-                                        href="https://www.linkedin.com/company/hr-factory-app">
-                                        <i class="fab fa-linkedin"></i></a></li>
-                            </ul>
 
-                        </div>
-                    </div> --}}
                 </div>
             </div>
         </div>
@@ -254,7 +242,7 @@
                         </div> --}}
                         <div class="col-6 logo margin-bottom-10px text-right">
                             <a id="logo" href="https://www.hrfactoryapp.com/" class="d-inline-block margin-top-20px"><img
-                                    src="{{ asset('assets/img/logo.png') }}" height="50" alt=""></a>
+                                    src="{{ asset('assets/img/logo.png') }}" height="" alt=""></a>
                         </div>
                     </div>
                     <!-- // Social -->

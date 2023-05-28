@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p>Taktuf Clients</p>
+                        <p>Clients</p>
                         @if (count($clients) > 0)
                             <div class="table-responsive">
                                 <table class="table table-hover">

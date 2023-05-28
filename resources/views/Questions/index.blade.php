@@ -78,6 +78,7 @@
                 <?php
                             $practiceQuestion = $practice->practiceQuestions != null ? $practice->practiceQuestions : null;
                             ?>
+                {{-- @if ($practiceQuestion) --}}
                 @if ($user_type == 3)
                 @if ($practiceQuestion->Respondent == 2 ||
                 $practiceQuestion->Respondent == 4 ||
@@ -172,6 +173,7 @@
                 </div>
                 @endif
                 @endif
+                {{-- {{ $practiceQuestion }}<br>-----------<br> --}}
                 @if ($user_type == 1)
                 @if ($practiceQuestion->Respondent == 3 ||
                 $practiceQuestion->Respondent == 5 ||
@@ -219,6 +221,7 @@
                 </div>
                 @endif
                 @endif
+                {{-- @endif --}}
                 @if ($user_type == null)
                 @if ($practiceQuestion->Respondent == 8)
                 <?php $counter++; ?>

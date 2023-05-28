@@ -57,8 +57,14 @@ class EmailsController extends Controller
     public function store(EmailStoreRequest $request)
     {
         // dd( $request->get('ClientId'));
-        $email = Emails::create($request->validated());
-
+        $request->validated();
+        //save new email
+        $email = new Emails();
+        $email->ClientId = $request->get('ClientId');
+        $email->SurveyId = $request->get('SurveyId');
+        $email->Email = $request->get('Email');
+        //department id
+        $email->dep_id = $request->get('dep_id');
         return redirect()->route('clients.show', $request->get('ClientId'));
     }
 
@@ -94,8 +100,14 @@ class EmailsController extends Controller
      */
     public function update(EmailUpdateRequest $request, Emails $email)
     {
-        $email->update($request->validated());
+        $request->validated();
+        //save updated email
 
+        $email->ClientId = $request->get('ClientId');
+        $email->SurveyId = $request->get('SurveyId');
+        $email->Email = $request->get('Email');
+        //department id
+        $email->dep_id = $request->get('dep_id');
         return redirect()->route('clients.show', $email->ClientId);
     }
 

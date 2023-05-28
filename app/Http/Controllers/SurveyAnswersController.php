@@ -195,7 +195,7 @@ class SurveyAnswersController extends Controller
             $hr_practice = array();
             $emp_practice = array();
             foreach ($function->functionPractices as $functionPractice) {
-
+                Log::alert($functionPractice.' === '.$functionPractice->practiceQuestions->id);
                 $answers = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $leaders_email)->sum('AnswerValue');
                 $count = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $leaders_email)->count();
                 $leaders_Pract_w = $count == 0 ? 0 : ($answers / $count) / 6;
@@ -209,7 +209,7 @@ class SurveyAnswersController extends Controller
                 if ($function->id == 8) {
                     Log::alert('===ee');
                     Log::info($SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id));
-                    Log::alert("test:". $functionPractice->practiceQuestions->id);
+                    Log::alert("test:" . $functionPractice->practiceQuestions->id);
                 }
                 $practiceAnsCount = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->count();
                 $practiceWeight = $practiceAnsCount == 0 ? 0 : round((($practiceAns / $practiceAnsCount) / 6), 2);
@@ -270,7 +270,7 @@ class SurveyAnswersController extends Controller
             $emp_performence = round(($emp_total / $counter), 2);
             $total_answers = $prioritiesRes->where('QuestionId', $function->id)->whereIn('AnsweredBy', $leaders_email)->sum('AnswerValue');
             $count_answers = $prioritiesRes->where('QuestionId', $function->id)->whereIn('AnsweredBy', $leaders_email)->count();
-            $priorityVal = round((($total_answers / $count_answers) / 3), 2);
+            $priorityVal = $count_answers==0?0:round((($total_answers / $count_answers) / 3), 2);
             //Log::info("priorityVal: " . $priorityVal);
             $priority = ["priority" => $priorityVal, "function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => $leader_performence];
             array_push($priorities, $priority);
@@ -344,7 +344,7 @@ class SurveyAnswersController extends Controller
             'function_Lables' => $function_Lables,
             'leaders_perform_only' => $leaders_perform_only,
             'hr_perform_only' => $hr_perform_only,
-            "id"=>$id
+            "id" => $id
         ];
         return view('SurveyAnswers.result')->with($data);
     }

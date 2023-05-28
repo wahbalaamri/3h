@@ -102,6 +102,11 @@ Route::get('/service-request/{id}', [App\Http\Controllers\RequestServiceControll
 Route::post('/service-request/store', [App\Http\Controllers\RequestServiceController::class,'store'])->name('service-request.store');
 Route::get('/service-request/create', [App\Http\Controllers\RequestServiceController::class,'create'])->name('service-request.create');
 Route::get('/service-request/add_client/{id}', [App\Http\Controllers\RequestServiceController::class,'addClient'])->name('request-service.add_client')->middleware('auth');
+// route to change language
+Route::get('lang/{locale}', function(){
+    session()->put('locale', request()->locale);
+    return redirect()->back();
+})->name('lang.swap');
 Route::get('/testing/migrate', function () {
     Artisan::call('migrate:fresh');
     $dd_output = Artisan::output();

@@ -105,7 +105,7 @@ class FunctionPracticeController extends Controller
 
         $functions = array();
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/FunctionPractices/getFunctionPractices?FunctionId=$id");
+        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/HFunctionPractices/getFunctionPractices?FunctionId=$id");
         // Set so curl_exec returns the result instead of outputting it.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Get the response and close the channel.

@@ -15,6 +15,8 @@ class CreateEmailsTable extends Migration
     {
         Schema::create('emails', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            //department
+            $table->integer('dep_id');
             $table->integer('ClientId');
             $table->integer('SurveyId');
             $table->string('Email');

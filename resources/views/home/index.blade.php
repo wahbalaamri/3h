@@ -8,10 +8,7 @@
         </div>
         <div class="col-lg-8 col-md-12 col-sm-12 p-0 m-0 text-center justify-content-center align-self-center">
             <h1 class="text-white" style="font-size: 3.4rem">
-                Are you measuring and
-                elevating your Employee
-                Engagement Level in
-                your organization
+                {{__('Are you measuring and elevating your Employee Engagement Level in your organization')}}
             </h1>
             {{-- <span style="font-size: 2.4rem">
                 Maximize your return on people investment
@@ -27,7 +24,7 @@
         <div class="col-12 text-center justify-content-center align-self-center">
             <h1 class="text-start" style="color: #f09e2e;
             font-size: 54px;">
-                Our Methodology:
+                {{ __('Our Methodology:') }}
             </h1>
             {{-- <div class="container">
                 <div class="row">
@@ -93,9 +90,7 @@
                 <div class="col-lg-9 col-md-12 col-sm-12">
                     <div class="col-12">
                         <div class="w-75 m-auto p-3">
-                            <p class="text-start" style="font-size: 24px">For employees to contribute optimally ,
-                                organizations need to
-                                engage the whole person’s;
+                            <p class="text-start" style="font-size: 24px">{{__('For employees to contribute optimally, organizations need to engage the whole person’s;')}}
                             </p>
                         </div>
                     </div>
@@ -135,11 +130,7 @@
                     </div>
                     <div class="col-12">
                         <div class="w-75 m-auto p-3">
-                            <p class="text-start" style="font-size: 24px">Engaging the heart is the center of employee
-                                engagement.
-                                When the heart is engaged, the mind will be stimulated to think.
-                                When the heart and mind are active, the human being must be
-                                enabled to give hand.
+                            <p class="text-start" style="font-size: 24px">{{ __('Engaging the heart is the center of employee engagement. When the heart is engaged, the mind will be stimulated to think. When the heart and mind are active, the human being must be enabled to give hand.') }}
                             </p>
                         </div>
                     </div>
@@ -155,20 +146,15 @@
         <div class="col-12 text-center justify-content-center align-self-center">
             <h1 class="text-start" style="color: #f09e2e;
             font-size: 54px;">
-                Employee Engagement:
+                {{ __('Employee Engagement:') }}
             </h1>
 
         </div>
         <div class="col-12 text-center justify-content-center align-self-center pt-5">
             <div class="row">
                 <div class="col-lg-5 col-md-12 col-sm-12">
-                    <p class="text-start col-9 float-end" style="font-size: 24px">The emotional, mental and
-                        physical connection of employees
-                        to the organization that drives an
-                        extraordinary personal contribution
-                        that achieves a win-win situation
-                        for a better employee happiness
-                        and organizational outcome. </p>
+                    <p class="text-start col-9 float-end" style="font-size: 24px">
+                        {{ __('The emotional, mental and physical connection of employees to the organization that drives an extraordinary personal contribution that achieves a win-win situation for a better employee happiness and organizational outcome.') }} </p>
                 </div>
 
                 <div class="col-lg-4 col-md-12 col-sm-12">
@@ -177,20 +163,20 @@
                 <div class="col-lg-3 col-md-12 col-sm-12">
                     <div class="col-lg-12 text-start">
                         <span style="font-size: 26px">
-                            <b class="text-start">Heart</b><br>
-                            Emotional Connection
+                            <b class="text-start">{{ __('Heart') }}</b><br>
+                            {{ __('Emotional Connection') }}
                         </span>
                     </div>
                     <div class="col-lg-12 text-start">
                         <span style="font-size: 26px">
-                            <b class="text-start">Head</b><br>
-                            Intellectual Stimulation
+                            <b class="text-start">{{ __("Head") }}</b><br>
+                            {{ __('Intellectual Stimulation') }}
                         </span>
                     </div>
                     <div class="col-lg-12 text-start">
                         <span style="font-size: 26px">
-                            <b class="text-start">Hand</b><br>
-                            Enablement
+                            <b class="text-start">{{ __('Hand') }}</b><br>
+                            {{ __('Enablement') }}
                         </span>
                     </div>
 
@@ -211,13 +197,14 @@
                         <img src="{{ asset('assets/img/nabahan.webp') }}" alt="" srcset="" height="" style="">
                         <div class="row text-start">
                             <p>
-                                <span style="font-size: 36px; font-style: italic">Contact :
+                                <span style="font-size: 36px; font-style: italic">{{ __('Contact :') }}
                                 </span><br>
                                 <span
-                                    style="font-size: 36px;font-style: italic; font-weight: bold; color:#f09e2e; margin: 0; padding: 0;">Nabahan
-                                    Al Kharusi</span>
+                                    style="font-size: 36px;font-style: italic; font-weight: bold; color:#f09e2e; margin: 0; padding: 0;">
+                                    {{ __('Nabahan Al Kharusi') }}
+                                </span>
                                 <br>
-                                <span style="font-size: 26px; font-style: italic">Employee EngagementExpert
+                                <span style="font-size: 26px; font-style: italic">{{ __('Employee EngagementExpert') }}
                                 </span><br>
                                 <span style="font-size: 23px; font-weight: 500">
                                     <i class="fa fa-phone"></i>
@@ -229,11 +216,12 @@
                                 </span><br>
                                 <hr class="w-75">
                                 <span style="font-size: 21px;">
-                                    Or Clients Happiness Champion:
+                                    {{ __('Or Clients Happiness Champion:') }}
                                 </span><br>
                                 <span
-                                    style="font-size: 26px;font-style: italic; font-weight: bold; color:#f09e2e; margin: 0; padding: 0;">Muath
-                                    Al Musalmi </span>
+                                    style="font-size: 26px;font-style: italic; font-weight: bold; color:#f09e2e; margin: 0; padding: 0;">
+                                    {{ __('Muath Al Musalmi') }}
+                                </span>
                                 <br>
                                 <span style="font-size: 23px; font-weight: 500">
                                     <i class="fa fa-phone"></i>
@@ -268,7 +256,7 @@
                     <div class="row">
                         <h1 class="text-start" style="color: #f09e2e;
                         font-size: 50px; font-weight: bold; font-style: italic">
-                            Employee Engagement:
+                            {{ __('Employee Engagement:') }}
                         </h1>
                     </div>
                     <div class="row pt-5">
@@ -279,8 +267,8 @@
                             <img src="{{ asset('assets/img/heart.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>Heart</b></h1>
-                            <p style="font-size: 20px">80% Emotional Connection
+                            <h1 style="font-size: 21px"><b>{{ __('Heart') }}</b></h1>
+                            <p style="font-size: 20px">{{ __('80% Emotional Connection') }}
                             </p>
                         </div>
                     </div>
@@ -292,8 +280,8 @@
                             <img src="{{ asset('assets/img/Head.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>Head</b></h1>
-                            <p style="font-size: 20px">55% Intellectual Stimulation</p>
+                            <h1 style="font-size: 21px"><b>{{ __('Head') }}</b></h1>
+                            <p style="font-size: 20px">{{ __('55% Intellectual Stimulation') }}</p>
                         </div>
                     </div>
                     <div class="row pt-5">
@@ -304,15 +292,15 @@
                             <img src="{{ asset('assets/img/Hand.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>Hand</b></h1>
-                            <p style="font-size: 20px">33% Enablement</p>
+                            <h1 style="font-size: 21px"><b>{{ __('Hand') }}</b></h1>
+                            <p style="font-size: 20px">{{ __('33% Enablement') }}</p>
                         </div>
                     </div>
                     <div class="row pt-5 text-start">
                         <p>
-                            <span style="font-size: 19px; font-weight: bold">Employee Net Promotor Score (eNPS)
+                            <span style="font-size: 19px; font-weight: bold">{{ __('Employee Net Promotor Score (eNPS)') }}
                             </span><br>
-                            <span style="font-size: 17px; ">How likely to recommend XXX as a good place to work?
+                            <span style="font-size: 17px; ">{{ __('How likely to recommend XXX as a good place to work?') }}
                             </span><br>
                         </p>
 

@@ -121,7 +121,7 @@ class PartnerShipPlansController extends Controller
     {
         $plans = array();
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/PlansToPartnerShips/getPlans?PartnerID=2");
+        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/HPlansToPartnerShips/getPlans?PartnerID=1");
         // Set so curl_exec returns the result instead of outputting it.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Get the response and close the channel.
@@ -195,7 +195,7 @@ class PartnerShipPlansController extends Controller
         Log::info('GetRemotFunctions' . $id);
         $functions = array();
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/Functions/getFunctions?planID=$id");
+        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/HFunctions/getFunctions?planID=$id");
         // Set so curl_exec returns the result instead of outputting it.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Get the response and close the channel.
@@ -226,7 +226,7 @@ class PartnerShipPlansController extends Controller
 
         $functions = array();
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/FunctionPractices/getFunctionPractices?FunctionId=$id");
+        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/HFunctionPractices/getFunctionPractices?FunctionId=$id");
         // Set so curl_exec returns the result instead of outputting it.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Get the response and close the channel.
@@ -256,7 +256,7 @@ class PartnerShipPlansController extends Controller
     {
         $Questions = array();
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/PracticeQuestions/GetPracticeQuestions?practiceId=$id");
+        curl_setopt($ch, CURLOPT_URL, "https://www.hrfactoryapp.com/Admin/HPracticeQuestions/GetPracticeQuestions?practiceId=$id");
         // Set so curl_exec returns the result instead of outputting it.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Get the response and close the channel.

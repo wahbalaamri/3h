@@ -13,48 +13,29 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-10" id="finalResult">
-            <div id="Function" class="card" style="font-family: emoji;letter-spacing: 0.065rem;">
-                <div class="card-header">
-                    <h3 class="card-title">Results</h3>
-                </div>
-                <div class="card-body text-capitalize">
-
-                    <div class="col-{{ count($functions) }} text-start h3 text-white p-3" style="background-color: #376092;border-radius: 45px 45px 45px 45px;width: 89%; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                        box-shadow: 5px 5px 20px 5px #ABABAB;">Key functions
-                    </div>
-                    <div class="row  padding-left-10px">
-                        @foreach ($functions as $function )
-                        <div class="text-center text-white m-1" style="background-color: #376092; width:10.5%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                        box-shadow: 5px 5px 20px 5px #ABABAB; font-size: 0.79rem">
-                            {{ $function->FunctionTitle }}
+            {{-- <div class="card">
+                {{-- card header --}}
+                {{-- <div class="card-header bg-white text-warning">
+                    <h4>Dashboard-Organizational Wide</h4>
+                </div> --}}
+                {{-- card body --}}
+                {{-- <div class="card-body"> --}}
+                    {{-- titles --}}
+                    {{-- <div class="row">
+                        {{-- text in div bigger and bold --}}
+                        {{-- <div
+                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
+                            <h4>Employee Engagement Index</h4>
                         </div>
-                        @endforeach
-                    </div>
-                    <div class="row" style="width: 100%">
-                        @foreach ($functions as $function )
-                        <?php $firstofFirstLoop= $loop->first ; ?>
-                        <div class="col-1 m-1 justify-content-center" style="width: 10.5%; font-size: 0.79rem">
-                            @foreach( $overall_Practices as $overall_Practice)
-                            @if ( $overall_Practice['function_id'] == $function->id)
-                            <div class="text-center @if(!$loop->first) mt-1 @endif @if($firstofFirstLoop) pl-1 pr-1 pb-1 @else p-2 m-1 @endif @if($overall_Practice['weight']<=0.6) bg-danger text-white @elseif (($overall_Practice['weight']>0.6)&&($overall_Practice['weight']<=0.8)) bg-warning text-black @else bg-success text-white @endif"
-                                style=" width:125%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                                box-shadow: 5px 5px 20px 5px #ABABAB;">
-                                {{ $overall_Practice['name'] }} {{-- {{ $overall_Practice['weight'] }} --}}
-                            </div>
-                            @endif
-                            @endforeach
+                        <div
+                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
+                            <h4>Employee Engagement Drivers</h4>
                         </div>
-                        @endforeach
+                        <div
+                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
+                            <h4>Employee Net Promotor Score (eNPS)</h4>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <button id="FunctionDownload" onclick="downloadResult('Function','Function')"
-                class="btn btn-success mt-1">Download Function</button>
-            <div id="key" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
-                <div class="card-header">
-                    <h3 class="card-title">Dashboard</h3>
-                </div>
-                <div class="card-body">
                     <div class="row">
                         <div class="col-3 m-1 rounded text-center h3 p-3"
                             style="background-color: #DCE6F2 ; color:#376092 !important;">Overall Performance
@@ -71,6 +52,117 @@
                                         </div>
                                         <div class="inside-circle"> {{ $overallResult }}%<p>Performance score</p>
                                         </div>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            {{-- create legands --}}
+                            {{-- <div class="row mt-5">
+                                <div class="col-2">
+                                    <div class="row">}}
+                                        {{-- bootstrap progress --}}
+                              {{--      </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <div class="circle-legend bg-warning"></div>
+                                        </div>
+                                        <div class="col-10">
+                                            <p class="text-warning">Average</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <div class="circle-legend bg-success"></div>
+                                        </div>
+                                        <div class="col-10">
+                                            <p class="text-success">Good</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
+            <div id="Function" class="card" style="font-family: emoji;letter-spacing: 0.065rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Results</h3>
+                </div>
+                <div class="card-body text-capitalize">
+
+                    <div class="col-{{ count($functions) }} text-start h3 text-white p-3" style="background-color: #376092;border-radius: 45px 45px 45px 45px;width: 89%; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
+                        box-shadow: 5px 5px 20px 5px #ABABAB;">Engagement Drivers
+                    </div>
+                    <div class="row  padding-left-10px">
+                        @foreach ($functions as $function )
+                        <div class="text-center text-white m-1 p-2" style="background-color: #376092; width:21%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
+                        box-shadow: 5px 5px 20px 5px #ABABAB; font-size: 0.79rem">
+                            {{ $function->FunctionTitle }}<br>
+                            @switch( $function->FunctionTitle )
+                            @case('Head')
+                            (Intellectual Stimulation)
+                            @break
+                            @case('Heart')
+                            (Emotional Connection)
+                            @break
+                            @case('Hand')
+                            (Enablement)
+                            @break
+                            @default
+
+                            @endswitch
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="row" style="width: 100%">
+                        @foreach ($functions as $function )
+                        <?php $firstofFirstLoop= $loop->first ; ?>
+                        <div class="col-1 m-1 justify-content-center" style="width: 21%; font-size: 0.79rem">
+                            @foreach( $overall_Practices as $overall_Practice)
+                            @if ( $overall_Practice['function_id'] == $function->id)
+                            <div class="text-center @if(!$loop->first) mt-1 pb-2 pt-2 @endif @if($firstofFirstLoop) pl-1 pr-1 pb-2 pt-2 @else p-2 m-1 @endif @if($overall_Practice['weight']<=0.6) bg-danger text-white @elseif (($overall_Practice['weight']>0.6)&&($overall_Practice['weight']<=0.8)) bg-warning text-black @else bg-success text-white @endif"
+                                style=" width:100%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
+                                box-shadow: 5px 5px 20px 5px #ABABAB;">
+
+                                {{ $overall_Practice['name'] }} {{-- {{ $overall_Practice['weight']
+                                }} --}}
+                            </div>
+                            @endif
+                            @endforeach
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="row"></div>
+                </div>
+            </div>
+            <button id="FunctionDownload" onclick="downloadResult('Function','Function')"
+                class="btn btn-success mt-1">Download Function</button>
+            <div id="key" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Dashboard</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3 m-1 rounded text-center h3 p-3"
+                            style="background-color: #DCE6F2 ; color:#376092 !important;">Overall
+                            Performance
+                            <div class="mt-5">
+                                <div class="circle-wrap">
+                                    <div class="circle">
+
+                                        <div class="mask half">
+                                            <div class="fill-{{ $overallResult }}"></div>
+                                        </div>
+
+                                        <div class="mask full-{{ $overallResult }}">
+                                            <div class="fill-{{ $overallResult }}"></div>
+                                        </div>
+                                        <div class="inside-circle"> {{ $overallResult }}%<p>
+                                                Performance score</p>
+                                        </div>
 
 
                                     </div>
@@ -81,9 +173,10 @@
                             </div>
                         </div>
                         <div class="col-4 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Key improvement areas
+                            style="background-color: #DCE6F2 ; color:#376092 !important;">Key
+                            improvement areas
 
-                            @for ($i=0; $i<5; $i++) <div class="mt-5 text-start">
+                            @for ($i=0; $i<3; $i++) <div class="mt-5 text-start">
                                 <span class="h5"> {{ $asc_perform[$i]['function'] }}</span>
 
                                 <div class="progress" style="height: 31px">
@@ -92,7 +185,16 @@
                                         role="progressbar"
                                         style="width: {{ $asc_perform[$i]['performance']  }}%; font-size: 1rem"
                                         aria-valuenow="{{ $asc_perform[$i]['performance']  }}" aria-valuemin="0"
-                                        aria-valuemax="100">{{ $asc_perform[$i]['performance'] }}%
+                                        aria-valuemax="100">{{
+                                        $asc_perform[$i]['performance'] }}%
+                                    </div>
+                                </div>
+                                <div class="" style="width: auto;height: {{ $i==2?178:81 }}px;">
+                                    <div style="position: relative; width: 80%; height: 80%;top: 23%;left: 25%;">
+                                        <img src="{{ asset('assets/img/mainindicator.webp') }}"
+                                            style="position: absolute; top: 0; left: 0; z-index: 1;">
+                                        <img src="{{ asset('assets/img/mainindicator1.webp') }}"
+                                            style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate({{ (($asc_perform[$i]['performance'] )/100)*180}}deg);">
                                     </div>
                                 </div>
                         </div>
@@ -111,16 +213,30 @@
                                     role="progressbar"
                                     style="width: {{ $asc_perform[$i]['performance']  }}%; font-size: 1rem"
                                     aria-valuenow="{{ $asc_perform[$i]['performance']  }}" aria-valuemin="0"
-                                    aria-valuemax="100">{{ $asc_perform[$i]['performance'] }}%</div>
+                                    aria-valuemax="100">{{
+                                    $asc_perform[$i]['performance'] }}%</div>
+                            </div>
+                            <div style="position: relative; width: 80%; height: 80%">
+                                <img src="{{ asset('assets/img/mainindicator.webp') }}"
+                                    style="position: absolute; top: 0; left: 0; z-index: 1;">
+                                <img src="{{ asset('assets/img/mainindicator1.webp') }}"
+                                    style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate({{ (($asc_perform[$i]['performance'] )/100)*180}}deg);">
                             </div>
                             @endif
                         </div>
                         @endfor
+                        {{-- <div style="position: relative; width: 80%; height: 80%">
+                            <img src="{{ asset('assets/img/mainindicator.webp') }}"
+                                style="position: absolute; top: 0; left: 0; z-index: 1;">
+                            <img src="{{ asset('assets/img/mainindicator1.webp') }}"
+                                style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate(0deg);">
+                        </div> --}}
                     </div>
                 </div>
             </div>
             <div class="card-footer">
-                <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b> Low:</b></span>
+                <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
+                        Low:</b></span>
                 <=60% – <span class="legend-levels"><b>Medium:</b></span> > 60% to 80% – <span
                         class="legend-levels"><b>High:</b></span> >80%
 
@@ -136,7 +252,8 @@
             <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
                 <div class="row text-center">
                     <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">Leadership</b> view average scores
+                        People management performance – <b style="font-size: 1.5rem">Leadership</b>
+                        view average scores
                         by people functions
                     </div>
                 </div>
@@ -168,7 +285,8 @@
             <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
                 <div class="row text-center">
                     <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">HR Team</b> view Average scores by
+                        People management performance – <b style="font-size: 1.5rem">HR Team</b>
+                        view Average scores by
                         people functions
                     </div>
                 </div>
@@ -256,7 +374,8 @@
             <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
                 <div class="row text-center">
                     <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">Employee</b> view Average scores by
+                        People management performance – <b style="font-size: 1.5rem">Employee</b>
+                        view Average scores by
                         people functions
                     </div>
                 </div>
@@ -280,7 +399,8 @@
             </div>
         </div>
         <button id="averagesDownload" class="btn btn-success mt-1"
-            onclick="downloadResult('Empaverages','Employee_View_Average')">Download averages</button>
+            onclick="downloadResult('Empaverages','Employee_View_Average')">Download
+            averages</button>
 
         <div id="heatmap" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
             <div class="card-header">
@@ -290,12 +410,14 @@
             <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
                 <div class="row text-center">
                     <div class="m-1 rounded text-center h5 p-3 text-danger" style="font-size: 1.7rem">
-                        High level heat map – Leadership view Priorities vs Performance in key People management
+                        High level heat map – Leadership view Priorities vs Performance in key
+                        People management
                         functions
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-3 text-center heat-map heat-map-priority heat-map-priority-v">Priority by
+                    <div class="col-3 text-center heat-map heat-map-priority heat-map-priority-v">
+                        Priority by
                         leaders</div>
                     <div class="col-9 heat-map"></div>
 
@@ -328,7 +450,8 @@
                             <ul>
                                 @foreach ($priorities as $pri)
                                 @if ($pri['priority'] >= 0.8 && $pri['priority'] <= 1) @if ($pri['performance'] <=0.6)
-                                    <li class="text-white">{{ $pri['function'] }}
+                                    <li class="text-white">{{
+                                    $pri['function'] }}
                                     </li>
                                     @endif
                                     @endif
@@ -338,8 +461,10 @@
                             <ul>
 
                                 @foreach ($priorities as $pri)
-                                @if ($pri['priority'] >= 0.8 && $pri['priority'] <= 1) @if ($pri['performance']> 0.6
-                                    && $pri['performance'] <= 0.8) <li class="text-white">{{ $pri['function'] }}
+                                @if ($pri['priority'] >= 0.8 && $pri['priority'] <= 1) @if ($pri['performance']>
+                                    0.6
+                                    && $pri['performance'] <= 0.8) <li class="text-white">{{
+                                        $pri['function'] }}
                                         </li>
                                         @endif
                                         @endif
@@ -352,7 +477,8 @@
                                 @foreach ($priorities as $pri)
                                 ffff
                                 @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance'] <=0.6) <li
-                                    class="text-white">{{ $pri['function'] }}</li>
+                                    class="text-white">{{
+                                    $pri['function'] }}</li>
                                     @endif
                                     @endif
                                     @endforeach
@@ -364,7 +490,8 @@
 
                                 @foreach ($priorities as $pri)
                                 @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance'] <=0.6) <li
-                                    class="text-white">{{ $pri['function'] }}</li>
+                                    class="text-white">{{
+                                    $pri['function'] }}</li>
                                     @endif
                                     @endif
                                     @endforeach
@@ -382,8 +509,10 @@
                         <ul>
 
                             @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance']> 0.6 &&
-                                $pri['performance'] <= 0.8) <li class="text-black">{{ $pri['function'] }}</li>
+                            @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance']>
+                                0.6 &&
+                                $pri['performance'] <= 0.8) <li class="text-black">{{
+                                    $pri['function'] }}</li>
                                     @endif
                                     @endif
                                     @endforeach
@@ -405,8 +534,9 @@
                         <ul>
 
                             @foreach ($priorities as $pri)
-                            @if ($pri['priority'] <=0.6) @if ($pri['performance']> 0.6 && $pri['performance'] <= 0.8)
-                                    <li class="text-black">{{ $pri['function'] }}</li>
+                            @if ($pri['priority'] <=0.6) @if ($pri['performance']> 0.6 &&
+                                $pri['performance'] <= 0.8) <li class="text-black">{{
+                                    $pri['function'] }}</li>
                                     @endif
                                     @endif
                                     @endforeach
@@ -424,7 +554,8 @@
                         <ul>
 
                             @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.8 && $pri['priority'] <= 1) @if ($pri['performance']> 0.8)
+                            @if ($pri['priority'] >0.8 && $pri['priority'] <= 1) @if ($pri['performance']>
+                                0.8)
                                 <li class="text-white">{{ $pri['function'] }}</li>
                                 @endif
                                 @endif
@@ -437,7 +568,8 @@
                         <ul>
 
                             @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.6 && $pri['priority'] < 0.8) @if ($pri['performance']> 0.8)
+                            @if ($pri['priority'] >0.6 && $pri['priority'] < 0.8) @if ($pri['performance']>
+                                0.8)
                                 <li class="text-white">{{ $pri['function'] }}
                                 </li>
                                 @endif
@@ -489,7 +621,8 @@
     </div>
     {{-- card footer --}}
     <div class="card-footer">
-        <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b> Low:</b></span>
+        <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
+                Low:</b></span>
         <=60% – <span class="legend-levels"><b>Medium:</b></span> > 60% to 80% – <span
                 class="legend-levels"><b>High:</b></span> >80%
 
@@ -568,7 +701,8 @@
             <div class="m-1 @if($perfomr['performance']<=60) bg-danger text-white @elseif($perfomr['performance']>80) bg-success text-white @else bg-warning @endif"
                 style="width: 10.4% !important; font-size: 0.8rem border-radius: 10px;
                 ">
-                @if($perfomr['performance']<=60) Critical to improve @elseif($perfomr['performance']>80) No Improvement
+                @if($perfomr['performance']<=60) Critical to improve @elseif($perfomr['performance']>80) No
+                    Improvement
                     Needed
                     @else Need to improve
                     @endif
@@ -655,8 +789,8 @@
     text-align: center;
     height: 2rem;
     font-size: 1rem;">
-                    @if( $pro['priority']<=0.6) Low @elseif($pro['priority']>0.6 && $pro['priority']<=0.8) Medium @else
-                            High @endif </div>
+                    @if( $pro['priority']<=0.6) Low @elseif($pro['priority']>0.6 && $pro['priority']
+                        <=0.8) Medium @else High @endif </div>
 
                             @break
                             @endif
@@ -699,10 +833,12 @@
             </div>
         </div>
         <div class="card-footer">
-            <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b> Leadership:</b></span>
-            <img src="{{ asset('assets/img/icon/LeadersIcon.png') }}" height="20" width="25" alt=""> – <span
-                class="legend-levels"><b>HR Team:</b></span> <img src="{{ asset('assets/img/icon/HRIcon.png') }}"
-                height="20" width="25" alt=""> – <span class="legend-levels"><b>Employee:</b></span> <img
+            <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
+                    Leadership:</b></span>
+            <img src="{{ asset('assets/img/icon/LeadersIcon.png') }}" height="20" width="25" alt="">
+            – <span class="legend-levels"><b>HR Team:</b></span> <img src="{{ asset('assets/img/icon/HRIcon.png') }}"
+                height="20" width="25" alt=""> –
+            <span class="legend-levels"><b>Employee:</b></span> <img
                 src="{{ asset('assets/img/icon/EmployeIcon.png') }}" height="20" width="25" alt="">
 
         </div>
