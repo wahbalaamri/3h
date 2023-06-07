@@ -130,6 +130,18 @@ class ModelLexer implements Lexer
     {
         $model = new Model($name);
 
+        if (isset($columns['meta']) && is_array($columns['meta'])) {
+            if (isset($columns['meta']['table'])) {
+                $model->setTableName($columns['meta']['table']);
+            }
+
+            if (!empty($columns['meta']['pivot'])) {
+                $model->setPivot();
+            }
+
+            unset($columns['meta']);
+        }
+
         if (isset($columns['id'])) {
             if ($columns['id'] === false) {
                 $model->disablePrimaryKey();
@@ -150,8 +162,10 @@ class ModelLexer implements Lexer
 
         if (isset($columns['softdeletes'])) {
             $model->enableSoftDeletes();
+            unset($columns['softdeletes']);
         } elseif (isset($columns['softdeletestz'])) {
             $model->enableSoftDeletes(true);
+            unset($columns['softdeletestz']);
         }
 
         if (isset($columns['relationships'])) {

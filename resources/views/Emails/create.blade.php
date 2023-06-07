@@ -27,7 +27,7 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="SurveyId">Survey ID</label>
                                     <select name="SurveyId" id="SurveyId"
@@ -45,7 +45,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="ClientId">Client ID</label>
                                     <select name="ClientId" id="ClientId"
@@ -59,11 +59,61 @@
                                     </select>
                                 </div>
                             </div>
+                            {{-- select sector --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="SectorId">{{ __('Sector') }}</label>
+                                    <select name="SectorId" id="SectorId"
+                                        class="form-control @error('SectorId') is-invalid @enderror">
+                                        <option value="">{{ __('Select Sector') }}</option>
+                                        @foreach ($sectors as $sector)
+                                        <option value="{{ $sector->id }}" @if (old('SectorId')==$sector->id) selected
+                                            @endif>
+                                            {{ app()->getLocale()=='ar'? $sector->sector_name_ar:$sector->sector_name_en
+                                            }}</option>
+                                        @endforeach
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('SectorId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- select company --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="CompanyId">{{ __('Company') }}</label>
+                                    <select name="CompanyId" id="CompanyId"
+                                        class="form-control @error('CompanyId') is-invalid @enderror">
+                                        <option value="">{{ __('Select Company') }}</option>
+
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('CompanyId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- select department --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="DepartmentId">{{ __('Department') }}</label>
+                                    <select name="DepartmentId" id="DepartmentId"
+                                        class="form-control @error('DepartmentId') is-invalid @enderror">
+                                        <option value="">{{ __('Select Department') }}</option>
+
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('DepartmentId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                         {{-- insert email details --}}
                         <div class="row">
                             {{-- employee email --}}
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="Email">Email</label>
                                     <input type="text" name="Email" id="Email"
@@ -76,7 +126,7 @@
                                 </div>
                             </div>
                             {{-- employee type --}}
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="EmployeeType">Employee Type</label>
                                     <select name="EmployeeType" id="EmployeeType"
@@ -117,7 +167,7 @@
                         id="uploadForm" class="d-inline">
                         @csrf
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="SurveyIdU">Survey ID</label>
                                     <select name="SurveyIdU" id="SurveyIdU"
@@ -135,7 +185,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="ClientIdU">Client ID</label>
                                     <select name="ClientIdU" id="ClientIdU"
@@ -180,7 +230,7 @@
                     <form action="{{ route('emails.copy') }}" method="POST" class="d-inline" id="CopyFrom">
                         @csrf
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="SurveyIdC">Old Survey</label>
                                     <select name="SurveyIdC" id="SurveyIdC"
@@ -200,7 +250,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="ClientIdC">Client ID</label>
                                     <select name="ClientIdC" id="ClientIdC"
@@ -216,7 +266,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="NewSurveyIdC">New Survey</label>
                                     <select name="NewSurveyIdC" id="NewSurveyIdC"
@@ -267,5 +317,51 @@
         $("#SurveyIdU").attr('disabled', false);
         $("#ClientIdU").attr('disabled', false);
     })
+    // on sector select update company select
+    $('#SectorId').change(function(){
+        var SectorId = $(this).val();
+        if(SectorId){
+            $.ajax({
+                type:"GET",
+                url:"{{ url('companies/getForSelect') }}/"+SectorId,
+                success:function(res){
+                    if(res){
+                        $("#CompanyId").empty();
+                        $("#CompanyId").append('<option value="">{{ __("Select Company") }}</option>');
+                        $.each(res,function(key,value){
+                            $("#CompanyId").append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
+                        });
+                    }else{
+                        $("#CompanyId").empty();
+                    }
+                }
+            });
+        }else{
+            $("#CompanyId").empty();
+        }
+    });
+    // on Company select update department select
+    $('#CompanyId').change(function(){
+        var CompanyId = $(this).val();
+        if(CompanyId){
+            $.ajax({
+                type:"GET",
+                url:"{{ url('departments/getForSelect') }}/"+CompanyId,
+                success:function(res){
+                    if(res){
+                        $("#DepartmentId").empty();
+                        $("#DepartmentId").append('<option value="">{{ __("Select Department") }}</option>');
+                        $.each(res,function(key,value){
+                            $("#DepartmentId").append('<option value="'+value.id+'">'+value.dep_name_en+'</option>');
+                        });
+                    }else{
+                        $("#DepartmentId").empty();
+                    }
+                }
+            });
+        }else{
+            $("#DepartmentId").empty();
+        }
+    });
 </script>
 @endsection

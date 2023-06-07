@@ -30,9 +30,13 @@ class TestGenerator extends AbstractClassGenerator implements Generator
     use HandlesImports, HandlesTraits;
 
     const TESTS_VIEW = 1;
+
     const TESTS_REDIRECT = 2;
+
     const TESTS_SAVE = 4;
+
     const TESTS_DELETE = 8;
+
     const TESTS_RESPONDS = 16;
 
     protected $stubs = [];
@@ -59,6 +63,7 @@ class TestGenerator extends AbstractClassGenerator implements Generator
     protected function getPath(BlueprintModel $model)
     {
         $path = str_replace('\\', '/', Blueprint::relativeNamespace($model->fullyQualifiedClassName()));
+
         return 'tests/Feature/' . $path . 'Test.php';
     }
 
@@ -102,6 +107,8 @@ class TestGenerator extends AbstractClassGenerator implements Generator
                 : config('blueprint.namespace');
 
             if (in_array($name, ['edit', 'update', 'show', 'destroy'])) {
+                $this->addImport($controller, $modelNamespace . '\\' . $model);
+
                 $setup['data'][] = sprintf('$%s = %s::factory()->create();', $variable, $model);
             }
 
@@ -125,7 +132,7 @@ class TestGenerator extends AbstractClassGenerator implements Generator
                             $assertion .= ', function ($notification)';
 
                             foreach ($statement->data() as $data) {
-                                if (Str::studly(Str::singular($data)) === $context || ! Str::contains($data, '.')) {
+                                if (Str::studly(Str::singular($data)) === $context || !Str::contains($data, '.')) {
                                     $variables[] .= '$' . $data;
                                     $conditions[] .= sprintf('$notification->%s->is($%s)', $data, $data);
                                 } else {
@@ -166,7 +173,7 @@ class TestGenerator extends AbstractClassGenerator implements Generator
                             }
 
                             foreach ($statement->data() as $data) {
-                                if (Str::studly(Str::singular($data)) === $context || ! Str::contains($data, '.')) {
+                                if (Str::studly(Str::singular($data)) === $context || !Str::contains($data, '.')) {
                                     $variables[] .= '$' . $data;
                                     $conditions[] .= sprintf('$mail->%s->is($%s)', $data, $data);
                                 } else {
@@ -262,7 +269,7 @@ class TestGenerator extends AbstractClassGenerator implements Generator
                         $assertion .= ', function ($job)';
 
                         foreach ($statement->data() as $data) {
-                            if (Str::studly(Str::singular($data)) === $context || ! Str::contains($data, '.')) {
+                            if (Str::studly(Str::singular($data)) === $context || !Str::contains($data, '.')) {
                                 $variables[] .= '$' . $data;
                                 $conditions[] .= sprintf('$job->%s->is($%s)', $data, $data);
                             } else {
@@ -305,7 +312,7 @@ class TestGenerator extends AbstractClassGenerator implements Generator
                         $assertion .= ', function ($event)';
 
                         foreach ($statement->data() as $data) {
-                            if (Str::studly(Str::singular($data)) === $context || ! Str::contains($data, '.')) {
+                            if (Str::studly(Str::singular($data)) === $context || !Str::contains($data, '.')) {
                                 $variables[] .= '$' . $data;
                                 $conditions[] .= sprintf('$event->%s->is($%s)', $data, $data);
                             } else {

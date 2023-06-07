@@ -9,11 +9,19 @@ class Departments extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'dep_name',
+        'dep_name_en',
+        'dep_name_ar',
         'parent_id',
     ];
+    //fillable
+
     public function emails()
     {
         return $this->hasMany(Emails::class, 'DepartmentId');
+    }
+    // belongs to Comapnies
+    public function companies()
+    {
+        return $this->belongsTo(Companies::class,'company_id');
     }
 }

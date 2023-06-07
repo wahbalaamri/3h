@@ -13,7 +13,7 @@ class StoreCompaniesRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->user()->user_type=='superadmin';
     }
 
     /**

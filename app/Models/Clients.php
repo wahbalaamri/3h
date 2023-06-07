@@ -46,4 +46,9 @@ class Clients extends Model
     {
         return $this->belongsTo(EmailContent::class);
     }
+    //has many sectors
+    public function sectors()
+    {
+        return $this->hasMany(Sectors::class,'client_id');
+    }
 }

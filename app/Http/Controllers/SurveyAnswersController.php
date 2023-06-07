@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SurveyAnswerStoreRequest;
 use App\Http\Requests\SurveyAnswerUpdateRequest;
+use App\Models\Companies;
+use App\Models\Departments;
 use App\Models\Emails;
 use App\Models\freeSurveyAnswers;
+use App\Models\FunctionPractice;
 use App\Models\Functions;
 use App\Models\PartnerShipPlans;
+use App\Models\PracticeQuestions;
 use App\Models\PrioritiesAnswers;
 use App\Models\SurveyAnswers;
 use App\Models\Surveys;
@@ -102,41 +106,33 @@ class SurveyAnswersController extends Controller
     public function result($id)
     {
         $surveyEmails = Emails::where('SurveyId', $id)->get();
-        $leaders_email = array();
-        $hr_teames_email = array();
-        $employees_email = array();
-        foreach ($surveyEmails as $surveyEmail) {
-            if ($surveyEmail->EmployeeType == 1) {
-                array_push($leaders_email, $surveyEmail->id);
-            }
-            if ($surveyEmail->EmployeeType == 2) {
-                array_push($hr_teames_email, $surveyEmail->id);
-            }
-            if ($surveyEmail->EmployeeType == 3) {
-                array_push($employees_email, $surveyEmail->id);
-            }
-        }
-        $leaders_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $leaders_email)->get();
-        $hr_teames_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $hr_teames_email)->get();
-        $employees_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $employees_email)->get();
-        $Answers_by_leaders = collect($leaders_answers)->unique('AnsweredBy')->count();
-        $Answers_by_hr = collect($hr_teames_answers)->unique('AnsweredBy')->count();
-        $Answers_by_emp = collect($employees_answers)->unique('AnsweredBy')->count();
-        if ($Answers_by_leaders < count($leaders_email) || $Answers_by_hr < count($hr_teames_email) || $Answers_by_emp < count($employees_email)) {
+        $respondent = $surveyEmails->pluck('id')->all();
+        $client = Surveys::find($id)->clients;
+        $sectors = $client->sectors;
+        $companies = null;
+        $result_per_sector = array();
+        $fun_sector_result = array();
+        $result_per_company = array();
+        $overall_per_fun = array();
+        $overall_per_practice = array();
+        $used_scale = 5;
+        $companies_list = [];
+        $deps_list = [];
+        $respondent_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $respondent)->get();
+        //substract 1 from respondent_answers->AnswerValue
+        $respondent_answers->transform(function ($item, $key) {
+            $item->AnswerValue = $item->AnswerValue - 1;
+            return $item;
+        });
+        //get count of distinct AnsweredBy
+        $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
+        if ($count_respondent_answers < count($respondent)) {
             $data = [
-                'leaders' => count($leaders_email),
-                'hr' => count($hr_teames_email),
-                'emp' => count($employees_email),
-                'leaders_answers' => $Answers_by_leaders,
-                'hr_answers' => $Answers_by_hr,
-                'emp_answers' => $Answers_by_emp,
-                'total' => count($surveyEmails),
-                'total_answers' => $Answers_by_leaders + $Answers_by_hr + $Answers_by_emp,
+                'respondent' => count($respondent),
+                'respondent_answers' => $count_respondent_answers,
             ];
             return view('SurveyAnswers.notComplet')->with($data);
         }
-        $planID = Surveys::where('id', $id)->first()->PlanId;
-
         $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
         if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
             $data = [
@@ -147,204 +143,176 @@ class SurveyAnswersController extends Controller
                 'hr_answers' => 0,
                 'emp_answers' => 0,
                 'total' => 1,
-                'total_answers' => 0 + 0 + 0,
+                'total_answers' => 0,
             ];
             return view('SurveyAnswers.notComplet')->with($data);
         }
-        $sumxx = $SurveyResult->sum('AnswerValue');
-        $countxx = $SurveyResult->count();
-        $avgxx = $countxx == 0 ? 0 : $sumxx / $countxx;
-        $overallResult = $avgxx / 6;
-        $overallResult = round($overallResult, 2) * 100;
-
-        $Number_of_leaders = $SurveyResult->whereIn('AnsweredBy', $leaders_email)->count();
-        $Number_of_hr = $SurveyResult->whereIn('AnsweredBy', $hr_teames_email)->count();
-        $Number_of_emp = $SurveyResult->whereIn('AnsweredBy', $employees_email)->count();
-
+        $planID = Surveys::where('id', $id)->first()->PlanId;
         $functions = Functions::where('PlanId', $planID)->get();
-        $prioritiesRes = PrioritiesAnswers::where('SurveyId', $id)->get();
-        $priorities = array();
-        $priority = array();
-        $performences_ = array();
-        $performence_ = array();
-        //leader
-        $leader_performences_ = array();
-        $leader_performence_ = array();
-        //hr
-        $hr_performences_ = array();
-        $hr_performence_ = array();
-        //emp
-        $emp_performences_ = array();
-        $emp_performence_ = array();
+        $driver_functions = $functions->where('IsDriver', true);
+        // driver_function_Ids
+        $driver_function_Ids = $driver_functions->pluck('id')->all();
+        //foreach
+        foreach ($driver_functions as $d_function) {
+            $discription = "";
+            if ($d_function->FunctionTitle == 'Head')
+                $discription = __('Intellectual Stimulation');
+            elseif ($d_function->FunctionTitle == 'Hand')
+                $discription = __('Enablement');
+            else
+                $discription = __('Emotional Connection');
+            //get function_practices IDs
+            $function_practices_ids = FunctionPractice::where('FunctionId', $d_function->id)->pluck('id')->all();
+            //get Practice questions
+            $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+            //get client all average AnswerValue
+            $client_all_avg = $respondent_answers->whereIn('QuestionId', $practices_questions)->avg('AnswerValue');
+            $function_result = [
+                'fun_title' => App()->getLocale() == 'en' ? $d_function->FunctionTitle : $d_function->FunctionTitleAr,
+                'fun_des' => $discription,
+                'fun_id' => $d_function->id,
+                'fun_perc' => round(($client_all_avg / $used_scale), 2) * 100,
+            ];
+            array_push($overall_per_fun, $function_result);
+            foreach ($function_practices_ids as $fp_id) {
+                $practice = FunctionPractice::find($fp_id);
+                $practice_questions = PracticeQuestions::where('PracticeId', $fp_id)->pluck('id')->all();
+                $practice_avg = $respondent_answers->whereIn('QuestionId', $practice_questions)->avg('AnswerValue');
+                $practice_result = [
+                    'PracticeId' => $fp_id,
+                    'FunctionId' => $d_function->id,
+                    'PracticeTitle' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'practice_perc' => round(($practice_avg / $used_scale), 2) * 100,
+                ];
+                array_push($overall_per_practice, $practice_result);
+            }
+        }
 
-        $overall_Practices = array();
-        $leaders_practices = array();
-        $hr_practices = array();
-        $emp_practices = array();
-        $function_Lables = array();
-        Log::info($SurveyResult);
-        foreach ($functions as $function) {
-            $function_Lables[] = $function->FunctionTitle;
-            $total = 0;
-            $leaders_total = 0;
-            $hr_total = 0;
-            $emp_total = 0;
-            $counter = 0;
-            $overall_Practice = array();
-            $leaders_practice = array();
-            $hr_practice = array();
-            $emp_practice = array();
-            foreach ($function->functionPractices as $functionPractice) {
-                Log::alert($functionPractice.' === '.$functionPractice->practiceQuestions->id);
-                $answers = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $leaders_email)->sum('AnswerValue');
-                $count = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $leaders_email)->count();
-                $leaders_Pract_w = $count == 0 ? 0 : ($answers / $count) / 6;
-                $leaders_total += $leaders_Pract_w;
+        foreach ($sectors as $sector) {
 
-                $counter++;
+            $sector_emails = [];;
+            $companies = $sector->companies;
+            $companies_list = array_merge($companies_list, $companies->toArray());
 
-                $practiceName = $functionPractice->PracticeTitle;
-
-                $practiceAns = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->sum('AnswerValue');
-                if ($function->id == 8) {
-                    Log::alert('===ee');
-                    Log::info($SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id));
-                    Log::alert("test:" . $functionPractice->practiceQuestions->id);
+            foreach ($companies as $company) {
+                //get Departments for Each Company
+                $deps_list = array_merge($deps_list, $company->departments->toArray());
+                $departments = $company->departments->pluck('id')->all();
+                //get all employees for each department
+                $Emails = Emails::whereIn('dep_id', $departments)->pluck('id')->all();
+                //push each id in $emails to Sector Emails
+                foreach ($Emails as $em) {
+                    array_push($sector_emails, $em);
                 }
-                $practiceAnsCount = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->count();
-                $practiceWeight = $practiceAnsCount == 0 ? 0 : round((($practiceAns / $practiceAnsCount) / 6), 2);
 
-                $overall_Practice = [
-                    'name' => $practiceName,
-                    'weight' => $practiceWeight,
-                    'function_id' => $function->id,
-                ];
-                $leaders_practice = [
-                    'name' => $practiceName,
-                    'weight' => round($leaders_Pract_w, 2),
-                    'function_id' => $function->id,
-                ];
-                $hr_practice_ans = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $hr_teames_email)->sum('AnswerValue');
-                $hr_practice_ans_count = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $hr_teames_email)->count();
-                $hr_practice_weight = $hr_practice_ans_count == 0 ? 0 : round((($hr_practice_ans / $hr_practice_ans_count) / 6), 2);
-                $hr_total += $hr_practice_weight;
-
-                $hr_practice = [
-                    'name' => $practiceName,
-                    'weight' => $hr_practice_weight,
-                    'function_id' => $function->id,
-                ];
-                $emp_practice_ans = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $employees_email)->sum('AnswerValue');
-                $emp_practice_ans_count = $SurveyResult->where('QuestionId', '=', $functionPractice->practiceQuestions->id)->whereIn('AnsweredBy', $employees_email)->count();
-                $emp_practice_weight = $emp_practice_ans_count == 0 ? 0 : round((($emp_practice_ans / $emp_practice_ans_count) / 6), 2);
-                $emp_total += $emp_practice_weight;
-
-                $emp_practice = [
-                    'name' => $practiceName,
-                    'weight' => $emp_practice_weight,
-                    'function_id' => $function->id,
-                ];
-                if (count($leaders_email) > 0 && count($hr_teames_email) > 0 && count($employees_email) > 0)
-                    $total += ($leaders_Pract_w + $hr_practice_weight + $emp_practice_weight) / 3;
-                elseif (count($leaders_email) > 0 && count($hr_teames_email) > 0)
-                    $total += ($leaders_Pract_w + $hr_practice_weight) / 2;
-                elseif (count($leaders_email) > 0  && count($employees_email) > 0)
-                    $total += ($leaders_Pract_w + $emp_practice_weight) / 2;
-                elseif (count($hr_teames_email) > 0  && count($employees_email) > 0)
-                    $total += ($hr_practice_weight + $emp_practice_weight) / 2;
-                else
-                    $total += $leaders_Pract_w;
-                array_push($overall_Practices, $overall_Practice);
-                array_push($leaders_practices, $leaders_practice);
-                array_push($hr_practices, $hr_practice);
-                array_push($emp_practices, $emp_practice);
+                // //get all employees answers for each department with format
+                // $company_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $Emails)->avg('AnswerValue'), 2);
+                // //formate the $company_avg
+                // $company_result = [
+                //     'company_name_en' => $company->company_name_en,
+                //     'company_name_ar' => $company->company_name_ar,
+                //     'company_perc' => round(($company_avg / $used_scale), 2) * 100,
+                // ];
+                // array_push($result_per_company, $company_result);
             }
-
-            $performence = round(($total / $counter), 2);
-
-            //leader performence
-            $leader_performence = round(($leaders_total / $counter), 2);
-            //hr performence
-            $hr_performence = round(($hr_total / $counter), 2);
-            //emp performence
-            $emp_performence = round(($emp_total / $counter), 2);
-            $total_answers = $prioritiesRes->where('QuestionId', $function->id)->whereIn('AnsweredBy', $leaders_email)->sum('AnswerValue');
-            $count_answers = $prioritiesRes->where('QuestionId', $function->id)->whereIn('AnsweredBy', $leaders_email)->count();
-            $priorityVal = $count_answers==0?0:round((($total_answers / $count_answers) / 3), 2);
-            //Log::info("priorityVal: " . $priorityVal);
-            $priority = ["priority" => $priorityVal, "function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => $leader_performence];
-            array_push($priorities, $priority);
-            $performence_ = ["function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => ($performence * 100), 'overall_Practices' => $overall_Practices, 'leaders_practices' => $leaders_practices, 'hr_practices' => $hr_practices, 'emp_practices' => $emp_practices];
-            array_push($performences_, $performence_);
-            //leader
-            $leader_performence_ = ["function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => ($leader_performence * 100)];
-            array_push($leader_performences_, $leader_performence_);
-            //hr
-            $hr_performence_ = ["function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => ($hr_performence * 100)];
-            array_push($hr_performences_, $hr_performence_);
-            //emp
-            $emp_performence_ = ["function" => $function->FunctionTitle, "function_id" => $function->id, "performance" => ($emp_performence * 100)];
-            array_push($emp_performences_, $emp_performence_);
+            //get all employees answers for each department with format
+            foreach ($driver_functions as $d_fun) {
+                //get function_practices IDs
+                $function_practices_ids = FunctionPractice::where('FunctionId', $d_fun->id)->pluck('id')->all();
+                //get Practice questions
+                $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+                $sector_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $sector_emails)->avg('AnswerValue'), 2);
+                //formate the $company_avg
+                $sector_fun_result = [
+                    //add functiontitle
+                    'FunctionTitle' => App()->getLocale() == 'en' ? $d_fun->FunctionTitle : $d_fun->FunctionTitleAr,
+                    'fun_id' => $d_fun->id,
+                    'sect_perc' => round(($sector_avg / $used_scale), 2) * 100,
+                ];
+                array_push($fun_sector_result, $sector_fun_result);
+            }
+            $sector_result = [
+                'sector_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+                'functions' => $fun_sector_result
+            ];
+            array_push($result_per_sector, $sector_result);
         }
-        Log::alert($overall_Practices);
-        $overAllpractice = $overall_Practices;
-        //sorte overAllpractice Asc
-        usort($overAllpractice, function ($a, $b) {
-            return $a['weight'] <=> $b['weight'];
-        });
-        $unsorted_performences = $performences_;
-        $sorted_leader_performences = $leader_performences_;
-        $sorted_hr_performences = $hr_performences_;
-        $sorted_emp_performences = $emp_performences_;
-        //sorte sorted_leader_performences descending
-        usort($sorted_leader_performences, function ($a, $b) {
-            return $b['performance'] <=> $a['performance'];
-        });
-        //sorte sorted_hr_performences descending
-        usort($sorted_hr_performences, function ($a, $b) {
-            return $b['performance'] <=> $a['performance'];
-        });
-        //sorte sorted_emp_performences descending
-        usort($sorted_emp_performences, function ($a, $b) {
-            return $b['performance'] <=> $a['performance'];
-        });
-        //sort performances_
-        usort($performences_, function ($a, $b) {
-            return $a['performance'] <=> $b['performance'];
-        });
-        $asc_perform = $performences_;
-        usort($performences_, function ($a, $b) {
-            return $b['performance'] <=> $a['performance'];
-        });
-        $leaders_perform_only = array();
-        $hr_perform_only = array();
-        $count_z = 0;
-        foreach ($functions as $function) {
-            if ($leader_performences_[$count_z]['function_id'] == $function->id) {
-                array_push($leaders_perform_only, $leader_performences_[$count_z]['performance']);
+        //get function_practices IDs
+        $EE_index_Practices_id = FunctionPractice::where('FunctionId', $functions->where('IsDriver', false)->first()->id)->pluck('id')->all();
+        //get Practice questions
+        $EE_index_questions = PracticeQuestions::whereIn('PracticeId', $EE_index_Practices_id)->pluck('id')->all();
+        $EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->avg('AnswerValue');
+        $EE_Index = round(($EE_Index / $used_scale), 2) * 100;
+        $eNPS_Question_id = PracticeQuestions::where('IsENPS', true)->first()->id;
+        $eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->avg('AnswerValue');
+        $eNPS = round(($eNPS / $used_scale), 2) * 100;
+        $EE_Index_Engaged = 0; // it's from 75-100
+        $EE_Index_Nuetral = 0; // from 55-75
+        $EE_Index_Actively_Disengaged = 0; // from 0-55
+        $eNPS_Promotors = 0; // it's from 75-100
+        $eNPS_Passives = 0; // from 55-75
+        $eNPS_Detractors = 0; // from 0-55
+        foreach ($respondent as $respond_id) {
+            $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
+            $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
+            if ($individual_eNPS >= 75) {
+                $eNPS_Promotors++;
+            } elseif ($individual_eNPS >= 55) {
+                $eNPS_Passives++;
+            } else {
+                $eNPS_Detractors++;
             }
-            if ($hr_performences_[$count_z]['function_id'] == $function->id) {
-                array_push($hr_perform_only, $hr_performences_[$count_z++]['performance']);
+            if ($individual_EE_Index >= 75) {
+                $EE_Index_Engaged++;
+            } elseif ($individual_EE_Index >= 55) {
+                $EE_Index_Nuetral++;
+            } else {
+                $EE_Index_Actively_Disengaged++;
             }
         }
-        $desc_perfom = $performences_;
+        $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
+        $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
+        $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
+        $EE_Index_Engaged = round(($EE_Index_Engaged / count($respondent)), 2) * 100;
+        $EE_Index_Nuetral = round(($EE_Index_Nuetral / count($respondent)), 2) * 100;
+        $EE_Index_Actively_Disengaged = round(($EE_Index_Actively_Disengaged / count($respondent)), 2) * 100;
+        // copy $overall_per_practice and sort the copy asc
+        $overall_per_practice_sorted = $overall_per_practice;
+        usort($overall_per_practice_sorted, function ($a, $b) {
+            return $a['practice_perc'] <=> $b['practice_perc'];
+        });
+        //get first three lowest items
+        $lowest_practices = array_slice($overall_per_practice_sorted, 0, 3);
+        //get first three highest items
+        $highest_practices = array_slice($overall_per_practice_sorted, -3, 3);
+        //sorte highest_practices desc
+        usort($highest_practices, function ($a, $b) {
+            return $b['practice_perc'] <=> $a['practice_perc'];
+        });
+        Log::alert($companies_list);
+        Log::alert($deps_list);
         $data = [
-            'functions' => $functions,
-            'priorities' => $priorities,
-            'overallResult' => $overallResult,
-            'asc_perform' => $asc_perform,
-            'desc_perfom' => $desc_perfom,
-            'overall_Practices' => $overall_Practices,
-            'overAllpractice' => $overAllpractice,
-            // 'overall_PracticesAsc' => $overall_PracticesAsc,
-            'unsorted_performences' => $unsorted_performences,
-            'sorted_leader_performences' => $sorted_leader_performences,
-            'sorted_hr_performences' => $sorted_hr_performences,
-            'sorted_emp_performences' => $sorted_emp_performences,
-            'function_Lables' => $function_Lables,
-            'leaders_perform_only' => $leaders_perform_only,
-            'hr_perform_only' => $hr_perform_only,
-            "id" => $id
+            'overall_per_fun' => $overall_per_fun,
+            'driver_functions' => $driver_functions,
+            'overall_per_practice' => $overall_per_practice,
+            'result_per_sector' => $result_per_sector,
+            'EE_Index' => $EE_Index,
+            'eNPS' => $eNPS,
+            'eNPS_Promotors' => $eNPS_Promotors,
+            'eNPS_Passives' => $eNPS_Passives,
+            'eNPS_Detractors' => $eNPS_Detractors,
+            'EE_Index_Engaged' => $EE_Index_Engaged,
+            'EE_Index_Nuetral' => $EE_Index_Nuetral,
+            'EE_Index_Actively_Disengaged' => $EE_Index_Actively_Disengaged,
+            'highest_practices' => $highest_practices,
+            'lowest_practices' => $lowest_practices,
+            'sectors' => $sectors,
+            'survey_id' => $id,
+            'not_home' => false,
+            'isDep' => false,
+            'type' => '1'
         ];
         return view('SurveyAnswers.result')->with($data);
     }
@@ -422,5 +390,586 @@ class SurveyAnswersController extends Controller
             'sorted_hr_performences' => $hr_performences_,
         ];
         return view('SurveyAnswers.freeResult')->with($data);
+    }
+    public function SectorResult($id, $sector_id)
+    {
+        $companies_id = Companies::where('sector_id', $sector_id)->pluck('id')->all();
+        $departments_id = Departments::whereIn('company_id', $companies_id)->pluck('id')->all();
+        $surveyEmails = Emails::where('SurveyId', $id)->whereIn('dep_id', $departments_id)->get();
+        $respondent = $surveyEmails->pluck('id')->all();
+        $client = Surveys::find($id)->clients;
+        $sectors = $client->sectors;
+        $companies = null;
+        $result_per_sector = array();
+        $fun_sector_result = array();
+        $result_per_company = array();
+        $overall_per_fun = array();
+        $overall_per_practice = array();
+        $used_scale = 5;
+        $companies_list = [];
+        $deps_list = [];
+        $respondent_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $respondent)->get();
+        //substract 1 from respondent_answers->AnswerValue
+        $respondent_answers->transform(function ($item, $key) {
+            $item->AnswerValue = $item->AnswerValue - 1;
+            return $item;
+        });
+        //get count of distinct AnsweredBy
+        $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
+        if ($count_respondent_answers < count($respondent)) {
+            $data = [
+                'respondent' => count($respondent),
+                'respondent_answers' => $count_respondent_answers,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
+        if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
+            $data = [
+                'leaders' => 1,
+                'hr' => 1,
+                'emp' => 1,
+                'leaders_answers' => 0,
+                'hr_answers' => 0,
+                'emp_answers' => 0,
+                'total' => 1,
+                'total_answers' => 0,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $planID = Surveys::where('id', $id)->first()->PlanId;
+        $functions = Functions::where('PlanId', $planID)->get();
+        $driver_functions = $functions->where('IsDriver', true);
+        // driver_function_Ids
+        $driver_function_Ids = $driver_functions->pluck('id')->all();
+        //foreach
+        foreach ($driver_functions as $d_function) {
+            $discription = "";
+            if ($d_function->FunctionTitle == 'Head')
+                $discription = __('Intellectual Stimulation');
+            elseif ($d_function->FunctionTitle == 'Hand')
+                $discription = __('Enablement');
+            else
+                $discription = __('Emotional Connection');
+            //get function_practices IDs
+            $function_practices_ids = FunctionPractice::where('FunctionId', $d_function->id)->pluck('id')->all();
+            //get Practice questions
+            $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+            //get client all average AnswerValue
+            $client_all_avg = $respondent_answers->whereIn('QuestionId', $practices_questions)->avg('AnswerValue');
+            $function_result = [
+                'fun_title' => App()->getLocale() == 'en' ? $d_function->FunctionTitle : $d_function->FunctionTitleAr,
+                'fun_des' => $discription,
+                'fun_id' => $d_function->id,
+                'fun_perc' => round(($client_all_avg / $used_scale), 2) * 100,
+            ];
+            array_push($overall_per_fun, $function_result);
+            foreach ($function_practices_ids as $fp_id) {
+                $practice = FunctionPractice::find($fp_id);
+                $practice_questions = PracticeQuestions::where('PracticeId', $fp_id)->pluck('id')->all();
+                $practice_avg = $respondent_answers->whereIn('QuestionId', $practice_questions)->avg('AnswerValue');
+                $practice_result = [
+                    'PracticeId' => $fp_id,
+                    'FunctionId' => $d_function->id,
+                    'PracticeTitle' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'practice_perc' => round(($practice_avg / $used_scale), 2) * 100,
+                ];
+                array_push($overall_per_practice, $practice_result);
+            }
+        }
+
+        // foreach ($sectors as $sector) {
+
+        $sector_emails = [];;
+        $companies = $sectors->where('id', $sector_id)->first()->companies;
+        // $companies_list = array_merge($companies_list, $companies->toArray());
+
+        foreach ($companies as $company) {
+            //get Departments for Each Company
+            $deps_list = array_merge($deps_list, $company->departments->toArray());
+            $departments = $company->departments->pluck('id')->all();
+            //get all employees for each department
+            $Emails = Emails::whereIn('dep_id', $departments)->pluck('id')->all();
+            //push each id in $emails to Sector Emails
+            // foreach ($Emails as $em) {
+            //     array_push($sector_emails, $em);
+            // }
+            foreach ($driver_functions as $d_fun) {
+                //get function_practices IDs
+                $function_practices_ids = FunctionPractice::where('FunctionId', $d_fun->id)->pluck('id')->all();
+                //get Practice questions
+                $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+                $sector_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $Emails)->avg('AnswerValue'), 2);
+                //formate the $company_avg
+                $sector_fun_result = [
+                    //add functiontitle
+                    'FunctionTitle' => App()->getLocale() == 'en' ? $d_fun->FunctionTitle : $d_fun->FunctionTitleAr,
+                    'fun_id' => $d_fun->id,
+                    'sect_perc' => round(($sector_avg / $used_scale), 2) * 100,
+                ];
+                array_push($fun_sector_result, $sector_fun_result);
+            }
+            $sector_result = [
+                'sector_name' => App()->getLocale() == 'en' ? $company->company_name_en : $company->company_name_ar,
+                'functions' => $fun_sector_result
+            ];
+            array_push($result_per_sector, $sector_result);
+        }
+        //get all employees answers for each department with format
+
+        // }
+        //get function_practices IDs
+        $EE_index_Practices_id = FunctionPractice::where('FunctionId', $functions->where('IsDriver', false)->first()->id)->pluck('id')->all();
+        //get Practice questions
+        $EE_index_questions = PracticeQuestions::whereIn('PracticeId', $EE_index_Practices_id)->pluck('id')->all();
+        $EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->avg('AnswerValue');
+        $EE_Index = round(($EE_Index / $used_scale), 2) * 100;
+        $eNPS_Question_id = PracticeQuestions::where('IsENPS', true)->first()->id;
+        $eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->avg('AnswerValue');
+        $eNPS = round(($eNPS / $used_scale), 2) * 100;
+        $EE_Index_Engaged = 0; // it's from 75-100
+        $EE_Index_Nuetral = 0; // from 55-75
+        $EE_Index_Actively_Disengaged = 0; // from 0-55
+        $eNPS_Promotors = 0; // it's from 75-100
+        $eNPS_Passives = 0; // from 55-75
+        $eNPS_Detractors = 0; // from 0-55
+        foreach ($respondent as $respond_id) {
+            $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
+            $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
+            if ($individual_eNPS >= 75) {
+                $eNPS_Promotors++;
+            } elseif ($individual_eNPS >= 55) {
+                $eNPS_Passives++;
+            } else {
+                $eNPS_Detractors++;
+            }
+            if ($individual_EE_Index >= 75) {
+                $EE_Index_Engaged++;
+            } elseif ($individual_EE_Index >= 55) {
+                $EE_Index_Nuetral++;
+            } else {
+                $EE_Index_Actively_Disengaged++;
+            }
+        }
+        $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
+        $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
+        $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
+        $EE_Index_Engaged = round(($EE_Index_Engaged / count($respondent)), 2) * 100;
+        $EE_Index_Nuetral = round(($EE_Index_Nuetral / count($respondent)), 2) * 100;
+        $EE_Index_Actively_Disengaged = round(($EE_Index_Actively_Disengaged / count($respondent)), 2) * 100;
+        // copy $overall_per_practice and sort the copy asc
+        $overall_per_practice_sorted = $overall_per_practice;
+        usort($overall_per_practice_sorted, function ($a, $b) {
+            return $a['practice_perc'] <=> $b['practice_perc'];
+        });
+        //get first three lowest items
+        $lowest_practices = array_slice($overall_per_practice_sorted, 0, 3);
+        //get first three highest items
+        $highest_practices = array_slice($overall_per_practice_sorted, -3, 3);
+        //sorte highest_practices desc
+        usort($highest_practices, function ($a, $b) {
+            return $b['practice_perc'] <=> $a['practice_perc'];
+        });
+        Log::alert($companies_list);
+        Log::alert($deps_list);
+        $data = [
+            'overall_per_fun' => $overall_per_fun,
+            'driver_functions' => $driver_functions,
+            'overall_per_practice' => $overall_per_practice,
+            'result_per_sector' => $result_per_sector,
+            'EE_Index' => $EE_Index,
+            'eNPS' => $eNPS,
+            'eNPS_Promotors' => $eNPS_Promotors,
+            'eNPS_Passives' => $eNPS_Passives,
+            'eNPS_Detractors' => $eNPS_Detractors,
+            'EE_Index_Engaged' => $EE_Index_Engaged,
+            'EE_Index_Nuetral' => $EE_Index_Nuetral,
+            'EE_Index_Actively_Disengaged' => $EE_Index_Actively_Disengaged,
+            'highest_practices' => $highest_practices,
+            'lowest_practices' => $lowest_practices,
+            'sectors' => $sectors,
+            'survey_id' => $id,
+            'not_home' => true,
+            'isDep' => false,
+            'type' => '2'
+        ];
+        return view('SurveyAnswers.result')->with($data);
+    }
+    public function CompanyResult($id, $company_id)
+    {
+
+        $departments_id = Departments::where('company_id', $company_id)->pluck('id')->all();
+        $surveyEmails = Emails::where('SurveyId', $id)->whereIn('dep_id', $departments_id)->get();
+        $respondent = $surveyEmails->pluck('id')->all();
+        $client = Surveys::find($id)->clients;
+        $sectors = $client->sectors;
+        $companies = null;
+        $result_per_sector = array();
+        $fun_sector_result = array();
+        $result_per_company = array();
+        $overall_per_fun = array();
+        $overall_per_practice = array();
+        $used_scale = 5;
+        $companies_list = [];
+        $deps_list = [];
+        $respondent_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $respondent)->get();
+        //substract 1 from respondent_answers->AnswerValue
+        $respondent_answers->transform(function ($item, $key) {
+            $item->AnswerValue = $item->AnswerValue - 1;
+            return $item;
+        });
+        //get count of distinct AnsweredBy
+        $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
+        if ($count_respondent_answers < count($respondent)) {
+            $data = [
+                'respondent' => count($respondent),
+                'respondent_answers' => $count_respondent_answers,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
+        if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
+            $data = [
+                'leaders' => 1,
+                'hr' => 1,
+                'emp' => 1,
+                'leaders_answers' => 0,
+                'hr_answers' => 0,
+                'emp_answers' => 0,
+                'total' => 1,
+                'total_answers' => 0,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $planID = Surveys::where('id', $id)->first()->PlanId;
+        $functions = Functions::where('PlanId', $planID)->get();
+        $driver_functions = $functions->where('IsDriver', true);
+        // driver_function_Ids
+        $driver_function_Ids = $driver_functions->pluck('id')->all();
+        //foreach
+        foreach ($driver_functions as $d_function) {
+            $discription = "";
+            if ($d_function->FunctionTitle == 'Head')
+                $discription = __('Intellectual Stimulation');
+            elseif ($d_function->FunctionTitle == 'Hand')
+                $discription = __('Enablement');
+            else
+                $discription = __('Emotional Connection');
+            //get function_practices IDs
+            $function_practices_ids = FunctionPractice::where('FunctionId', $d_function->id)->pluck('id')->all();
+            //get Practice questions
+            $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+            //get client all average AnswerValue
+            $client_all_avg = $respondent_answers->whereIn('QuestionId', $practices_questions)->avg('AnswerValue');
+            $function_result = [
+                'fun_title' => App()->getLocale() == 'en' ? $d_function->FunctionTitle : $d_function->FunctionTitleAr,
+                'fun_des' => $discription,
+                'fun_id' => $d_function->id,
+                'fun_perc' => round(($client_all_avg / $used_scale), 2) * 100,
+            ];
+            array_push($overall_per_fun, $function_result);
+            foreach ($function_practices_ids as $fp_id) {
+                $practice = FunctionPractice::find($fp_id);
+                $practice_questions = PracticeQuestions::where('PracticeId', $fp_id)->pluck('id')->all();
+                $practice_avg = $respondent_answers->whereIn('QuestionId', $practice_questions)->avg('AnswerValue');
+                $practice_result = [
+                    'PracticeId' => $fp_id,
+                    'FunctionId' => $d_function->id,
+                    'PracticeTitle' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'practice_perc' => round(($practice_avg / $used_scale), 2) * 100,
+                ];
+                array_push($overall_per_practice, $practice_result);
+            }
+        }
+
+        // foreach ($sectors as $sector) {
+
+        $sector_emails = [];;
+        $departments = Departments::where('company_id', $company_id)->get();
+        // $companies_list = array_merge($companies_list, $companies->toArray());
+
+        foreach ($departments as $department) {
+            $Emails = Emails::where('dep_id', $department->id)->pluck('id')->all();
+            //push each id in $emails to Sector Emails
+            // foreach ($Emails as $em) {
+            //     array_push($sector_emails, $em);
+            // }
+            foreach ($driver_functions as $d_fun) {
+                //get function_practices IDs
+                $function_practices_ids = FunctionPractice::where('FunctionId', $d_fun->id)->pluck('id')->all();
+                //get Practice questions
+                $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+                $sector_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $Emails)->avg('AnswerValue'), 2);
+                //formate the $company_avg
+                $sector_fun_result = [
+                    //add functiontitle
+                    'FunctionTitle' => App()->getLocale() == 'en' ? $d_fun->FunctionTitle : $d_fun->FunctionTitleAr,
+                    'fun_id' => $d_fun->id,
+                    'sect_perc' => round(($sector_avg / $used_scale), 2) * 100,
+                ];
+                array_push($fun_sector_result, $sector_fun_result);
+            }
+            $sector_result = [
+                'sector_name' => App()->getLocale() == 'en' ? $department->dep_name_en : $department->dep_name_ar,
+                'functions' => $fun_sector_result
+            ];
+            array_push($result_per_sector, $sector_result);
+        }
+        //get all employees answers for each department with format
+
+        // }
+        //get function_practices IDs
+        $EE_index_Practices_id = FunctionPractice::where('FunctionId', $functions->where('IsDriver', false)->first()->id)->pluck('id')->all();
+        //get Practice questions
+        $EE_index_questions = PracticeQuestions::whereIn('PracticeId', $EE_index_Practices_id)->pluck('id')->all();
+        $EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->avg('AnswerValue');
+        $EE_Index = round(($EE_Index / $used_scale), 2) * 100;
+        $eNPS_Question_id = PracticeQuestions::where('IsENPS', true)->first()->id;
+        $eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->avg('AnswerValue');
+        $eNPS = round(($eNPS / $used_scale), 2) * 100;
+        $EE_Index_Engaged = 0; // it's from 75-100
+        $EE_Index_Nuetral = 0; // from 55-75
+        $EE_Index_Actively_Disengaged = 0; // from 0-55
+        $eNPS_Promotors = 0; // it's from 75-100
+        $eNPS_Passives = 0; // from 55-75
+        $eNPS_Detractors = 0; // from 0-55
+        foreach ($respondent as $respond_id) {
+            $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
+            $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
+            if ($individual_eNPS >= 75) {
+                $eNPS_Promotors++;
+            } elseif ($individual_eNPS >= 55) {
+                $eNPS_Passives++;
+            } else {
+                $eNPS_Detractors++;
+            }
+            if ($individual_EE_Index >= 75) {
+                $EE_Index_Engaged++;
+            } elseif ($individual_EE_Index >= 55) {
+                $EE_Index_Nuetral++;
+            } else {
+                $EE_Index_Actively_Disengaged++;
+            }
+        }
+        $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
+        $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
+        $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
+        $EE_Index_Engaged = round(($EE_Index_Engaged / count($respondent)), 2) * 100;
+        $EE_Index_Nuetral = round(($EE_Index_Nuetral / count($respondent)), 2) * 100;
+        $EE_Index_Actively_Disengaged = round(($EE_Index_Actively_Disengaged / count($respondent)), 2) * 100;
+        // copy $overall_per_practice and sort the copy asc
+        $overall_per_practice_sorted = $overall_per_practice;
+        usort($overall_per_practice_sorted, function ($a, $b) {
+            return $a['practice_perc'] <=> $b['practice_perc'];
+        });
+        //get first three lowest items
+        $lowest_practices = array_slice($overall_per_practice_sorted, 0, 3);
+        //get first three highest items
+        $highest_practices = array_slice($overall_per_practice_sorted, -3, 3);
+        //sorte highest_practices desc
+        usort($highest_practices, function ($a, $b) {
+            return $b['practice_perc'] <=> $a['practice_perc'];
+        });
+        Log::alert($companies_list);
+        Log::alert($deps_list);
+        $data = [
+            'overall_per_fun' => $overall_per_fun,
+            'driver_functions' => $driver_functions,
+            'overall_per_practice' => $overall_per_practice,
+            'result_per_sector' => $result_per_sector,
+            'EE_Index' => $EE_Index,
+            'eNPS' => $eNPS,
+            'eNPS_Promotors' => $eNPS_Promotors,
+            'eNPS_Passives' => $eNPS_Passives,
+            'eNPS_Detractors' => $eNPS_Detractors,
+            'EE_Index_Engaged' => $EE_Index_Engaged,
+            'EE_Index_Nuetral' => $EE_Index_Nuetral,
+            'EE_Index_Actively_Disengaged' => $EE_Index_Actively_Disengaged,
+            'highest_practices' => $highest_practices,
+            'lowest_practices' => $lowest_practices,
+            'sectors' => $sectors,
+            'survey_id' => $id,
+            'not_home' => true,
+            'isDep' => false,
+            'type' => '3'
+        ];
+        return view('SurveyAnswers.result')->with($data);
+    }
+
+    public function DepartmentResult($id, $dep_id)
+    {
+
+        $surveyEmails = Emails::where('SurveyId', $id)->where('dep_id', $dep_id)->get();
+        $respondent = $surveyEmails->pluck('id')->all();
+        $client = Surveys::find($id)->clients;
+        $sectors = $client->sectors;
+        $companies = null;
+        $result_per_sector = array();
+        $fun_sector_result = array();
+        $result_per_company = array();
+        $overall_per_fun = array();
+        $overall_per_practice = array();
+        $used_scale = 5;
+        $companies_list = [];
+        $deps_list = [];
+        $respondent_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $respondent)->get();
+        //substract 1 from respondent_answers->AnswerValue
+        $respondent_answers->transform(function ($item, $key) {
+            $item->AnswerValue = $item->AnswerValue - 1;
+            return $item;
+        });
+        //get count of distinct AnsweredBy
+        $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
+        if ($count_respondent_answers < count($respondent)) {
+            $data = [
+                'respondent' => count($respondent),
+                'respondent_answers' => $count_respondent_answers,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
+        if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
+            $data = [
+                'leaders' => 1,
+                'hr' => 1,
+                'emp' => 1,
+                'leaders_answers' => 0,
+                'hr_answers' => 0,
+                'emp_answers' => 0,
+                'total' => 1,
+                'total_answers' => 0,
+            ];
+            return view('SurveyAnswers.notComplet')->with($data);
+        }
+        $planID = Surveys::where('id', $id)->first()->PlanId;
+        $functions = Functions::where('PlanId', $planID)->get();
+        $driver_functions = $functions->where('IsDriver', true);
+        // driver_function_Ids
+        $driver_function_Ids = $driver_functions->pluck('id')->all();
+        //foreach
+        foreach ($driver_functions as $d_function) {
+            $discription = "";
+            if ($d_function->FunctionTitle == 'Head')
+                $discription = __('Intellectual Stimulation');
+            elseif ($d_function->FunctionTitle == 'Hand')
+                $discription = __('Enablement');
+            else
+                $discription = __('Emotional Connection');
+            //get function_practices IDs
+            $function_practices_ids = FunctionPractice::where('FunctionId', $d_function->id)->pluck('id')->all();
+            //get Practice questions
+            $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
+            //get client all average AnswerValue
+            $client_all_avg = $respondent_answers->whereIn('QuestionId', $practices_questions)->avg('AnswerValue');
+            $function_result = [
+                'fun_title' => App()->getLocale() == 'en' ? $d_function->FunctionTitle : $d_function->FunctionTitleAr,
+                'fun_des' => $discription,
+                'fun_id' => $d_function->id,
+                'fun_perc' => round(($client_all_avg / $used_scale), 2) * 100,
+            ];
+            array_push($overall_per_fun, $function_result);
+            foreach ($function_practices_ids as $fp_id) {
+                $practice = FunctionPractice::find($fp_id);
+                $practice_questions = PracticeQuestions::where('PracticeId', $fp_id)->pluck('id')->all();
+                $practice_avg = $respondent_answers->whereIn('QuestionId', $practice_questions)->avg('AnswerValue');
+                $practice_result = [
+                    'PracticeId' => $fp_id,
+                    'FunctionId' => $d_function->id,
+                    'PracticeTitle' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'practice_perc' => round(($practice_avg / $used_scale), 2) * 100,
+                ];
+                array_push($overall_per_practice, $practice_result);
+            }
+        }
+
+        // foreach ($sectors as $sector) {
+
+        $sector_emails = [];;
+
+        //get all employees answers for each department with format
+
+        // }
+        //get function_practices IDs
+        $EE_index_Practices_id = FunctionPractice::where('FunctionId', $functions->where('IsDriver', false)->first()->id)->pluck('id')->all();
+        //get Practice questions
+        $EE_index_questions = PracticeQuestions::whereIn('PracticeId', $EE_index_Practices_id)->pluck('id')->all();
+        $EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->avg('AnswerValue');
+        $EE_Index = round(($EE_Index / $used_scale), 2) * 100;
+        $eNPS_Question_id = PracticeQuestions::where('IsENPS', true)->first()->id;
+        $eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->avg('AnswerValue');
+        $eNPS = round(($eNPS / $used_scale), 2) * 100;
+        $EE_Index_Engaged = 0; // it's from 75-100
+        $EE_Index_Nuetral = 0; // from 55-75
+        $EE_Index_Actively_Disengaged = 0; // from 0-55
+        $eNPS_Promotors = 0; // it's from 75-100
+        $eNPS_Passives = 0; // from 55-75
+        $eNPS_Detractors = 0; // from 0-55
+        foreach ($respondent as $respond_id) {
+            $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
+            $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
+            if ($individual_eNPS >= 75) {
+                $eNPS_Promotors++;
+            } elseif ($individual_eNPS >= 55) {
+                $eNPS_Passives++;
+            } else {
+                $eNPS_Detractors++;
+            }
+            if ($individual_EE_Index >= 75) {
+                $EE_Index_Engaged++;
+            } elseif ($individual_EE_Index >= 55) {
+                $EE_Index_Nuetral++;
+            } else {
+                $EE_Index_Actively_Disengaged++;
+            }
+        }
+        $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
+        $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
+        $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
+        $EE_Index_Engaged = round(($EE_Index_Engaged / count($respondent)), 2) * 100;
+        $EE_Index_Nuetral = round(($EE_Index_Nuetral / count($respondent)), 2) * 100;
+        $EE_Index_Actively_Disengaged = round(($EE_Index_Actively_Disengaged / count($respondent)), 2) * 100;
+        // copy $overall_per_practice and sort the copy asc
+        $overall_per_practice_sorted = $overall_per_practice;
+        usort($overall_per_practice_sorted, function ($a, $b) {
+            return $a['practice_perc'] <=> $b['practice_perc'];
+        });
+        //get first three lowest items
+        $lowest_practices = array_slice($overall_per_practice_sorted, 0, 3);
+        //get first three highest items
+        $highest_practices = array_slice($overall_per_practice_sorted, -3, 3);
+        //sorte highest_practices desc
+        usort($highest_practices, function ($a, $b) {
+            return $b['practice_perc'] <=> $a['practice_perc'];
+        });
+        Log::alert($companies_list);
+        Log::alert($deps_list);
+        $data = [
+            'overall_per_fun' => $overall_per_fun,
+            'driver_functions' => $driver_functions,
+            'overall_per_practice' => $overall_per_practice,
+            'result_per_sector' => $result_per_sector,
+            'EE_Index' => $EE_Index,
+            'eNPS' => $eNPS,
+            'eNPS_Promotors' => $eNPS_Promotors,
+            'eNPS_Passives' => $eNPS_Passives,
+            'eNPS_Detractors' => $eNPS_Detractors,
+            'EE_Index_Engaged' => $EE_Index_Engaged,
+            'EE_Index_Nuetral' => $EE_Index_Nuetral,
+            'EE_Index_Actively_Disengaged' => $EE_Index_Actively_Disengaged,
+            'highest_practices' => $highest_practices,
+            'lowest_practices' => $lowest_practices,
+            'sectors' => $sectors,
+            'survey_id' => $id,
+            'not_home' => true,
+            'isDep' => true,
+            'type' => '4'
+        ];
+        return view('SurveyAnswers.result')->with($data);
     }
 }

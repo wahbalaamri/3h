@@ -15,7 +15,8 @@
     <!-- google fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 
     <!-- animate -->
@@ -112,7 +113,7 @@
     @yield('style')
 </head>
 
-<body class="background-white">
+<body class="background-white" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
 
 
     <!-- header -->
@@ -291,7 +292,8 @@
     <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/popper.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
         // $(".contentImage").on("click", function() {

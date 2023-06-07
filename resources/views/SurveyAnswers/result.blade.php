@@ -13,1030 +13,625 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-10" id="finalResult">
-            {{-- <div class="card">
+            @php
+            $term='';
+            $term1='';
+            $term2='';
+            if ($type=='1')
+            //for Organization
+            {$term='Organizational';
+            $term1='Sectors';
+            $term2='Sector';
+            }
+            elseif ($type=='2')
+            //for sector
+            {$term='Sector';
+            $term1='Companies';
+            $term2='Company';
+            }
+            elseif ($type=='3')
+            //for company
+            {$term='Company';
+            $term1='Departments';
+            $term2='Department';
+            }
+            else
+            //for department
+            {$term='Department';
+            $term1='Departments';
+            $term2='Department';
+            }
+            @endphp
+            {{-- card for sector , company and department selection --}}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
                 {{-- card header --}}
-                {{-- <div class="card-header bg-white text-warning">
-                    <h4>Dashboard-Organizational Wide</h4>
-                </div> --}}
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>{{ __('Final Result') }}</h5>
+                    {{-- <a href="{{ route('home') }}" class="btn btn-sm btn-primary">Back</a> --}}
+                </div>
                 {{-- card body --}}
-                {{-- <div class="card-body"> --}}
-                    {{-- titles --}}
-                    {{-- <div class="row">
-                        {{-- text in div bigger and bold --}}
-                        {{-- <div
-                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
-                            <h4>Employee Engagement Index</h4>
+                <div class="card-body">
+                    @if ($not_home)
+                        <div class="row">
+                            <a href="{{ route('survey-answers.result',$survey_id) }}" class="btn btn-primary" id="GetSector">{{ __('Back To Organizational View')}}</a>
                         </div>
-                        <div
-                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
-                            <h4>Employee Engagement Drivers</h4>
-                        </div>
-                        <div
-                            class="col-3 m-1 p-3 rounded bg-primary text-white d-flex justify-content-center align-items-center">
-                            <h4>Employee Net Promotor Score (eNPS)</h4>
-                        </div>
-                    </div>
+                    @endif
                     <div class="row">
-                        <div class="col-3 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Overall Performance
-                            <div class="mt-5">
-                                <div class="circle-wrap">
-                                    <div class="circle">
-
-                                        <div class="mask half">
-                                            <div class="fill-{{ $overallResult }}"></div>
-                                        </div>
-
-                                        <div class="mask full-{{ $overallResult }}">
-                                            <div class="fill-{{ $overallResult }}"></div>
-                                        </div>
-                                        <div class="inside-circle"> {{ $overallResult }}%<p>Performance score</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-                            {{-- create legands --}}
-                            {{-- <div class="row mt-5">
-                                <div class="col-2">
-                                    <div class="row">}}
-                                        {{-- bootstrap progress --}}
-                              {{--      </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <div class="circle-legend bg-warning"></div>
-                                        </div>
-                                        <div class="col-10">
-                                            <p class="text-warning">Average</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <div class="circle-legend bg-success"></div>
-                                        </div>
-                                        <div class="col-10">
-                                            <p class="text-success">Good</p>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="col-md-3 col-sm-12">
+                            <div class="form-group">
+                                <label for="sector">{{ __('Sector') }}</label>
+                                <select class="form-control" id="sector" name="sector">
+                                    <option value="">{{ __('Select Sector') }}</option>
+                                    @foreach ($sectors as $sector)
+                                    <option value="{{ $sector->id }}">{{
+                                        App()->getLocale()=='en'?$sector->sector_name_en:$sector->sector_name_ar }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            {{-- button to fetch data --}}
+                            <div class="form-group mt-2" id="GetSectorData" style="display: none">
+                                <a href="" class="btn btn-primary" id="GetSector">{{ __('Get Result For This Sector')
+                                    }}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12" id="companyDiv" style="display: none">
+                            <div class="form-group">
+                                <label for="company">{{ __('Company') }}</label>
+                                <select class="form-control" id="company" name="company">
+                                    <option value="">{{ __('Select Company') }}</option>
+                                </select>
+                            </div>
+                            {{-- button to fetch data --}}
+                            <div class="form-group mt-2" id="GetCompData" style="display: none">
+                                <a href="" class="btn btn-primary" id="GetCompany">{{ __('Get Result For This Company')
+                                    }}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12" id="departmentDiv" style="display: none">
+                            <div class="form-group">
+                                <label for="Department">{{ __('Department') }}</label>
+                                <select class="form-control" id="Department" name="Department">
+                                    <option value="">{{ __('Select Department') }}</option>
+                                </select>
+                            </div>
+                            {{-- button to fetch data --}}
+                            <div class="form-group mt-2" id="GetDepData" style="display: none">
+                                <a href="" class="btn btn-primary" id="GetDep">{{ __('Get Result For This Department')
+                                    }}</a>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div> --}}
-            <div id="Function" class="card" style="font-family: emoji;letter-spacing: 0.065rem;">
-                <div class="card-header">
-                    <h3 class="card-title">Results</h3>
-                </div>
-                <div class="card-body text-capitalize">
-
-                    <div class="col-{{ count($functions) }} text-start h3 text-white p-3" style="background-color: #376092;border-radius: 45px 45px 45px 45px;width: 89%; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                        box-shadow: 5px 5px 20px 5px #ABABAB;">Engagement Drivers
-                    </div>
-                    <div class="row  padding-left-10px">
-                        @foreach ($functions as $function )
-                        <div class="text-center text-white m-1 p-2" style="background-color: #376092; width:21%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                        box-shadow: 5px 5px 20px 5px #ABABAB; font-size: 0.79rem">
-                            {{ $function->FunctionTitle }}<br>
-                            @switch( $function->FunctionTitle )
-                            @case('Head')
-                            (Intellectual Stimulation)
-                            @break
-                            @case('Heart')
-                            (Emotional Connection)
-                            @break
-                            @case('Hand')
-                            (Enablement)
-                            @break
-                            @default
-
-                            @endswitch
-                        </div>
-                        @endforeach
-                    </div>
-                    <div class="row" style="width: 100%">
-                        @foreach ($functions as $function )
-                        <?php $firstofFirstLoop= $loop->first ; ?>
-                        <div class="col-1 m-1 justify-content-center" style="width: 21%; font-size: 0.79rem">
-                            @foreach( $overall_Practices as $overall_Practice)
-                            @if ( $overall_Practice['function_id'] == $function->id)
-                            <div class="text-center @if(!$loop->first) mt-1 pb-2 pt-2 @endif @if($firstofFirstLoop) pl-1 pr-1 pb-2 pt-2 @else p-2 m-1 @endif @if($overall_Practice['weight']<=0.6) bg-danger text-white @elseif (($overall_Practice['weight']>0.6)&&($overall_Practice['weight']<=0.8)) bg-warning text-black @else bg-success text-white @endif"
-                                style=" width:100%; border-radius: 10px; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                                box-shadow: 5px 5px 20px 5px #ABABAB;">
-
-                                {{ $overall_Practice['name'] }} {{-- {{ $overall_Practice['weight']
-                                }} --}}
-                            </div>
-                            @endif
-                            @endforeach
-                        </div>
-                        @endforeach
-                    </div>
-                    <div class="row"></div>
                 </div>
             </div>
-            <button id="FunctionDownload" onclick="downloadResult('Function','Function')"
-                class="btn btn-success mt-1">Download Function</button>
-            <div id="key" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
+            {{--card for dashboard result--}}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                {{-- header --}}
                 <div class="card-header">
-                    <h3 class="card-title">Dashboard</h3>
+                    <h2 class="card-title">
+                        {{-- color text orange with later spacing 1 --}}
+                        <span class="text-orange space-x-6">
+                            {{ __('Dashboard-'.$term.' Wide') }}
+                        </span>
+                    </h2>
                 </div>
+                {{-- body --}}
+                <div class="card-body">
+                    {{-- row with three columns idintical --}}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light p-3 mb-3 rounded">
+                                {{-- header with blue background --}}
+                                <div class="card-header bg-primary">
+                                    {{-- centerlize items --}}
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <h3 class="card-title text-white text-center pt-4 pb-4">{{
+                                            __('Employee
+                                            Engagement Index') }}</h3>
+                                    </div>
+                                </div>
+                                {{-- body --}}
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center align-items-center text-center">
+                                        <div class="col-12">
+                                            <div class="speedometer
+                                            @if ($EE_Index<=25)
+                                            speed-1
+                                            @elseif($EE_Index<=50)
+                                            speed-2
+                                            @elseif($EE_Index<=65)
+                                            speed-3
+                                            @elseif($EE_Index<=85)
+                                            speed-4
+                                            @else
+                                            speed-5
+                                            @endif
+                                            ">
+                                                <div class="pointer"></div>
+                                            </div>
+                                            <h3 class="caption">{{ $EE_Index }}%</h3>
+                                        </div>
+                                        <div class="col-12 mt-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-success"
+                                                            style="height:{{ $EE_Index_Engaged }}%">
+                                                            <span>{{ $EE_Index_Engaged }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Engaged') }}</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-warning"
+                                                            style="height:{{ $EE_Index_Nuetral }}%">
+                                                            <span>{{ $EE_Index_Nuetral }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Nuetral') }}</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-danger"
+                                                            style="height:{{ $EE_Index_Actively_Disengaged }}%">
+                                                            <span>{{ $EE_Index_Actively_Disengaged
+                                                                }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Actively
+                                                        Disengaged') }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light p-3 mb-3 rounded">
+                                {{-- header with blue background --}}
+                                <div class="card-header bg-primary">
+                                    {{-- centerlize items --}}
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <h3 class="card-title text-white text-center pt-4 pb-4">{{
+                                            __('Employee
+                                            Engagement Drivers') }}</h3>
+                                    </div>
+                                </div>
+                                {{-- body --}}
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center align-items-center text-center">
+                                        @foreach ($overall_per_fun as $fun)
+                                        <div class="col-12">
+                                            <div class="caption">
+                                                <h3 class="h3">{{ $fun['fun_title'] }}</h3>
+                                                <h5 class="h6">({{ $fun['fun_des'] }})</h5>
+                                            </div>
+                                            <div class="speedometer
+                                            @if ($fun['fun_perc']<=25)
+                                            speed-1
+                                            @elseif($fun['fun_perc']<=50)
+                                            speed-2
+                                            @elseif($fun['fun_perc']<=65)
+                                            speed-3
+                                            @elseif($fun['fun_perc']<=85)
+                                            speed-4
+                                            @else
+                                            speed-5
+                                            @endif
+                                            ">
+                                                <div class="pointer"></div>
+                                            </div>
+                                            <h3 class="caption">{{ $fun['fun_perc'] }}%</h3>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light p-3 mb-3 rounded">
+                                {{-- header with blue background --}}
+                                <div class="card-header bg-primary">
+                                    {{-- centerlize items --}}
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <h3 class="card-title text-white text-center pt-2 pb-2">{{
+                                            __('Employee Net
+                                            Promotor Score (eNPS)') }}</h3>
+                                    </div>
+                                </div>
+                                {{-- body --}}
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center align-items-center text-center">
+                                        <div class="col-12">
+                                            <div class="speedometer
+                                            @if ($eNPS<=25)
+                                            speed-1
+                                            @elseif($eNPS<=50)
+                                            speed-2
+                                            @elseif($eNPS<=65)
+                                            speed-3
+                                            @elseif($eNPS<=85)
+                                            speed-4
+                                            @else
+                                            speed-5
+                                            @endif
+                                            ">
+                                                <div class="pointer"></div>
+                                            </div>
+                                            <h3 class="caption">{{ $eNPS }}%</h3>
+                                        </div>
+                                        <div class="col-12 mt-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-success"
+                                                            style="height:{{ $eNPS_Promotors }}%">
+                                                            <span>{{ $eNPS_Promotors }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Promotors')
+                                                        }}</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-warning"
+                                                            style="height:{{ $eNPS_Passives }}%">
+                                                            <span>{{ $eNPS_Passives }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Passives') }}</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-12">
+                                                    <div class="custom-progress">
+                                                        <div class="custom-progress-bar bg-danger"
+                                                            style="height:{{ $eNPS_Detractors }}%">
+                                                            <span>{{ $eNPS_Detractors }}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="caption h6">{{ __('Detractors')
+                                                        }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- card for Engagement Drivers Result-Organizational Wide --}}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                {{-- header --}}
+                <div class="card-header d-flex align-items-center">
+                    <h2 class="h4 text-orange">{{ __('Engagement Drivers Result - '.$term.' Wide')
+                        }}</h2>
+                </div>
+                {{-- body --}}
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-3 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Overall
-                            Performance
-                            <div class="mt-5">
-                                <div class="circle-wrap">
-                                    <div class="circle">
-
-                                        <div class="mask half">
-                                            <div class="fill-{{ $overallResult }}"></div>
-                                        </div>
-
-                                        <div class="mask full-{{ $overallResult }}">
-                                            <div class="fill-{{ $overallResult }}"></div>
-                                        </div>
-                                        <div class="inside-circle"> {{ $overallResult }}%<p>
-                                                Performance score</p>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                                <div class="pt-3">
-                                    Overall performance of HR functionality,
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Key
-                            improvement areas
-
-                            @for ($i=0; $i<3; $i++) <div class="mt-5 text-start">
-                                <span class="h5"> {{ $asc_perform[$i]['function'] }}</span>
-
-                                <div class="progress" style="height: 31px">
-                                    <div class="progress-bar
-                                    @if($asc_perform[$i]['performance']<=60) bg-danger @elseif($asc_perform[$i]['performance']>60 && $asc_perform[$i]['performance']<80) bg-warning @else bg-success @endif"
-                                        role="progressbar"
-                                        style="width: {{ $asc_perform[$i]['performance']  }}%; font-size: 1rem"
-                                        aria-valuenow="{{ $asc_perform[$i]['performance']  }}" aria-valuemin="0"
-                                        aria-valuemax="100">{{
-                                        $asc_perform[$i]['performance'] }}%
-                                    </div>
-                                </div>
-                                <div class="" style="width: auto;height: {{ $i==2?178:81 }}px;">
-                                    <div style="position: relative; width: 80%; height: 80%;top: 23%;left: 25%;">
-                                        <img src="{{ asset('assets/img/mainindicator.webp') }}"
-                                            style="position: absolute; top: 0; left: 0; z-index: 1;">
-                                        <img src="{{ asset('assets/img/mainindicator1.webp') }}"
-                                            style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate({{ (($asc_perform[$i]['performance'] )/100)*180}}deg);">
-                                    </div>
-                                </div>
-                        </div>
-
-                        @endfor
-
-                    </div>
-                    <div class="col-4 m-1 rounded text-center h3 p-3"
-                        style="background-color: #DCE6F2 ; color:#376092 !important;">Strength Areas
-                        @for($i=(count($asc_perform)-1); $i>=(count($asc_perform)-3); $i--) <div
-                            class="mt-5 text-start">
-                            @if($asc_perform[$i]['performance'] >80)
-                            <span class="h5"> {{ $asc_perform[$i]['function'] }}</span>
-                            <div class="progress" style="height: 31px">
-                                <div class="progress-bar @if($asc_perform[$i]['performance']<=60) bg-danger @elseif($asc_perform[$i]['performance']>60 && $asc_perform[$i]['performance']<80) bg-warning @else bg-success @endif"
-                                    role="progressbar"
-                                    style="width: {{ $asc_perform[$i]['performance']  }}%; font-size: 1rem"
-                                    aria-valuenow="{{ $asc_perform[$i]['performance']  }}" aria-valuemin="0"
-                                    aria-valuemax="100">{{
-                                    $asc_perform[$i]['performance'] }}%</div>
-                            </div>
-                            <div style="position: relative; width: 80%; height: 80%">
-                                <img src="{{ asset('assets/img/mainindicator.webp') }}"
-                                    style="position: absolute; top: 0; left: 0; z-index: 1;">
-                                <img src="{{ asset('assets/img/mainindicator1.webp') }}"
-                                    style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate({{ (($asc_perform[$i]['performance'] )/100)*180}}deg);">
-                            </div>
-                            @endif
-                        </div>
-                        @endfor
-                        {{-- <div style="position: relative; width: 80%; height: 80%">
-                            <img src="{{ asset('assets/img/mainindicator.webp') }}"
-                                style="position: absolute; top: 0; left: 0; z-index: 1;">
-                            <img src="{{ asset('assets/img/mainindicator1.webp') }}"
-                                style="position: absolute; top: 58px; left: 66px; z-index: 2;transform: rotate(0deg);">
-                        </div> --}}
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
-                        Low:</b></span>
-                <=60% – <span class="legend-levels"><b>Medium:</b></span> > 60% to 80% – <span
-                        class="legend-levels"><b>High:</b></span> >80%
-
-            </div>
-        </div>
-        <button id="keyDownload" onclick="downloadResult('key','Dashboard')" class="btn btn-success mt-1">Download
-            key</button>
-        <div id="Laverages" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
-            <div class="card-header">
-                <h3 class="card-title ">Averages by functions - Leadership
-                </h3>
-            </div>
-            <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
-                <div class="row text-center">
-                    <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">Leadership</b>
-                        view average scores
-                        by people functions
-                    </div>
-                </div>
-                <div class="row">
-                    @foreach ($sorted_leader_performences as $performence)
-
-
-                    <div class="col-3 text-end function-lable">{{ $performence['function'] }}</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar @if($performence['performance']>80 && $performence['performance']<=100) bg-success @elseif($performence['performance']>60 && $performence['performance']<=80) bg-warning @else bg-danger @endif"
-                                role="progressbar" style="width: {{ $performence['performance'] }}%; font-size: 1rem"
-                                aria-valuenow="{{ $performence['performance'] }}" aria-valuemin="0" aria-valuemax="100">
-                                {{
-                                $performence['performance'] }}%</div>
+                        <div class="col-sm-12 pt-5 pb-5 bg-primary shadow p-3 rounded">
+                            <h3 class="text-white">{{ __('Engagement Drivers') }}</h3>
                         </div>
                     </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        <button id="averagesDownload" onclick="downloadResult('Laverages','Leadership_View_Average')"
-            class="btn btn-success mt-1">Download averages</button>
-        <div id="HRaverages" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
-            <div class="card-header">
-                <h3 class="card-title ">Averages by functions - HR Team
-                </h3>
-            </div>
-            <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
-                <div class="row text-center">
-                    <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">HR Team</b>
-                        view Average scores by
-                        people functions
-                    </div>
-                </div>
-                <div class="row">
-                    @foreach ($sorted_hr_performences as $performence)
-
-
-                    <div class="col-3 text-end function-lable">{{ $performence['function'] }}</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar @if($performence['performance']>80 && $performence['performance']<=100) bg-success @elseif($performence['performance']>60 && $performence['performance']<=80) bg-warning @else bg-danger @endif"
-                                role="progressbar" style="width: {{ $performence['performance'] }}%; font-size: 1rem"
-                                aria-valuenow="{{ $performence['performance'] }}" aria-valuemin="0" aria-valuemax="100">
-                                {{
-                                $performence['performance'] }}%</div>
-                        </div>
-                    </div>
-                    @endforeach
-                    {{-- <div class="col-3 text-end function-lable">Function 6</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 95%; font-size: 1rem"
-                                aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">95%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 8</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 81%; font-size: 1rem"
-                                aria-valuenow="81" aria-valuemin="0" aria-valuemax="100">81%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 5</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 80%; font-size: 1rem"
-                                aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 4</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 79%; font-size: 1rem"
-                                aria-valuenow="79" aria-valuemin="0" aria-valuemax="100">79%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 7</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 78%; font-size: 1rem"
-                                aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">78%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 3</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 67%; font-size: 1rem"
-                                aria-valuenow="67" aria-valuemin="0" aria-valuemax="100">67%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 2</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 59%; font-size: 1rem"
-                                aria-valuenow="59" aria-valuemin="0" aria-valuemax="100">59%</div>
-                        </div>
-                    </div>
-                    <div class="col-3 text-end function-lable">Function 1</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 34%; font-size: 1rem"
-                                aria-valuenow="34" aria-valuemin="0" aria-valuemax="100">34%</div>
-                        </div>
-                    </div> --}}
-                </div>
-            </div>
-        </div>
-        <button id="averagesDownload" class="btn btn-success mt-1"
-            onclick="downloadResult('HRaverages','HR_View_Average')">Download averages</button>
-        <div id="Empaverages" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
-            <div class="card-header">
-                <h3 class="card-title ">Averages by functions - Employees
-                </h3>
-            </div>
-            <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
-                <div class="row text-center">
-                    <div class="m-1 rounded text-center h5 p-3" style="font-size: 1.7rem">
-                        People management performance – <b style="font-size: 1.5rem">Employee</b>
-                        view Average scores by
-                        people functions
-                    </div>
-                </div>
-                <div class="row">
-                    @foreach ($sorted_emp_performences as $performence)
-
-
-                    <div class="col-3 text-end function-lable">{{ $performence['function'] }}</div>
-                    <div class="col-9 text-start function-progress">
-                        <div class="progress" style="height: 31px">
-                            <div class="progress-bar @if($performence['performance']>80 && $performence['performance']<=100) bg-success @elseif($performence['performance']>60 && $performence['performance']<=80) bg-warning @else bg-danger @endif"
-                                role="progressbar" style="width: {{ $performence['performance'] }}%; font-size: 1rem"
-                                aria-valuenow="{{ $performence['performance'] }}" aria-valuemin="0" aria-valuemax="100">
-                                {{
-                                $performence['performance'] }}%</div>
-                        </div>
-                    </div>
-                    @endforeach
-
-                </div>
-            </div>
-        </div>
-        <button id="averagesDownload" class="btn btn-success mt-1"
-            onclick="downloadResult('Empaverages','Employee_View_Average')">Download
-            averages</button>
-
-        <div id="heatmap" class="card mt-4" style="font-family: emoji;letter-spacing: 0.065rem;">
-            <div class="card-header">
-                <h3 class="card-title ">High level heat map
-                </h3>
-            </div>
-            <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
-                <div class="row text-center">
-                    <div class="m-1 rounded text-center h5 p-3 text-danger" style="font-size: 1.7rem">
-                        High level heat map – Leadership view Priorities vs Performance in key
-                        People management
-                        functions
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-3 text-center heat-map heat-map-priority heat-map-priority-v">
-                        Priority by
-                        leaders</div>
-                    <div class="col-9 heat-map"></div>
-
-                    @for ($i = 0; $i < 3; $i++) <div
-                        class="col-3 text-end heat-map heat-map-priority heat-map-priority-lable text-capitalize">
-                        <span>
-                            @switch($i)
-                            @case(0)
-                            High
-                            @break
-
-                            @case(1)
-                            Medium
-                            @break
-
-                            @case(2)
-                            Low
-                            @break
-
-                            @default
-                            @endswitch
-                        </span>
-                </div>
-                <div class="col-9 heat-map">
                     <div class="row">
-                        @for ($j = 0; $j < 3; $j++) {{-- Start first --}} @if (($i==0 && $j==0) || ($i==0 && $j==1) ||
-                            ($i==1 && $j==0)) <div class="bg-danger heat-map-result">
-                            @if ($i == 0)
-                            @if ($j == 0)
-                            <ul>
-                                @foreach ($priorities as $pri)
-                                @if ($pri['priority'] >= 0.8 && $pri['priority'] <= 1) @if ($pri['performance'] <=0.6)
-                                    <li class="text-white">{{
-                                    $pri['function'] }}
-                                    </li>
-                                    @endif
-                                    @endif
-                                    @endforeach
-                            </ul>
-                            @elseif ($j == 1)
-                            <ul>
+                        @foreach ( $overall_per_fun as $fun_result)
 
-                                @foreach ($priorities as $pri)
-                                @if ($pri['priority'] >= 0.8 && $pri['priority'] <= 1) @if ($pri['performance']>
-                                    0.6
-                                    && $pri['performance'] <= 0.8) <li class="text-white">{{
-                                        $pri['function'] }}
-                                        </li>
-                                        @endif
-                                        @endif
-                                        @endforeach
-                            </ul>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="card-header d-flex align-items-center pt-3 text-center">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="caption">
+                                                    <h3 class="h3">{{ $fun_result['fun_title'] }}</h3>
+                                                    <h5 class="h5">({{ $fun_result['fun_des'] }})</h5>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="speedometer
+                                            @if ($fun_result['fun_perc']<=25)
+                                            speed-1
+                                            @elseif($fun_result['fun_perc']<=50)
+                                            speed-2
+                                            @elseif($fun_result['fun_perc']<=65)
+                                            speed-3
+                                            @elseif($fun_result['fun_perc']<=85)
+                                            speed-4
+                                            @else
+                                            speed-5
+                                            @endif
+                                            ">
+                                                    <div class="pointer"></div>
+                                                </div>
+                                                <h3 class="caption">{{ $fun_result['fun_perc'] }}%</h3>
+                                            </div>
+                                            @foreach ($overall_per_practice as $practice)
+                                            @if ($practice['FunctionId']==$fun_result['fun_id'])
 
-                            @else
-                            <ul>
-
-                                @foreach ($priorities as $pri)
-                                ffff
-                                @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance'] <=0.6) <li
-                                    class="text-white">{{
-                                    $pri['function'] }}</li>
-                                    @endif
-                                    @endif
-                                    @endforeach
-                            </ul>
-                            @endif
-                            @else
-                            @if ($j == 0)
-                            <ul>
-
-                                @foreach ($priorities as $pri)
-                                @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance'] <=0.6) <li
-                                    class="text-white">{{
-                                    $pri['function'] }}</li>
-                                    @endif
-                                    @endif
-                                    @endforeach
-                            </ul>
-                            @endif
-                            @endif
-                    </div>
-                    @endif
-                    {{-- End first --}}
-                    {{-- Start second --}}
-                    @if (($i == 1 && $j == 1) || ($i == 2 && $j == 1) || ($i == 2 && $j == 0))
-                    <div class="bg-warning heat-map-result">
-                        @if ($i == 1)
-                        @if ($j == 1)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.6 && $pri['priority'] <0.8) @if ($pri['performance']>
-                                0.6 &&
-                                $pri['performance'] <= 0.8) <li class="text-black">{{
-                                    $pri['function'] }}</li>
-                                    @endif
-                                    @endif
-                                    @endforeach
-                        </ul>
-                        @endif
-                        @else
-                        @if ($j == 0)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] <=0.6) @if ($pri['performance'] <=0.6) <li class="text-black">
-                                {{$pri['function'] }}</li>
-                                @endif
-                                @endif
-                                @endforeach
-                        </ul>
-                        @endif
-                        @if ($j == 1)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] <=0.6) @if ($pri['performance']> 0.6 &&
-                                $pri['performance'] <= 0.8) <li class="text-black">{{
-                                    $pri['function'] }}</li>
-                                    @endif
-                                    @endif
-                                    @endforeach
-                        </ul>
-                        @endif
-                        @endif
-                    </div>
-                    @endif
-                    {{-- End second --}}
-                    {{-- Start third --}}
-                    @if (($i == 0 && $j == 2) || ($i == 1 && $j == 2) || ($i == 2 && $j == 2))
-                    <div class="bg-success heat-map-result">
-                        @if ($i == 0)
-                        @if ($j == 2)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.8 && $pri['priority'] <= 1) @if ($pri['performance']>
-                                0.8)
-                                <li class="text-white">{{ $pri['function'] }}</li>
-                                @endif
-                                @endif
-                                @endforeach
-                        </ul>
-                        @endif
-                        @endif
-                        @if ($i == 1)
-                        @if ($j == 2)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] >0.6 && $pri['priority'] < 0.8) @if ($pri['performance']>
-                                0.8)
-                                <li class="text-white">{{ $pri['function'] }}
-                                </li>
-                                @endif
-                                @endif
-                                @endforeach
-                        </ul>
-                        @endif
-                        @endif
-                        @if ($i == 2)
-                        @if ($j == 2)
-                        <ul>
-
-                            @foreach ($priorities as $pri)
-                            @if ($pri['priority'] <=0.6) @if ($pri['performance']> 0.8)
-                                <li class="text-white">{{ $pri['function'] }}
-                                </li>
-                                @endif
-                                @endif
-                                @endforeach
-                        </ul>
-                        @endif
-                        @endif
-                    </div>
-                    @endif
-                    @endfor
-                </div>
-            </div>
-            @endfor
-
-            <div class="col-3 text-end heat-map">
-                <span></span>
-            </div>
-            <div class="col-9 heat-map">
-                <div class="row">
-                    <div class="heat-map-bottom-label">Low</div>
-                    <div class="heat-map-bottom-label">Medium</div>
-                    <div class="heat-map-bottom-label">High</div>
-                </div>
-            </div>
-            <div class="col-3 text-end heat-map">
-                <span></span>
-            </div>
-            <div class="col-9 heat-map text-center p-3">
-                <div class="heat-map-bottom-title">
-                    People management performance score by leaders
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- card footer --}}
-    <div class="card-footer">
-        <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
-                Low:</b></span>
-        <=60% – <span class="legend-levels"><b>Medium:</b></span> > 60% to 80% – <span
-                class="legend-levels"><b>High:</b></span> >80%
-
-    </div>
-</div>
-<button id="heatmapDownload" class="btn btn-success mt-1" onclick="downloadResult('heatmap','heatmap')">
-    Download heatmap
-</button>
-<div class="card mt-4" id="Linear" style="font-family: emoji;letter-spacing: 0.065rem;">
-    <div class="card-header">
-        <h4 class="card-title">Linear chart</h4>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-12">
-                <div class="chart-container">
-                    <canvas id="myChart" width="400" height="400"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- <div id="img-out"></div> --}}
-    {{-- <button id="pptDownload" class="btn btn-success">Download PPT</button> --}}
-</div>
-<button id="heatmapDownload" class="btn btn-success mt-1" onclick="downloadResult('Linear','Linear')">Download
-    Chart</button>
-<div class="card mt-4" id="Consolidated" style="font-family: emoji;letter-spacing: 0.065rem;">
-    <div class="card-header">
-        <h4 class="card-title">Consolidated</h4>
-    </div>
-    <div class="card-body" style="font-family: emoji;letter-spacing: 0.065rem;">
-        <div class="row">
-            <div class="col-12">
-                Consolidated findings by function
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-1 m-1 text-white" style="font-size: 0.84rem;
-    border: 4px solid #376092;
-    background-color: #376092;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;">
-                <span>Functions</span>
-            </div>
-            @foreach ($asc_perform as $perfomr)
-            <div class="m-1 text-white" style="width: 10.4% !important; font-size: 0.8rem; border: 4px solid #376092;
-    background-color: #376092;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-            flex-direction: column;
-            text-align: center;">
-                {{ $perfomr['function'] }}
-            </div>
-            @endforeach
-        </div>
-        <div class="row">
-            <div class="col-sm-1 m-1 text-white" style="font-size: 0.84rem;
-    border: 4px solid #376092;
-    background-color: #376092;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;">
-                <span style="hyphens: auto;">Improvement need
-                </span>
-            </div>
-            @foreach ($asc_perform as $perfomr)
-            <div class="m-1 @if($perfomr['performance']<=60) bg-danger text-white @elseif($perfomr['performance']>80) bg-success text-white @else bg-warning @endif"
-                style="width: 10.4% !important; font-size: 0.8rem border-radius: 10px;
-                ">
-                @if($perfomr['performance']<=60) Critical to improve @elseif($perfomr['performance']>80) No
-                    Improvement
-                    Needed
-                    @else Need to improve
-                    @endif
-            </div>
-            @endforeach
-        </div>
-        <div class="row">
-            <div class="col-sm-1 m-1 text-white" style="font-size: 0.84rem;
-            border: 4px solid #376092;
-            background-color: #376092;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-            flex-direction: column;
-            text-align: center;">
-                <span>Performance rating by
-                    Leaders, Employees and HR Team
-                </span>
-            </div>
-            @foreach ($asc_perform as $perfomr)
-
-            <div class="m-1 " style="width: 10.4% !important; font-size: 0.8rem border-radius: 10px;">
-                @foreach( $sorted_leader_performences as $leader)
-                @if($leader['function_id'] == $perfomr['function_id'])
-                <div class="row mt-2">
-                    <div class="col-md-5">
-                        <img src="{{ asset('assets/img/icon/LeadersIcon.png') }}" height="30" width="35" alt="">
-                    </div>
-                    {{ $leader['performance'] }}% <br>
-                </div>
-                @break;
-                @endif
-                @endforeach
-                {{-- hr --}}
-                @foreach ($sorted_hr_performences as $hr)
-                @if($hr['function_id'] == $perfomr['function_id'])
-                <div class="row mt-2">
-                    <div class="col-md-5">
-                        <img src="{{ asset('assets/img/icon/HRIcon.png') }}" height="30" width="35" alt="">
-                    </div>
-                    {{ $hr['performance'] }}% <br>
-                </div>
-                @break;
-                @endif
-                @endforeach
-                {{-- emp --}}
-                @foreach ($sorted_emp_performences as $emp)
-                @if($emp['function_id'] == $perfomr['function_id'])
-                <div class="row mt-2">
-                    <div class="col-md-5">
-                        <img src="{{ asset('assets/img/icon/EmployeIcon.png') }}" height="30" width="35" alt="">
-                    </div>
-                    {{ $emp['performance'] }}% <br>
-                </div>
-                @break;
-                @endif
-                @endforeach
-            </div>
-            @endforeach
-        </div>
-        <div class="row">
-            <div class="col-sm-1 m-1 text-white" style="font-size: 0.84rem;
-    border: 4px solid #376092;
-    background-color: #376092;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;">
-                <span>Priority
-                </span>
-            </div>
-            @foreach ($asc_perform as $perfomr)
-            <div class="m-1 " style="width: 10.4% !important; font-size: 0.8rem">
-                @foreach ($priorities as $pro)
-                @if($pro['function_id'] == $perfomr['function_id'])
-                <div class="@if( $pro['priority']<=0.6) bg-success text-white @elseif($pro['priority']>0.6 && $pro['priority']<=0.8) bg-warning text-black @else bg-danger text-white @endif"
-                    style="border-radius: 10px;     display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;
-    height: 2rem;
-    font-size: 1rem;">
-                    @if( $pro['priority']<=0.6) Low @elseif($pro['priority']>0.6 && $pro['priority']
-                        <=0.8) Medium @else High @endif </div>
-
-                            @break
-                            @endif
-                            @endforeach
-                </div>
-                @endforeach
-            </div>
-            <div class="row">
-                <div class="col-sm-1 m-1 text-white" style="font-size: 0.84rem;
-    border: 4px solid #376092;
-    background-color: #376092;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;">
-
-                    <span>Key improvement areas by practices
-                    </span>
-                </div>
-                @foreach ($asc_perform as $perfomr)
-                <?php $count=0; ?>
-                <div class="m-1 " style="width: 10.4% !important; font-size: 0.8rem">
-                    <ul class="list-group" style="width: 100%; border-radius: 10px;">
-                        @foreach ( $overAllpractice as $practice)
-                        @if($practice['function_id'] == $perfomr['function_id'])
-                        <li class="list-group-item list-group-item p-2 text-center">
-                            {{ $practice['name'] }}
-                        </li>
-                        <?php $count++; ?>
-                        @endif
-                        @if($count==3)
-                        @break;
-                        @endif
+                                            <div class="col-12 pt-2 pb-2 text-center mb-2 rounded
+                                            @if ($practice['practice_perc']<=54)
+                                                bg-danger text-white
+                                            @elseif($practice['practice_perc']<=74)
+                                                bg-warning
+                                                @else
+                                                bg-success text-white
+                                            @endif
+                                            ">
+                                                {{ $practice['PracticeTitle'] }}
+                                            </div>
+                                            @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         @endforeach
-                    </ul>
+                    </div>
                 </div>
-                @endforeach
             </div>
-        </div>
-        <div class="card-footer">
-            <span class="legend-result"><b>Legend:</b></span> <span class="legend-levels"><b>
-                    Leadership:</b></span>
-            <img src="{{ asset('assets/img/icon/LeadersIcon.png') }}" height="20" width="25" alt="">
-            – <span class="legend-levels"><b>HR Team:</b></span> <img src="{{ asset('assets/img/icon/HRIcon.png') }}"
-                height="20" width="25" alt=""> –
-            <span class="legend-levels"><b>Employee:</b></span> <img
-                src="{{ asset('assets/img/icon/EmployeIcon.png') }}" height="20" width="25" alt="">
+            {{-- card for Top and Bottom Scores-Organizational Wide --}}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                {{-- header --}}
+                <div class="card-header d-flex align-items-center">
+                    <h2 class="h4 text-orange">{{ __('Top and Bottom Scores - '.$term.' Wide') }}
+                    </h2>
+                </div>
+                {{-- body --}}
 
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            {{-- card --}}
+                            <div class="card p-3 mb-5 rounded">
+                                {{-- header --}}
+                                <div class="card-header d-flex align-items-center bg-primary">
+                                    <h3 class="h3 text-white">{{ __('Key Strengths') }}</h3>
+                                </div>
+                                {{-- body --}}
+                                <div class="card-body">
+                                    <div class="row">
+                                        @foreach ($highest_practices as $parctice)
+
+                                        <div class="col-12">
+                                            <span class="caption"> {{ $parctice['PracticeTitle']
+                                                }}</span>
+                                            <div class="progress" role="progressbar" aria-label="Warning example"
+                                                aria-valuenow="{{  $parctice['practice_perc'] }}" aria-valuemin="0"
+                                                aria-valuemax="100" style="height: 20px">
+                                                <div class="progress-bar
+                                                @if ($parctice['practice_perc']>=75)
+                                                text-bg-success
+                                                @elseif ($parctice['practice_perc']>=55)
+                                                text-bg-warning
+                                                @else
+                                                text-bg-danger
+                                                @endif
+                                                "
+                                                    style="width: {{  $parctice['practice_perc'] }}% ; font-size: 0.9rem;">
+                                                    {{
+                                                    $parctice['practice_perc'] }}%</div>
+                                            </div>
+
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            {{-- card --}}
+                            <div class="card p-3 mb-5 rounded">
+                                {{-- header --}}
+                                <div class="card-header d-flex align-items-center bg-primary">
+                                    <h3 class="h3 text-white">{{ __('Key Improvement Areas') }}</h3>
+                                </div>
+                                {{-- body --}}
+                                <div class="card-body">
+                                    <div class="row">
+                                        @foreach ($lowest_practices as $parctice)
+
+                                        <div class="col-12">
+                                            <span class="caption"> {{ $parctice['PracticeTitle']
+                                                }}</span>
+                                            <div class="progress" role="progressbar" aria-label="Warning example"
+                                                aria-valuenow="{{  $parctice['practice_perc'] }}" aria-valuemin="0"
+                                                aria-valuemax="100" style="height: 20px">
+                                                <div class="progress-bar
+                                                @if ($parctice['practice_perc']>=75)
+                                                text-bg-success
+                                                @elseif ($parctice['practice_perc']>=55)
+                                                text-bg-warning
+                                                @else
+                                                text-bg-danger
+                                                @endif
+                                                "
+                                                    style="width: {{  $parctice['practice_perc'] }}% ; font-size: 0.9rem;">
+                                                    {{
+                                                    $parctice['practice_perc'] }}%</div>
+                                            </div>
+
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            {{--
+                            ===========================================================================
+                            --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if(!$isDep)
+            {{-- card for Heat Map-Engagement Drivers Result across Sectors --}}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                {{-- header --}}
+                <div class="card-header d-flex align-items-center">
+                    <h2 class="h4 text-orange">{{ __('Heat Map - Engagement Drivers Result across '.$term1) }}</h2>
+                </div>
+                {{-- body --}}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-active table-bordered" aria-colspan="2">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="bg-info">{{ __($term2) }}</th>
+                                    <th class="bg-info">{{
+                                        App()->getLocale()=='ar'?$driver_functions[0]->FunctionTitleAr:$driver_functions[0]->FunctionTitle
+                                        }}</th>
+                                    <th class="bg-info">{{
+                                        App()->getLocale()=='ar'?$driver_functions[1]->FunctionTitleAr:$driver_functions[1]->FunctionTitle
+                                        }}</th>
+                                    <th class="bg-info">{{
+                                        App()->getLocale()=='ar'?$driver_functions[2]->FunctionTitleAr:$driver_functions[2]->FunctionTitle
+                                        }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ( $result_per_sector as $Sect_data)
+                                <tr>
+                                    <td class="text-center bg-info">{{ $Sect_data['sector_name'] }}</td>
+
+                                    @foreach ($Sect_data['functions'] as $sect_fun)
+                                    @if($sect_fun['fun_id']==$driver_functions[0]->id)
+                                    <td class="text-center
+                                    @if ($sect_fun['sect_perc']>=75)
+                                        bg-success
+                                        @elseif ($sect_fun['sect_perc']>=55)
+                                        bg-warning
+                                    @else
+                                    bg-danger
+                                    @endif">
+                                        {{ $sect_fun['sect_perc'] }}%
+                                    </td>
+                                    @break
+                                    @endif
+                                    @endforeach
+                                    @foreach ($Sect_data['functions'] as $sect_fun)
+                                    @if($sect_fun['fun_id']==$driver_functions[1]->id)
+                                    <td class="text-center
+                                    @if ($sect_fun['sect_perc']>=75)
+                                        bg-success
+                                        @elseif ($sect_fun['sect_perc']>=55)
+                                        bg-warning
+                                    @else
+                                    bg-danger
+                                    @endif">
+                                        {{ $sect_fun['sect_perc'] }}%
+                                    </td>
+                                    @break
+                                    @endif
+                                    @endforeach
+                                    @foreach ($Sect_data['functions'] as $sect_fun)
+                                    @if($sect_fun['fun_id']==$driver_functions[2]->id)
+                                    <td class="text-center
+                                    @if ($sect_fun['sect_perc']>=75)
+                                        bg-success
+                                        @elseif ($sect_fun['sect_perc']>=55)
+                                        bg-warning
+                                    @else
+                                    bg-danger
+                                    @endif">
+                                        {{ $sect_fun['sect_perc'] }}%
+                                    </td>
+                                    @break
+                                    @endif
+                                    @endforeach
+
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
+        {{-- =============================================================== --}}
     </div>
-    <button id="heatmapDownload" class="btn btn-success mt-1" style="border-radius: 10px;
-    -webkit-box-shadow: 5px 5px 20px 5px #ababab;
-    box-shadow: 5px 5px 20px 5px #ababab;" onclick="downloadResult('Consolidated','Consolidated')">Download
-        Consolidated</button>
-    <div class="row text-start">
-        <div class="col-4 p-3 ">
-
-            <button id="DownloadAll" class="btn btn-success mt-3" style="border-radius: 10px;
-    -webkit-box-shadow: 5px 5px 20px 5px #ababab;
-    box-shadow: 5px 5px 20px 5px #ababab;">Download
-                All Graph</button>
-        </div>
-        <div class="col-4 p-3 ">
-
-            <a href="{{ route('surveys.DownloadSurvey',$id) }}" class="btn btn-success mt-3" style="border-radius: 10px;
-    -webkit-box-shadow: 5px 5px 20px 5px #ababab;
-    box-shadow: 5px 5px 20px 5px #ababab;">Download Survey Answers</a>
-        </div>
-        <div class="col-4 p-3 ">
-
-            <a href="{{ route('surveys.DownloadPriorities',$id) }}" class="btn btn-success mt-3" style="border-radius: 10px;
-    -webkit-box-shadow: 5px 5px 20px 5px #ababab;
-    box-shadow: 5px 5px 20px 5px #ababab;">Download Priorities Answers</a>
-        </div>
-    </div>
-</div>
-</div>
 </div>
 @endsection
 @section('scripts')
-{{-- <script src="{{ asset('assets/js/libs/jszip.min.js') }}"></script>
-<script src="{{ asset('assets/js/dist/pptxgen.min.js') }}"></script> --}}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js">
-</script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.esm.js">
-</script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.js">
-</script>
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    Labels= @json($function_Lables);
-    Leaders= @json($leaders_perform_only);
-    hr=@json($hr_perform_only);
-    const ctx = document.getElementById('myChart');
-
-const myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: Labels,
-        datasets: [
-            {
-            label: 'Leadership responses',
-            data: Leaders,
-            backgroundColor: [
-                'rgba(0, 74, 159, 1)'//,
-                // 'rgba(54, 162, 235, 0.2)',
-                // 'rgba(255, 206, 86, 0.2)',
-                // 'rgba(75, 192, 192, 0.2)',
-                // 'rgba(153, 102, 255, 0.2)',
-                // 'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(0, 74, 159, 1)'//,
-                // 'rgba(54, 162, 235, 1)',
-                // 'rgba(255, 206, 86, 1)',
-                // 'rgba(75, 192, 192, 1)',
-                // 'rgba(153, 102, 255, 1)',
-                // 'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        },
-            {
-            label: 'HR responses',
-            data: hr,
-            backgroundColor: [
-                // 'rgba(255, 99, 132, 0.2)',
-                // 'rgba(54, 162, 235, 0.2)',
-                // 'rgba(255, 206, 86, 0.2)',
-                // 'rgba(75, 192, 192, 0.2)',
-                // 'rgba(153, 102, 255, 0.2)',
-                'rgba(0, 153, 204,1)'
-            ],
-            borderColor: [
-                // 'rgba(255, 99, 132, 1)',
-                // 'rgba(54, 162, 235, 1)',
-                // 'rgba(255, 206, 86, 1)',
-                // 'rgba(75, 192, 192, 1)',
-                // 'rgba(153, 102, 255, 1)',
-                'rgba(0, 159, 204, 1)'
-            ],
-            borderWidth: 1
-        },
-    ]
-    },
-    options: {
-        scales: {
-            y: {
-                suggestedMin: 0,
-                suggestedMax: 100,
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Score'
+    var survey_id="{{ $survey_id }}"
+    $("#sector").change(function(){
+if($("#sector").val()!='')
+{
+    $.ajax({
+                type:"GET",
+                url:"{{ url('companies/getForSelect') }}/"+$("#sector").val(),
+                success:function(res){
+                    if(res){
+                        $("#company").empty();
+                        $("#company").append('<option value="">{{ __("Select Company") }}</option>');
+                        $.each(res,function(key,value){
+                            $("#company").append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
+                        });
+                    }else{
+                        $("#company").empty();
+                    }
                 }
-            }
-        }
-    }
+            });
+    // GetSectorData companyDiv
+    $('#companyDiv').show();
+    $('#GetSectorData').show();
+    //set href for GetSector
+    $('#GetSector').attr('href','{{ url("/survey-answers/SectorResult/") }}/'+survey_id+'/'+$("#sector").val());
+}
+else{
+    $('#GetSectorData').hide();
+    $('#companyDiv').hide();
+    $('#GetCompData').hide();
+    $('#departmentDiv').hide();
+    $('#GetDepData').hide();
+}
 });
-$("#DownloadAll").click(function(){
-    window.setTimeout(function(){
-                 // do whatever you want to do
-                 downloadResult('Function','Function' )
-                  }, 3000);
-    window.setTimeout(function(){
-                 // do whatever you want to do
-                 downloadResult('key','Dashboard' )
-                  }, 3000);
-    window.setTimeout(function(){
-                 // do whatever you want to do
-                 downloadResult('Laverages','Leadership_View_Average' )
-                  }, 3000);
-    window.setTimeout(function(){
-                 // do whatever you want to do
-                 downloadResult('HRaverages','HR_View_Average' )
-                  }, 3000);
-                  window.setTimeout(function(){
-                             // do whatever you want to do
-                             downloadResult('Empaverages','Employee_View_Average' )
-                              }, 3000);
-                window.setTimeout(function(){
-                             // do whatever you want to do
-                             downloadResult('heatmap','heatmap' )
-                              }, 3000);
-                window.setTimeout(function(){
-                             // do whatever you want to do
-                             downloadResult('Linear','Linear' )
-                              }, 3000);
-                window.setTimeout(function(){
-                             // do whatever you want to do
-                             downloadResult('Consolidated','Consolidated' )
-                              }, 3000);
-                });
+    $("#company").change(function(){
+if($("#company").val()!='')
+{
+    $.ajax({
+                type:"GET",
+                url:"{{ url('departments/getForSelect') }}/"+$("#company").val(),
+                success:function(res){
+                    if(res){
+                        $("#Department").empty();
+                        $("#Department").append('<option value="">{{ __("Select Department") }}</option>');
+                        $.each(res,function(key,value){
+                            $("#Department").append('<option value="'+value.id+'">'+value.dep_name_en+'</option>');
+                        });
+                    }else{
+                        $("#Department").empty();
+                    }
+                }
+            });
 
-                // $("#heatmapDownload").click(function() {
+    // GetSectorData companyDiv
 
-    //     html2canvas(document.getElementById("heatmap")).then(function(canvas) {
-    //         downloadImage(canvas.toDataURL(), "heatmap.png");
-    //     });
-
-
-    // });
-    // $("#FunctionDownload").click(function() {
-
-    //     html2canvas(document.getElementById("Function")).then(function(canvas) {
-    //         downloadImage(canvas.toDataURL(), "Function.png");
-    //     });
-
-
-    // });
-    // $("#keyDownload").click(function() {
-
-    //     html2canvas(document.getElementById("key")).then(function(canvas) {
-    //         downloadImage(canvas.toDataURL(), "key.png");
-    //     });
-// });
-    function downloadResult(Resultcard, filename = 'untitled') {
-        console.log(Resultcard);
-        html2canvas(document.getElementById(Resultcard)).then(function(canvas) {
-            downloadImage(canvas.toDataURL(), filename+".png");
-        });
-    }
-
-    function downloadImage(uri, filename) {
-        var link = document.createElement('a');
-        if (typeof link.download !== 'string') {
-            window.open(uri);
-        } else {
-            link.href = uri;
-            link.download = filename;
-            accountForFirefox(clickLink, link);
-        }
-    }
-
-    function clickLink(link) {
-        link.click();
-    }
-
-    function accountForFirefox(click) {
-        var link = arguments[1];
-        document.body.appendChild(link);
-        click(link);
-        document.body.removeChild(link);
-    }
+    $('#departmentDiv').show();
+    $('#GetCompData').show();
+    //set href for GetCompany
+    $('#GetCompany').attr('href','{{ url("/survey-answers/CompanyResult/") }}/'+survey_id+'/'+$("#company").val());
+}else{
+    $('#GetCompData').hide();
+    $('#departmentDiv').hide();
+    $('#GetDepData').hide();
+}
+});
+$("#Department").change(function(){
+    if($("#Department").val()!='')
+{
+    $('#GetDepData').show();
+    //set href for GetDep
+    $('#GetDep').attr('href','{{ url("/survey-answers/DepartmentResult/") }}/'+survey_id+'/'+$("#Department").val());
+}
+else{
+    $('#GetDepData').hide();
+}
+});
 </script>
 @endsection

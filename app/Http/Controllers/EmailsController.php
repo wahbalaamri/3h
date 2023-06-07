@@ -6,9 +6,12 @@ use App\Http\Requests\EmailByUploadStoreRequest;
 use App\Http\Requests\EmailStoreRequest;
 use App\Http\Requests\EmailUpdateRequest;
 use App\Mail\SendSurvey;
+use App\Models\Clients;
 use App\Models\EmailContent;
 use App\Models\Emails;
+use App\Models\Sectors;
 use App\Models\SurveyAnswers;
+use App\Models\Surveys;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Input;
@@ -63,8 +66,11 @@ class EmailsController extends Controller
         $email->ClientId = $request->get('ClientId');
         $email->SurveyId = $request->get('SurveyId');
         $email->Email = $request->get('Email');
+        $email->EmployeeType=$request->EmployeeType;
         //department id
-        $email->dep_id = $request->get('dep_id');
+        $email->dep_id = $request->get('DepartmentId');
+        $email->AddedBy=Auth()->user()->id;
+        $email->save();
         return redirect()->route('clients.show', $request->get('ClientId'));
     }
 
@@ -341,8 +347,9 @@ class EmailsController extends Controller
     public function CreateNewEmails($ClientID, $SurveyID)
     {
         $data = [
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::where('ClientId', '=', $ClientID)->get(),
+            'sectors'=>Sectors::where('client_id',$ClientID)->get(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::where('ClientId', '=', $ClientID)->get(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
         ];

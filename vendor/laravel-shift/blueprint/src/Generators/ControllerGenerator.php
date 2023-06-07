@@ -125,7 +125,7 @@ class ControllerGenerator extends AbstractClassGenerator implements Generator
                             $queryStatement = new QueryStatement('all', [$statement->reference()]);
                             $body = implode(PHP_EOL, [
                                 self::INDENT . $queryStatement->output($statement->reference()),
-                                PHP_EOL . $body
+                                PHP_EOL . $body,
                             ]);
 
                             $this->addImport($controller, $this->determineModel($controller, $queryStatement->model()));
@@ -158,7 +158,16 @@ class ControllerGenerator extends AbstractClassGenerator implements Generator
                 if (isset($fqcn) && $name !== 'destroy' && $controller->isApiResource()) {
                     $method = str_replace(')' . PHP_EOL, '): \\' . $fqcn . PHP_EOL, $method);
                 } else {
-                    $method = str_replace(')' . PHP_EOL, '): \Illuminate\Http\Response' . PHP_EOL, $method);
+                    $returnType = match (true) {
+                        $statement instanceof RenderStatement => 'Illuminate\View\View',
+                        $statement instanceof RedirectStatement => 'Illuminate\Routing\Redirector',
+                        default => 'Illuminate\Http\Response'
+                    };
+
+                    $method = Str::of($method)
+                        ->replace('* @return \\Illuminate\\Http\\Response', '* @return \\' . $returnType)
+                        ->replace(')' . PHP_EOL, '): \\' . $returnType . PHP_EOL)
+                        ->toString();
                 }
             }
 

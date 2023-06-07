@@ -106,7 +106,6 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
 
     protected function populateStub(string $stub, Model $model)
     {
-        $stub = str_replace('{{ class }}', $this->getClassName($model), $stub);
         $stub = str_replace('{{ table }}', $model->tableName(), $stub);
         $stub = str_replace('{{ definition }}', $this->buildDefinition($model), $stub);
 
@@ -123,7 +122,6 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
 
     protected function populatePivotStub(string $stub, array $segments)
     {
-        $stub = str_replace('{{ class }}', $this->getPivotClassName($segments), $stub);
         $stub = str_replace('{{ table }}', $this->getPivotTableName($segments), $stub);
         $stub = str_replace('{{ definition }}', $this->buildPivotTableDefinition($segments), $stub);
 
@@ -136,7 +134,6 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
 
     protected function populatePolyStub(string $stub, string $parentTable)
     {
-        $stub = str_replace('{{ class }}', $this->getPolyClassName($parentTable), $stub);
         $stub = str_replace('{{ table }}', $this->getPolyTableName($parentTable), $stub);
         $stub = str_replace('{{ definition }}', $this->buildPolyTableDefinition($parentTable), $stub);
 
@@ -157,14 +154,19 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
 
         /**
          * @var \Blueprint\Models\Column $column
-        */
+         */
         foreach ($model->columns() as $column) {
             $dataType = $column->dataType();
 
             if ($column->name() === 'id' && $dataType === 'id') {
                 $dataType = 'bigIncrements';
             } elseif ($dataType === 'id') {
-                $dataType = 'unsignedBigInteger';
+                if ($model->isPivot()) {
+                    // TODO: what if constraints are enabled?
+                    $dataType = 'foreignId';
+                } else {
+                    $dataType = 'unsignedBigInteger';
+                }
             }
 
             if (in_array($dataType, self::UNSIGNABLE_TYPES) && in_array('unsigned', $column->modifiers())) {
@@ -180,10 +182,6 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
                 $column_definition .= '$table->id(';
             } elseif ($dataType === 'rememberToken') {
                 $column_definition .= '$table->rememberToken(';
-            } elseif ($dataType === 'softDeletes') {
-                $column_definition .= '$table->softDeletes(';
-            } elseif ($dataType === 'softDeletesTz') {
-                $column_definition .= '$table->softDeletesTz(';
             } else {
                 $column_definition .= '$table->' . $dataType . "('{$column->name()}'";
             }
@@ -275,6 +273,10 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
         }
         if ($model->usesTimestamps()) {
             $definition .= self::INDENT . '$table->' . $model->timestampsDataType() . '();' . PHP_EOL;
+        }
+
+        if ($model->usesSoftDeletes()) {
+            $definition .= self::INDENT . '$table->' . $model->softDeletesDataType() . '();' . PHP_EOL;
         }
 
         return trim($definition);
@@ -407,24 +409,18 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
 
         if ($overwrite) {
             $migrations = collect($this->filesystem->files($dir))
-                ->filter(
-                    fn (SplFileInfo $file) => str_contains($file->getFilename(), $name)
-                )
+                ->filter(fn (SplFileInfo $file) => str_contains($file->getFilename(), $name))
                 ->sort();
 
             if ($migrations->isNotEmpty()) {
                 $migration = $migrations->first()->getPathname();
 
                 $migrations->diff($migration)
-                    ->each(
-                        function (SplFileInfo $file) {
-                            $path = $file->getPathname();
-
-                            $this->filesystem->delete($path);
-
-                            $this->output['deleted'][] = $path;
-                        }
-                    );
+                    ->each(function (SplFileInfo $file) {
+                        $path = $file->getPathname();
+                        $this->filesystem->delete($path);
+                        $this->output['deleted'][] = $path;
+                    });
 
                 return $migration;
             }
@@ -433,22 +429,10 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
         return $dir . $timestamp->format('Y_m_d_His') . $name;
     }
 
-    protected function getPivotClassName(array $segments)
-    {
-        return 'Create' . Str::studly($this->getPivotTableName($segments)) . 'Table';
-    }
-
-    protected function getPolyClassName(string $parentTable)
-    {
-        return 'Create' . Str::studly($this->getPolyTableName($parentTable)) . 'Table';
-    }
-
     protected function getPivotTableName(array $segments)
     {
         $isCustom = collect($segments)
-            ->filter(
-                fn ($segment) => Str::contains($segment, ':')
-            )->first();
+            ->filter(fn ($segment) => Str::contains($segment, ':'))->first();
 
         if ($isCustom) {
             $table = Str::after($isCustom, ':');
@@ -456,10 +440,7 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
             return $table;
         }
 
-        $segments = array_map(
-            fn ($name) => Str::snake($name),
-            $segments
-        );
+        $segments = array_map(fn ($name) => Str::snake($name), $segments);
         sort($segments);
 
         return strtolower(implode('_', $segments));
@@ -495,9 +476,7 @@ class MigrationGenerator extends AbstractClassGenerator implements Generator
         }
 
         return collect(self::UNSIGNABLE_TYPES)
-            ->contains(
-                fn ($value) => strtolower($value) === strtolower($type)
-            );
+            ->contains(fn ($value) => strtolower($value) === strtolower($type));
     }
 
     protected function isIdOrUuid(string $dataType)

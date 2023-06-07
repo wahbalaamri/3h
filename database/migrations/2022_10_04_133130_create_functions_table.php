@@ -20,6 +20,7 @@ class CreateFunctionsTable extends Migration
             $table->integer('PlanId');
             $table->text('Respondent');
             $table->boolean('Status');
+            $table->boolean('IsDriver')->default(1);
             $table->boolean('IsDefault')->default(1);
             $table->timestamps();
         });

@@ -13,7 +13,8 @@ class StoreSectorsRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        //check if current user is admin
+        return auth()->user()->user_type=='superadmin';
     }
 
     /**

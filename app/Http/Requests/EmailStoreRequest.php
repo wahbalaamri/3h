@@ -28,6 +28,7 @@ class EmailStoreRequest extends FormRequest
             'SurveyId' => ['required', 'integer'],
             'ClientId' => ['required', 'integer'],
             'EmployeeType' => ['required', 'integer'],
+            'DepartmentId' => ['required'],
             'AddedBy' => ['required', 'integer'],
         ];
     }

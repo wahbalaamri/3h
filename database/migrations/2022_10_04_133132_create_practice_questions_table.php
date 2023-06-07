@@ -20,6 +20,7 @@ class CreatePracticeQuestionsTable extends Migration
             $table->integer('PracticeId');
             $table->integer('Respondent');
             $table->boolean('Status');
+            $table->boolean('IsENPS');
             $table->timestamps();
         });
     }

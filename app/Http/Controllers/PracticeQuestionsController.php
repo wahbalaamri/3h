@@ -145,6 +145,7 @@ class PracticeQuestionsController extends Controller
                 $remoteQuestion->PracticeId = $quetion->Practice;
                 $remoteQuestion->Respondent = $quetion->Respondent;
                 $remoteQuestion->Status = $quetion->Status;
+                $remoteQuestion->IsENPS = $quetion->IsENPS;
 
                 array_push($Questions, $remoteQuestion);
             }

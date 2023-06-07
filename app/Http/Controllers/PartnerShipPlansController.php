@@ -215,6 +215,7 @@ class PartnerShipPlansController extends Controller
                     $remotFunctions->PlanId = $function->planId;
                     $remotFunctions->Respondent = $function->Respondent;
                     $remotFunctions->Status = $function->status;
+                    $remotFunctions->IsDriver = $function->isDriver;
                     $remotFunctions->save();
                 }
             }
@@ -233,7 +234,7 @@ class PartnerShipPlansController extends Controller
         $response = curl_exec($ch);
         $result = json_decode($response);
         curl_close($ch);
-
+        Log::alert($result);
         if (is_array($result)) {
             foreach ($result as $function) {
                 if (FunctionPractice::find(intval($function->Id)) != null)
@@ -276,6 +277,7 @@ class PartnerShipPlansController extends Controller
                     $remoteQuestion->PracticeId = $quetion->Practice;
                     $remoteQuestion->Respondent = $quetion->Respondent;
                     $remoteQuestion->Status = $quetion->Status;
+                    $remoteQuestion->IsENPS = $quetion->IsENPS;
                     $remoteQuestion->save();
                 }
             }

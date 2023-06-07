@@ -13,11 +13,8 @@ class StoreDepartmentsRequest extends FormRequest
      */
     public function authorize()
     {
-        // check if current user is authenticated
-        if (auth()->check()) {
-            return true;
-        }
-        return false;
+
+        return auth()->user()->user_type=='superadmin';
     }
 
     /**
@@ -29,7 +26,8 @@ class StoreDepartmentsRequest extends FormRequest
     {
         return [
             // department name is required
-            'dep_name' => 'required',
+            'department_name_en' => 'required',
+            'department_name_ar' => 'required',
         ];
     }
     /**

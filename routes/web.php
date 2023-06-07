@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\DepartmentsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Home;
+use App\Http\Controllers\SectorsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +35,7 @@ Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'inde
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-Route::post('/functions/change-status', [App\Http\Controllers\PartnerShipPlansController::class,'changeStatus'])->middleware('auth');
+Route::post('/functions/change-status', [App\Http\Controllers\PartnerShipPlansController::class, 'changeStatus'])->middleware('auth');
 Route::resource('partner-ship-plans', App\Http\Controllers\PartnerShipPlansController::class)->middleware('auth');
 Route::get('/partner-ship-plans/getPlan/{id}', [App\Http\Controllers\PartnerShipPlansController::class, 'getPlan'])->name('partner-ship-plans.getPlan')->middleware('auth');
 
@@ -59,10 +62,10 @@ Route::post('/practice-questions/SaveNewQuestion/{id}', [App\Http\Controllers\Pr
 // save remote data
 Route::post('/practice-questions/save/{id}', [App\Http\Controllers\PracticeQuestionsController::class, 'saveQuestions'])->name('practice-questions.save')->middleware('auth');
 
-Route::get('/clients/getClients/{id}', [App\Http\Controllers\ClientsController::class,'getClients'])->name('clients.getClients')->middleware('auth');
+Route::get('/clients/getClients/{id}', [App\Http\Controllers\ClientsController::class, 'getClients'])->name('clients.getClients')->middleware('auth');
 Route::resource('clients', App\Http\Controllers\ClientsController::class)->middleware('auth');
-Route::get('users/changePassword/{id}', [UsersController::class,'changePassword'])->name('users.changePassword')->middleware('auth');
-Route::post('users/storeNewPass/{id}', [UsersController::class,'storeNewPass'])->name('users.storeNewPass')->middleware('auth');
+Route::get('users/changePassword/{id}', [UsersController::class, 'changePassword'])->name('users.changePassword')->middleware('auth');
+Route::post('users/storeNewPass/{id}', [UsersController::class, 'storeNewPass'])->name('users.storeNewPass')->middleware('auth');
 Route::resource('users', App\Http\Controllers\UsersController::class)->middleware('auth');
 
 Route::get('/emails/send-survey/{Surveyid}/{Clientid}', [App\Http\Controllers\EmailsController::class, 'sendSurveyw'])->name('emails.Ssurvey')->middleware('auth');
@@ -85,30 +88,44 @@ Route::post('/emails/saveUpload', [App\Http\Controllers\EmailsController::class,
 //post route for copy email
 Route::post('/emails/copy', [App\Http\Controllers\EmailsController::class, 'copy'])->name('emails.copy')->middleware('auth');
 
-Route::get('surveys/DownloadPriorities/{id}', [App\Http\Controllers\SurveysController::class,'DownloadPriorities'])->name('surveys.DownloadPriorities')->middleware('auth');
-Route::get('surveys/DownloadSurvey/{id}', [App\Http\Controllers\SurveysController::class,'DownloadSurvey'])->name('surveys.DownloadSurvey')->middleware('auth');
-Route::get('surveys/CreateNewSurvey/{id}', [App\Http\Controllers\SurveysController::class,'CreateNewSurvey'])->name('surveys.CreateNewSurvey')->middleware('auth');
-Route::post('surveys/ChangeCheck', [App\Http\Controllers\SurveysController::class,'ChangeCheck'])->name('surveys.ChangeCheck')->middleware('auth');
+Route::get('surveys/DownloadPriorities/{id}', [App\Http\Controllers\SurveysController::class, 'DownloadPriorities'])->name('surveys.DownloadPriorities')->middleware('auth');
+Route::get('surveys/DownloadSurvey/{id}', [App\Http\Controllers\SurveysController::class, 'DownloadSurvey'])->name('surveys.DownloadSurvey')->middleware('auth');
+Route::get('surveys/CreateNewSurvey/{id}', [App\Http\Controllers\SurveysController::class, 'CreateNewSurvey'])->name('surveys.CreateNewSurvey')->middleware('auth');
+Route::post('surveys/ChangeCheck', [App\Http\Controllers\SurveysController::class, 'ChangeCheck'])->name('surveys.ChangeCheck')->middleware('auth');
 Route::resource('surveys', App\Http\Controllers\SurveysController::class)->middleware('auth');
 
-Route::get('survey-answers/freeSurveyResult/{id}', [App\Http\Controllers\SurveyAnswersController::class,'ShowFreeResult'])->name('survey-answers.freeSurveyResult');
+Route::get('survey-answers/freeSurveyResult/{id}', [App\Http\Controllers\SurveyAnswersController::class, 'ShowFreeResult'])->name('survey-answers.freeSurveyResult');
 Route::resource('survey-answers', App\Http\Controllers\SurveyAnswersController::class)->middleware('auth');
-Route::get('/survey-answers/result/{id}', [App\Http\Controllers\SurveyAnswersController::class,'result'])->name('survey-answers.result')->middleware('auth');
+Route::get('/survey-answers/result/{id}', [App\Http\Controllers\SurveyAnswersController::class, 'result'])->name('survey-answers.result')->middleware('auth');
+Route::get('/survey-answers/SectorResult/{id}/{sctor}', [App\Http\Controllers\SurveyAnswersController::class, 'SectorResult'])->name('survey-answers.SectorResult')->middleware('auth');
+Route::get('/survey-answers/CompanyResult/{id}/{company}', [App\Http\Controllers\SurveyAnswersController::class, 'CompanyResult'])->name('survey-answers.CompanyResult')->middleware('auth');
+Route::get('/survey-answers/DepartmentResult/{id}/{dep}', [App\Http\Controllers\SurveyAnswersController::class, 'DepartmentResult'])->name('survey-answers.DepartmentResult')->middleware('auth');
 // Route::get('/survey-answers/free-result/{id}', [App\Http\Controllers\SurveyAnswersController::class,'free-result'])->name('survey-answers.free-result')->middleware('auth');
 
 Route::resource('priorities-answers', App\Http\Controllers\PrioritiesAnswersController::class)->middleware('auth');
-Route::get('/service-request', [App\Http\Controllers\RequestServiceController::class,'index'])->middleware('auth')->name('service-request.index');
-Route::get('/service-request/{id}', [App\Http\Controllers\RequestServiceController::class,'show'])->middleware('auth')->name('service-request.show');
-Route::post('/service-request/store', [App\Http\Controllers\RequestServiceController::class,'store'])->name('service-request.store');
-Route::get('/service-request/create', [App\Http\Controllers\RequestServiceController::class,'create'])->name('service-request.create');
-Route::get('/service-request/add_client/{id}', [App\Http\Controllers\RequestServiceController::class,'addClient'])->name('request-service.add_client')->middleware('auth');
+Route::get('/service-request', [App\Http\Controllers\RequestServiceController::class, 'index'])->middleware('auth')->name('service-request.index');
+Route::get('/service-request/{id}', [App\Http\Controllers\RequestServiceController::class, 'show'])->middleware('auth')->name('service-request.show');
+Route::post('/service-request/store', [App\Http\Controllers\RequestServiceController::class, 'store'])->name('service-request.store');
+Route::get('/service-request/create', [App\Http\Controllers\RequestServiceController::class, 'create'])->name('service-request.create');
+Route::get('/service-request/add_client/{id}', [App\Http\Controllers\RequestServiceController::class, 'addClient'])->name('request-service.add_client')->middleware('auth');
+Route::get('sectors/getClientsSectors/{id}', [SectorsController::class, 'getClientsSectors'])->name('sectors.getClientsSectors');
+Route::resource('sectors', SectorsController::class);
+//companies.getClientsCompanies
+Route::get('companies/getClientsCompanies/{id}', [CompaniesController::class, 'getClientsCompanies'])->name('companies.getClientsCompanies');
+Route::resource('companies',CompaniesController::class);
+Route::resource('departments',DepartmentsController::class);
+Route::POST('/getCompanies/{id}',[CompaniesController::class,'GetCompanies'])->name('getCompanies');
+Route::POST('/getDeps/{id}',[CompaniesController::class,'GetDeps'])->name('getDeps');
+Route::get('departments/getClientsDepartments/{id}',[DepartmentsController::class,'getClientsDepartments'])->name('departments.getClientsDepartments');
+Route::get('departments/getForSelect/{id}',[DepartmentsController::class,'GetForSelect'])->name('departments.getSelect')->middleware('auth');
+Route::get('companies/getForSelect/{id}',[CompaniesController::class,'GetForSelect'])->name('companies.getSelect')->middleware('auth');
 // route to change language
-Route::get('lang/{locale}', function(){
+Route::get('lang/{locale}', function () {
     session()->put('locale', request()->locale);
     return redirect()->back();
 })->name('lang.swap');
 Route::get('/testing/migrate', function () {
-    Artisan::call('migrate:fresh');
+    Artisan::call('migrate:fresh --seed');
     $dd_output = Artisan::output();
     dd($dd_output);
 });
