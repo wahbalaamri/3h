@@ -34654,7 +34654,7 @@ ul.releaseRow li {
 }
 
 .speedometer.speed-1 {
-    background-color: #ed1c24;
+    background-color: #dc3545;
 }
 
 .speedometer.speed-1>.pointer {
@@ -34662,7 +34662,7 @@ ul.releaseRow li {
 }
 
 .speedometer.speed-2 {
-    background-color: #f59122;
+    background-color: #dc3545;
 }
 
 .speedometer.speed-2>.pointer {
@@ -34670,7 +34670,7 @@ ul.releaseRow li {
 }
 
 .speedometer.speed-3 {
-    background-color: #e3d61e;
+    background-color: #ffc107;
 }
 
 .speedometer.speed-3>.pointer {
@@ -34678,7 +34678,7 @@ ul.releaseRow li {
 }
 
 .speedometer.speed-4 {
-    background-color: #add732;
+    background-color: #ffc107;
 }
 
 .speedometer.speed-4>.pointer {
@@ -34686,7 +34686,7 @@ ul.releaseRow li {
 }
 
 .speedometer.speed-5 {
-    background-color: #39b54a;
+    background-color: #28a745;
 }
 
 .speedometer.speed-5>.pointer {
@@ -34784,4 +34784,8 @@ ul.releaseRow li {
     text-align: center;
     color: white;
     font-weight: bold;
+}
+
+.menu-li-iteam {
+    margin-right: 1rem !important
 }

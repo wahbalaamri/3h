@@ -3,7 +3,7 @@
 {{-- add imager banner --}}
 <div class="container-fluid">
     <div class="row main-bg">
-        <div class="col-lg-4 col-md-12 col-sm-12 p-0 m-0">
+        <div class="col-lg-4 col-md-12 col-sm-12 p-0 m-0 d-flex">
             <img src="{{ asset('assets/img/mainbg.webp') }}" class="float-start image-2" alt="" srcset="">
         </div>
         <div class="col-lg-8 col-md-12 col-sm-12 p-0 m-0 text-center justify-content-center align-self-center">
@@ -21,7 +21,7 @@
 {{-- add welcome paragraph --}}
 <div class="container-fluid p-5">
     {{-- <div class="row"> --}}
-        <div class="col-12 text-center justify-content-center align-self-center">
+        <div class="col-12 text-center justify-content-center align-self-center d-flex">
             <h1 class="text-start" style="color: #f09e2e;
             font-size: 54px;">
                 {{ __('Our Methodology:') }}
@@ -143,7 +143,7 @@
 </div>
 <div class="container-fluid p-5">
     {{-- <div class="row"> --}}
-        <div class="col-12 text-center justify-content-center align-self-center">
+        <div class="col-12 text-center justify-content-center align-self-center d-flex">
             <h1 class="text-start" style="color: #f09e2e;
             font-size: 54px;">
                 {{ __('Employee Engagement:') }}
@@ -152,7 +152,7 @@
         </div>
         <div class="col-12 text-center justify-content-center align-self-center pt-5">
             <div class="row">
-                <div class="col-lg-5 col-md-12 col-sm-12">
+                <div class="col-lg-5 col-md-12 col-sm-12 d-flex">
                     <p class="text-start col-9 float-end" style="font-size: 24px">
                         {{ __('The emotional, mental and physical connection of employees to the organization that drives an extraordinary personal contribution that achieves a win-win situation for a better employee happiness and organizational outcome.') }} </p>
                 </div>
@@ -161,21 +161,21 @@
                     <img src="{{ asset('assets/img/all.webp') }}" alt="" srcset="" height="" style="">
                 </div>
                 <div class="col-lg-3 col-md-12 col-sm-12">
-                    <div class="col-lg-12 text-start">
+                    <div class="col-lg-12 text-start d-flex">
                         <span style="font-size: 26px">
-                            <b class="text-start">{{ __('Heart') }}</b><br>
+                            <b class="{{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Heart') }}</b><br>
                             {{ __('Emotional Connection') }}
                         </span>
                     </div>
-                    <div class="col-lg-12 text-start">
+                    <div class="col-lg-12 text-start d-flex">
                         <span style="font-size: 26px">
-                            <b class="text-start">{{ __("Head") }}</b><br>
+                            <b class="{{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __("Head") }}</b><br>
                             {{ __('Intellectual Stimulation') }}
                         </span>
                     </div>
-                    <div class="col-lg-12 text-start">
+                    <div class="col-lg-12 text-start d-flex">
                         <span style="font-size: 26px">
-                            <b class="text-start">{{ __('Hand') }}</b><br>
+                            <b class="{{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Hand') }}</b><br>
                             {{ __('Enablement') }}
                         </span>
                     </div>
@@ -195,8 +195,8 @@
                 <div class="col-lg-5 col-md-12 col-sm-12">
                     <div class="col-12">
                         <img src="{{ asset('assets/img/nabahan.webp') }}" alt="" srcset="" height="" style="">
-                        <div class="row text-start">
-                            <p>
+                        <div class="row d-flex">
+                            <p class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">
                                 <span style="font-size: 36px; font-style: italic">{{ __('Contact :') }}
                                 </span><br>
                                 <span
@@ -215,15 +215,15 @@
                                     Nabahan@extramiles-om.com
                                 </span><br>
                                 <hr class="w-75">
-                                <span style="font-size: 21px;">
+                                <span style="font-size: 21px;" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">
                                     {{ __('Or Clients Happiness Champion:') }}
                                 </span><br>
-                                <span
+                                <span class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}"
                                     style="font-size: 26px;font-style: italic; font-weight: bold; color:#f09e2e; margin: 0; padding: 0;">
                                     {{ __('Muath Al Musalmi') }}
                                 </span>
                                 <br>
-                                <span style="font-size: 23px; font-weight: 500">
+                                <span style="font-size: 23px; font-weight: 500" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">
                                     <i class="fa fa-phone"></i>
                                     +968 7917 8007
                                 </span><br>
@@ -253,7 +253,7 @@
                     </div>
                 </div> --}}
                 <div class="col-lg-7 col-md-12 col-sm-12">
-                    <div class="row">
+                    <div class="col-12 d-flex">
                         <h1 class="text-start" style="color: #f09e2e;
                         font-size: 50px; font-weight: bold; font-style: italic">
                             {{ __('Employee Engagement:') }}
@@ -267,8 +267,8 @@
                             <img src="{{ asset('assets/img/heart.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>{{ __('Heart') }}</b></h1>
-                            <p style="font-size: 20px">{{ __('80% Emotional Connection') }}
+                            <h1 style="font-size: 21px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}"><b>{{ __('Heart') }}</b></h1>
+                            <p style="font-size: 20px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">{{ __('80% Emotional Connection') }}
                             </p>
                         </div>
                     </div>
@@ -280,8 +280,8 @@
                             <img src="{{ asset('assets/img/Head.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>{{ __('Head') }}</b></h1>
-                            <p style="font-size: 20px">{{ __('55% Intellectual Stimulation') }}</p>
+                            <h1 style="font-size: 21px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}"><b>{{ __('Head') }}</b></h1>
+                            <p style="font-size: 20px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">{{ __('55% Intellectual Stimulation') }}</p>
                         </div>
                     </div>
                     <div class="row pt-5">
@@ -292,11 +292,11 @@
                             <img src="{{ asset('assets/img/Hand.webp') }}" height="50" alt="">
                         </div>
                         <div class="col-lg-3 text-start my-auto">
-                            <h1 style="font-size: 21px"><b>{{ __('Hand') }}</b></h1>
-                            <p style="font-size: 20px">{{ __('33% Enablement') }}</p>
+                            <h1 style="font-size: 21px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}"><b>{{ __('Hand') }}</b></h1>
+                            <p style="font-size: 20px" class="{{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">{{ __('33% Enablement') }}</p>
                         </div>
                     </div>
-                    <div class="row pt-5 text-start">
+                    <div class="row pt-5 {{ App()->getLocale()=='ar'? 'text-end':'text-start' }}">
                         <p>
                             <span style="font-size: 19px; font-weight: bold">{{ __('Employee Net Promotor Score (eNPS)') }}
                             </span><br>

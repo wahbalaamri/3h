@@ -23,7 +23,7 @@ class QuestionnairController extends Controller
         }
         $answerBythisEmail = SurveyAnswers::where('AnsweredBy', $id)->count();
         if ($answerBythisEmail > 0) {
-            return view('errors.404');
+            return view('errors.completed');
         }
         $SurveyId = $emailDetails->SurveyId;
         $survey = Surveys::where([['id', $SurveyId], ['SurveyStat', '=', true]])->first();
@@ -34,23 +34,23 @@ class QuestionnairController extends Controller
         $functions = Functions::where([['Status', '=', 1], ['PlanId', '=', $survey->PlanId]])->get();
         $user_type = $emailDetails->EmployeeType;
         $can_ansewer_to_priorities = false;
-        foreach ($functions as $function) {
-            if ($user_type == 3) {
-                if ($function->Respondent == 2 || $function->Respondent == 4 || $function->Respondent == 5 || $function->Respondent == 7 || $function->Respondent == 8) {
-                    $can_ansewer_to_priorities = true;
-                }
-            }
-            if ($user_type == 2) {
-                if ($function->Respondent == 1 || $function->Respondent == 4 || $function->Respondent == 6 || $function->Respondent == 7 || $function->Respondent == 8) {
-                    $can_ansewer_to_priorities = true;
-                }
-            }
-            if ($user_type == 1) {
-                if ($function->Respondent == 3 || $function->Respondent == 5 || $function->Respondent == 6 || $function->Respondent == 7 || $function->Respondent == 8) {
-                    $can_ansewer_to_priorities = true;
-                }
-            }
-        }
+        // foreach ($functions as $function) {
+        //     if ($user_type == 3) {
+        //         if ($function->Respondent == 2 || $function->Respondent == 4 || $function->Respondent == 5 || $function->Respondent == 7 || $function->Respondent == 8) {
+        //             $can_ansewer_to_priorities = true;
+        //         }
+        //     }
+        //     if ($user_type == 2) {
+        //         if ($function->Respondent == 1 || $function->Respondent == 4 || $function->Respondent == 6 || $function->Respondent == 7 || $function->Respondent == 8) {
+        //             $can_ansewer_to_priorities = true;
+        //         }
+        //     }
+        //     if ($user_type == 1) {
+        //         if ($function->Respondent == 3 || $function->Respondent == 5 || $function->Respondent == 6 || $function->Respondent == 7 || $function->Respondent == 8) {
+        //             $can_ansewer_to_priorities = true;
+        //         }
+        //     }
+        // }
         $data = [
             'functions' => $functions,
             'user_type' => $user_type,

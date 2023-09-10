@@ -15,11 +15,11 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-6">
-                                <h3 class="card-title">Edit Client Details</h3>
+                                <h3 class="card-title">{{ __('Edit Client Details') }}</h3>
                             </div>
                             {{-- back to clients button --}}
                             <div class="col-6 text-end">
-                                <a href="{{ route('clients.index') }}" class="btn btn-primary">Back to Clients</a>
+                                <a href="{{ route('clients.index') }}" class="btn btn-primary">{{ __('Back') }}</a>
                             </div>
                         </div>
                     </div>
@@ -29,26 +29,26 @@
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
-                                <label for="ClientName" class="form-label">Client Name</label>
+                                <label for="ClientName" class="form-label">{{ __('Client Name') }}</label>
                                 <input type="text" class="form-control" id="ClientName" name="ClientName"
                                     value="{{ $client->ClientName }}">
                             </div>
                             <div class="mb-3">
-                                <label for="ClientPhone" class="form-label">Client Phone</label>
+                                <label for="ClientPhone" class="form-label">{{ __('Client Phone') }}</label>
                                 <input type="text" class="form-control" id="ClientPhone" name="ClientPhone"
                                     value="{{ $client->ClientPhone }}">
                             </div>
                             <div class="mb-3">
-                                <label for="CilentFPName" class="form-label">Focal Point Name</label>
+                                <label for="CilentFPName" class="form-label">{{ __('Focal Point Name') }}</label>
                                 <input type="text" class="form-control" id="CilentFPName" name="CilentFPName"
                                     value="{{ $client->CilentFPName }}">
                             </div>
                             <div class="mb-3">
-                                <label for="CilentFPEmil" class="form-label">Focal Point Email</label>
+                                <label for="CilentFPEmil" class="form-label">{{ __('Focal Point Email') }}</label>
                                 <input type="email" class="form-control" id="CilentFPEmil" name="CilentFPEmil"
                                     value="{{ $client->CilentFPEmil }}">
                             </div>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                         </form>
                     </div>
                 </div>

@@ -34,8 +34,8 @@ class EmailsController extends Controller
         // $emails = Emails::all();
         $data = [
             'emails' => array(),
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.index')->with($data);
     }
@@ -47,8 +47,8 @@ class EmailsController extends Controller
     public function create(Request $request)
     {
         $data = [
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.create')->with($data);
     }
@@ -76,7 +76,7 @@ class EmailsController extends Controller
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Emails $email
+     * @param Emails $email
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, Emails $email)
@@ -86,22 +86,22 @@ class EmailsController extends Controller
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Emails $email
+     * @param Emails $email
      * @return \Illuminate\Http\Response
      */
     public function edit(Request $request, Emails $email)
     {
         $data = [
             'email' => $email,
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.edit')->with($data);
     }
 
     /**
      * @param \App\Http\Requests\EmailsUpdateRequest $request
-     * @param \App\Models\Emails $email
+     * @param Emails $email
      * @return \Illuminate\Http\Response
      */
     public function update(EmailUpdateRequest $request, Emails $email)
@@ -119,7 +119,7 @@ class EmailsController extends Controller
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Emails $email
+     * @param Emails $email
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, Emails $email)
@@ -136,8 +136,8 @@ class EmailsController extends Controller
         $emails = Emails::where([['ClientId', '=', $ClientID], ['SurveyId', '=', $SurveyID]])->get();
         $data = [
             'emails' => $emails,
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.index')->with($data);
     }
@@ -201,16 +201,16 @@ class EmailsController extends Controller
     {
         $data = [
             'emails' => EmailContent::all(),
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.manage')->with($data);
     }
     public function CreateContent(Request $request)
     {
         $data = [
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.createcontent')->with($data);
     }
@@ -240,8 +240,8 @@ class EmailsController extends Controller
         $email = EmailContent::find($id);
         $data = [
             'email' => $email,
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
         ];
         return view('Emails.viewcontent')->with($data);
     }
@@ -268,8 +268,8 @@ class EmailsController extends Controller
     public function sendSurveyw(Request $request, $SurveyID, $ClientID)
     {
         $data = [
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
             'reminder' => 0
@@ -306,8 +306,8 @@ class EmailsController extends Controller
     public function sendReminder(Request $request, $SurveyID, $ClientID)
     {
         $data = [
-            'clients' => \App\Models\Clients::all(),
-            'surveys' => \App\Models\Surveys::all(),
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
             'reminder' => 1

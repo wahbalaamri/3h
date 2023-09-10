@@ -19,7 +19,7 @@
             </ul>
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="card-title">Create Email (Manual)</h3>
+                    <h3 class="card-title">{{ __('Create Email (Manual)') }}</h3>
                 </div>
                 <div class="card-body">
 
@@ -29,10 +29,10 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="SurveyId">Survey ID</label>
+                                    <label for="SurveyId">{{ __('Survey') }}</label>
                                     <select name="SurveyId" id="SurveyId"
                                         class="form-control @error('SurveyId') is-invalid @enderror" disabled>
-                                        <option value="">Select Survey</option>
+                                        <option value="">{{ __('Select Survey') }}</option>
                                         @foreach ($surveys as $survey)
                                         <option value="{{ $survey->id }}" @if (old('SurveyId',$surveyId)==$survey->id)
                                             selected @endif>
@@ -47,10 +47,10 @@
                             </div>
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="ClientId">Client ID</label>
+                                    <label for="ClientId">{{ __('Client') }}</label>
                                     <select name="ClientId" id="ClientId"
                                         class="form-control @error('ClientId') is-invalid @enderror" disabled>
-                                        <option value="">Select Client</option>
+                                        <option value="">{{ __('Select Client') }}</option>
                                         @foreach ($clients as $client)
                                         <option value="{{ $client->id }}" @if (old('ClientId',$clientId)==$client->id)
                                             selected @endif>
@@ -115,7 +115,7 @@
                             {{-- employee email --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="Email">Email</label>
+                                    <label for="Email">{{ __('Email') }}</label>
                                     <input type="text" name="Email" id="Email"
                                         class="form-control @error('Email') is-invalid @enderror"
                                         value="{{ old('Email') }}" placeholder="Email">
@@ -128,16 +128,16 @@
                             {{-- employee type --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="EmployeeType">Employee Type</label>
+                                    <label for="EmployeeType">{{ __('Employee Type') }}</label>
                                     <select name="EmployeeType" id="EmployeeType"
                                         class="form-control @error('EmployeeType') is-invalid @enderror">
-                                        <option value="">Select Employee Type</option>
-                                        <option value="1" @if (old('EmployeeType')==1) selected @endif>Manager
+                                        <option value="">{{ __('Select Employee Type') }}</option>
+                                        <option value="1" @if (old('EmployeeType')==1) selected @endif>{{ __('Manager') }}
                                         </option>
-                                        <option value="2" @if (old('EmployeeType')==2) selected @endif>HR Team
+                                        <option value="2" @if (old('EmployeeType')==2) selected @endif>{{ __('HR Team') }}
                                         </option>
                                         <option value="3" @if (old('EmployeeType')==3) selected @endif>
-                                            Employee</option>
+                                            {{ __('Employee') }}</option>
                                     </select>
                                     {{-- validation --}}
                                     @error('EmployeeType')
@@ -151,7 +151,7 @@
                             value="{{ Auth::user()->user_type == 'superadmin' ? 0 : Auth::user()->company_id }}">
                         <div class="row text-end mt-4">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Create</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
                             </div>
                         </div>
                     </form>
@@ -160,7 +160,7 @@
             {{-- add email by upload file --}}
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="card-title">Create Email (Upload File)</h3>
+                    <h3 class="card-title">{{ __('Create Email (Upload File)') }}</h3>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('emails.saveUpload') }}" method="POST" enctype="multipart/form-data"
@@ -169,10 +169,10 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="SurveyIdU">Survey ID</label>
+                                    <label for="SurveyIdU">{{ __('Survey') }}</label>
                                     <select name="SurveyIdU" id="SurveyIdU"
                                         class="form-control @error('SurveyIdU') is-invalid @enderror" disabled>
-                                        <option value="">Select Survey</option>
+                                        <option value="">{{ __('Select Survey') }}</option>
                                         @foreach ($surveys as $survey)
                                         <option value="{{ $survey->id }}" @if (old('SurveyIdU',$surveyId)==$survey->id)
                                             selected @endif>
@@ -187,10 +187,10 @@
                             </div>
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="ClientIdU">Client ID</label>
+                                    <label for="ClientIdU">{{ __('Client') }}</label>
                                     <select name="ClientIdU" id="ClientIdU"
                                         class="form-control @error('ClientIdU') is-invalid @enderror" disabled>
-                                        <option value="">Select Client</option>
+                                        <option value="">{{ __('Select Client') }}</option>
                                         @foreach ($clients as $client)
                                         <option value="{{ $client->id }}" @if (old('ClientIdU',$clientId)==$client->id)
                                             selected @endif>
@@ -202,7 +202,7 @@
                         </div>
                         <div class="row">
                             <div class="form-group">
-                                <label for="EmailFile">Upload File</label>
+                                <label for="EmailFile">{{ __('Upload File') }}</label>
                                 <input type="file" name="EmailFile" id="EmailFile"
                                     class="form-control @error('EmailFile') is-invalid @enderror">
                                 {{-- validation --}}
@@ -215,7 +215,7 @@
                             value="{{ Auth::user()->user_type == 'superadmin' ? 0 : Auth::user()->company_id }}">
                         <div class="row text-end mt-4">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             </div>
                         </div>
                     </form>
@@ -224,7 +224,7 @@
             {{-- copy from previous survey --}}
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Copy From Previous Survey</h3>
+                    <h3 class="card-title">{{ __('Copy From Previous Survey') }}</h3>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('emails.copy') }}" method="POST" class="d-inline" id="CopyFrom">
@@ -232,10 +232,10 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="SurveyIdC">Old Survey</label>
+                                    <label for="SurveyIdC">{{ __('Old Survey') }}</label>
                                     <select name="SurveyIdC" id="SurveyIdC"
                                         class="form-control @error('SurveyIdC') is-invalid @enderror">
-                                        <option value="">Select Survey</option>
+                                        <option value="">{{ __('Select Survey') }}</option>
                                         @foreach ($surveys as $survey)
                                         @if($survey->id!=$surveyId)
                                         <option value="{{ $survey->id }}" @if (old('SurveyIdC')==$survey->id) selected
@@ -252,10 +252,10 @@
                             </div>
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="ClientIdC">Client ID</label>
+                                    <label for="ClientIdC">{{ __('Client') }}</label>
                                     <select name="ClientIdC" id="ClientIdC"
                                         class="form-control @error('ClientIdC') is-invalid @enderror" disabled>
-                                        <option value="">Select Client</option>
+                                        <option value="">{{ __('Select Client') }}</option>
                                         @foreach ($clients as $client)
                                         <option value="{{ $client->id }}" @if (old('ClientIdC',$clientId)==$client->id)
                                             selected @endif>
@@ -268,10 +268,10 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="NewSurveyIdC">New Survey</label>
+                                    <label for="NewSurveyIdC">{{ __('New Survey') }}</label>
                                     <select name="NewSurveyIdC" id="NewSurveyIdC"
                                         class="form-control @error('NewSurveyIdC') is-invalid @enderror" disabled>
-                                        <option value="">Select Survey</option>
+                                        <option value="">{{ __('Select Survey') }}</option>
                                         @foreach ($surveys as $survey)
                                         <option value="{{ $survey->id }}" @if (old('NewSurveyIdC',$surveyId)==$survey->
                                             id) selected @endif>
@@ -289,7 +289,7 @@
                             value="{{ Auth::user()->user_type == 'superadmin' ? 0 : Auth::user()->company_id }}">
                         <div class="row text-end mt-4">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Copy</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Copy') }}</button>
                             </div>
                         </div>
                     </form>

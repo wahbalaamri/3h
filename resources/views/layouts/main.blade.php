@@ -113,7 +113,7 @@
     @yield('style')
 </head>
 
-<body class="background-white" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
+<body class="background-white">
 
 
     <!-- header -->
@@ -123,9 +123,11 @@
                 <div class="row">
                     <div class="col-6 text-white float-start">
                         @if( app()->getLocale()=='en')
-                        <a class="text-white" href="{{ route('lang.swap','ar') }}" style="text-decoration: none">العربية</a>
+                        <a class="text-white" href="{{ route('lang.swap','ar') }}"
+                            style="text-decoration: none">العربية</a>
                         @else
-                        <a class="text-white" href="{{ route('lang.swap','en') }}" style="text-decoration: none">English</a>
+                        <a class="text-white" href="{{ route('lang.swap','en') }}"
+                            style="text-decoration: none">English</a>
                         @endif
                     </div>
                     <div class="col-6 text-white text-end">
@@ -134,10 +136,11 @@
                             {{-- login or logout --}}
                             @if (Auth::check())
                             <div class="col-3">
-                                <a href="{{ route('users.changePassword',auth()->user()->id) }}" class="text-white text-decoration-none" >
-                                <i class="fas fa-key"></i>
-                                {{ __('Change Password') }}
-                            </a>
+                                <a href="{{ route('users.changePassword',auth()->user()->id) }}"
+                                    class="text-white text-decoration-none">
+                                    <i class="fas fa-key"></i>
+                                    {{ __('Change Password') }}
+                                </a>
                             </div>
                             <div class="col-3 text-start">
                                 <a href="{{ route('logout') }}" class="text-white text-decoration-none" onclick="event.preventDefault();
@@ -192,14 +195,16 @@
                         </div>
                     </div> --}}
 
-                    <div class="col-xl-4 col-lg-4">
-                        <div class="float-lg-right margin-top-0px">
-                            <ul id="menu-main" class="float-lg-left nav-menu dropdown-dark">
-                                <li><a href="/">{{ __('Home') }}</a></li>
+                    <div class="col-xl-4 col-lg-4 d-flex" dir="{{ App()->getLocale()=='ar'?'rtl':'ltr' }}">
+                        <div class="float-start margin-top-0px">
+                            <ul id="menu-main" class="float-start nav-menu dropdown-dark">
+                                <li><a href="/" class="menu-li-iteam" {{-- style="margin-right:1rem !important" --}}>{{ __('Home') }}</a></li>
                                 @if (Auth()->check())
 
                                 @if (Auth()->user()->user_type == 'admin' ||Auth()->user()->user_type == 'superadmin')
-                                <li><a href="{{ route('partner-ship-plans.index') }}">{{ __('Control Panel') }}</a> </li>
+                                <li><a href="{{ route('partner-ship-plans.index') }}" class="menu-li-iteam"
+                                        {{-- style="margin-right:1rem !important" --}}>{{ __('Control Panel') }}</a>
+                                </li>
                                 @endif
                                 @endif
                                 {{-- <li><a href="/TrainingHome#learnOnline">تعلم</a> </li>
@@ -225,9 +230,9 @@
         </div>
     </header>
     <!-- // header -->
-
-    @yield('content')
-
+    <div class="" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
+        @yield('content')
+    </div>
     <footer class="background-footer mt-1" dir="ltr" style="">
         <div class="container mt-1 pt-1 pb-1">
             <div class="row">
@@ -242,8 +247,9 @@
 
                         </div> --}}
                         <div class="col-6 logo margin-bottom-10px text-right">
-                            <a id="logo" href="https://www.hrfactoryapp.com/" class="d-inline-block margin-top-20px"><img
-                                    src="{{ asset('assets/img/logo.png') }}" height="" alt=""></a>
+                            <a id="logo" href="https://www.hrfactoryapp.com/"
+                                class="d-inline-block margin-top-20px"><img src="{{ asset('assets/img/logo.png') }}"
+                                    height="" alt=""></a>
                         </div>
                     </div>
                     <!-- // Social -->

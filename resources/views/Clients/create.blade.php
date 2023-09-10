@@ -14,11 +14,11 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-6">
-                                <h3 class="card-title">Create New Client</h3>
+                                <h3 class="card-title">{{ __('Create New Client') }}</h3>
                             </div>
                             {{-- create New Client button --}}
                             <div class="col-6 text-end">
-                                <a href="{{ route('clients.index') }}" class="btn btn-primary">Back</a>
+                                <a href="{{ route('clients.index') }}" class="btn btn-primary">{{ __('Back') }}</a>
                             </div>
                         </div>
                     </div>
@@ -29,9 +29,9 @@
                             <div class="row">
                                 <div class="col-6">
                                     <div class="mb-3">
-                                        <label for="ClientName" class="form-label">Client Name</label>
+                                        <label for="ClientName" class="form-label">{{ __('Client Name') }}</label>
                                         <input type="text" class="form-control @error('ClientName') is-invalid @enderror"
-                                            id="ClientName" name="ClientName" placeholder="Client Name">
+                                            id="ClientName" name="ClientName" placeholder="{{ __('Client Name') }}">
                                         {{-- validation error --}}
                                         @error('ClientName')
                                             <p class="text-danger">{{ $message }}</p>
@@ -40,10 +40,10 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mb-3">
-                                        <label for="ClientPhone" class="form-label">Client Phone</label>
+                                        <label for="ClientPhone" class="form-label">{{ __('Client Phone') }}</label>
                                         <input type="text"
                                             class="form-control @error('ClientPhone') is-invalid @enderror" id="ClientPhone"
-                                            name="ClientPhone" placeholder="Client Phone">
+                                            name="ClientPhone" placeholder="{{ __('Client Phone') }}">
                                         {{-- validationerror --}}
                                         @error('ClientPhone')
                                             <p class="text-danger">{{ $message }}</p>
@@ -52,10 +52,10 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mb-3">
-                                        <label for="CilentFPName" class="form-label">Focal Point Name</label>
+                                        <label for="CilentFPName" class="form-label">{{ __('Focal Point Name') }}</label>
                                         <input type="text"
                                             class="form-control @error('CilentFPName') is-invalid @enderror"
-                                            id="CilentFPName" name="CilentFPName" placeholder="Focal Point Name">
+                                            id="CilentFPName" name="CilentFPName" placeholder="{{ __('Focal Point Name') }}">
                                         {{-- validation error --}}
                                         @error('CilentFPName')
                                             <p class="text-danger">{{ $message }}</p>
@@ -64,10 +64,10 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mb-3">
-                                        <label for="CilentFPEmil" class="form-label">Focal Point Email</label>
+                                        <label for="CilentFPEmil" class="form-label">{{ __('Focal Point Email') }}</label>
                                         <input type="email"
                                             class="form-control  @error('CilentFPEmil') is-invalid @enderror"
-                                            id="CilentFPEmil" name="CilentFPEmil" placeholder="Focal Point Email">
+                                            id="CilentFPEmil" name="CilentFPEmil" placeholder="{{ __('Focal Point Email') }}">
                                         {{-- validation error --}}
                                         @error('CilentFPEmil')
                                             <p class="text-danger">{{ $message }}</p>
@@ -77,7 +77,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-primary">Create</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
                                 </div>
                             </div>
                         </form>

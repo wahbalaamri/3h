@@ -16,12 +16,12 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-6 text-start">
-                            <h3 class="card-title">Create Email Content</h3>
+                            <h3 class="card-title">{{ __('Create Email Content') }}</h3>
                         </div>
                         <div class="col-6 text-end">
                             <h3 class="">
                                 <a href="{{ route('emails.manage') }}" class="btn btn-primary btn-sm"
-                                    style="letter-spacing: 1px;">Back</a>
+                                    style="letter-spacing: 1px;">{{ __('Back') }}</a>
                             </h3>
                         </div>
                     </div>
@@ -34,10 +34,10 @@
                             {{-- select Client --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="client_id">Select Client</label>
+                                    <label for="client_id">{{ __('Select Client') }}</label>
                                     <select name="client_id" id="client_id"
                                         class="form-control @error('client_id') is-invalid @enderror" disabled>
-                                        <option value="" selected>Select Client</option>
+                                        <option value="" selected>{{ __('Select Client') }}</option>
                                         @foreach ($clients as $client)
                                         <option value="{{ $client->id }}" @selected(old('client_id',$clientId)==$client->id)>{{
                                             $client->ClientName }}</option>
@@ -48,10 +48,10 @@
                             {{-- select Survey --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="survey_id">Select Survey</label>
+                                    <label for="survey_id">{{ __('Select Survey') }}</label>
                                     <select name="survey_id" id="survey_id" class="form-control @error('survey_id') is-invalid
                             @enderror" disabled>
-                                        <option value="" selected>Select Survey</option>
+                                        <option value="" selected>{{ __('Select Survey') }}</option>
                                         @foreach ($surveys as $survey)
                                         <option value="{{ $survey->id }}" @selected(old('survey_id',$surveyId)==$survey->id)>{{
                                             $survey->SurveyTitle }}</option>
@@ -65,7 +65,7 @@
                             {{-- Subject --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="subject">Subject</label>
+                                    <label for="subject">{{ __('Subject') }}</label>
                                     <input type="text" name="subject" id="subject" value="{{ old('subject') }}"
                                         class="form-control @error('subject') is-invalid @enderror">
                                     @error('subject')
@@ -87,7 +87,7 @@
                             {{-- Email body_header textare --}}
                             <div class="col-md-8 col-sm-12">
                                 <div class="form-group">
-                                    <label for="body_header">Email Body Header</label>
+                                    <label for="body_header">{{ __('Email Body Header') }}</label>
                                     <textarea name="body_header" id="body_header" cols="30" rows="10"
                                         class="form-control @error('body_header') is-invalid @enderror">{{ old('body_header') }}</textarea>
                                     @error('body_header')
@@ -109,7 +109,7 @@
                             {{-- Email body_footer textare --}}
                             <div class="col-md-8 col-sm-12">
                                 <div class="form-group">
-                                    <label for="body_footer">Email Body Footer</label>
+                                    <label for="body_footer">{{ __('Email Body Footer') }}</label>
                                     <textarea name="body_footer" id="body_footer" cols="30" rows="10"
                                         class="form-control @error('body_footer') is-invalid @enderror">{{ old('body_footer') }}</textarea>
                                     @error('body_footer')
@@ -131,7 +131,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12 text-end mt-1">
-                                <button type="submit" class="btn btn-primary">Send</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Send') }}</button>
                             </div>
                         </div>
                     </form>
@@ -151,7 +151,7 @@
     //summernote
     $(document).ready(function() {
         $('#body_header').summernote({
-            placeholder: 'Email Body Header',
+            placeholder: "{{ __('Email Body Header') }}",
         tabsize: 2,
         height: 120,
         toolbar: [
@@ -165,7 +165,7 @@
         ]
         });
         $('#body_header_ar').summernote({
-            placeholder: 'Email Body Header in (Arabic)',
+            placeholder: "{{ __('Email Body Header in (Arabic)') }}",
         tabsize: 2,
         height: 120,
         toolbar: [
@@ -179,7 +179,7 @@
         ]
         });
         $('#body_footer').summernote({
-            placeholder: 'Email Body Footer',
+            placeholder: "{{ __('Email Body Footer') }}",
         tabsize: 2,
         height: 120,
         toolbar: [

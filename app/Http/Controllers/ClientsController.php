@@ -98,29 +98,30 @@ class ClientsController extends Controller
                 $url = route('survey-answers.result', $row->id);
                 // $data=
                 $data = '<a href="' . $url . '" class="btn btn-info btn-sm float-end">' . __('Result') . '</a>';
+                $data.='<a  data-bs-toggle="modal" href="#RespondentEmails" onclick="GetRespondentsEmails(\'' . $row->id . '\')" class="btn btn-success btn-sm float-start">' . __('Respondents') . '</a>';
                 return $data;
             })
-            ->addColumn('respondents', function ($row) {
-
-                return '<a  data-bs-toggle="modal" href="#RespondentEmails" onclick="GetRespondentsEmails(\'' . $row->id . '\')" class="btn btn-success btn-sm float-start">' . __('Respondents') . '</a>';
-            })
+            // ->addColumn('respondents', function ($row) {
+            //     return '<a  data-bs-toggle="modal" href="#RespondentEmails" onclick="GetRespondentsEmails(\'' . $row->id . '\')" class="btn btn-success btn-sm float-start">' . __('Respondents') . '</a>';
+            // })
             ->addColumn('send_survey', function ($row) {
                 // $data = '<a href="/emails/send-reminder/' . $row->id . '/' . $row->ClientId . '" class="btn btn-info btn-sm float-start"> Reminder</a>';
-                $data = '<a href="/emails/send-survey/' . $row->id . '/' . $row->ClientId . '" class="btn btn-success btn-sm">' . __('Survey') . '</a>';
+                $data = '<a href="/emails/send-survey/' . $row->id . '/' . $row->ClientId . '" class="btn btn-success btn-sm float-start">' . __('Survey') . '</a>';
+                $data .= '<a href="/emails/send-reminder/' . $row->id . '/' . $row->ClientId . '" class="btn btn-info btn-sm float-end">' . ('Reminder') . '</a>';
                 return $data;
             })
-            ->addColumn('send_reminder', function ($row) {
-                $data = '<a href="/emails/send-reminder/' . $row->id . '/' . $row->ClientId . '" class="btn btn-info btn-sm">' . ('Reminder') . '</a>';
-                return  $data;
-            })
+            // ->addColumn('send_reminder', function ($row) {
+            //     $data = '<a href="/emails/send-reminder/' . $row->id . '/' . $row->ClientId . '" class="btn btn-info btn-sm">' . ('Reminder') . '</a>';
+            //     return  $data;
+            // })
             ->addColumn('action', function ($row) {
-                $btn = '<a href="' . route('surveys.show', $row->id) . '" class="edit btn btn-primary btn-sm m-1"><i class="fa fa-eye"></i></a>';
-                $btn .= '<a href="' . route('surveys.edit', $row->id) . '" class="edit btn btn-primary btn-sm m-1"><i class="fa fa-edit"></i></a>';
-                $btn .= '<form action="' . route('surveys.destroy', $row->id) . '" method="POST" class="delete_form" style="display:inline">';
+                $btn = '<td><a href="' . route('surveys.show', $row->id) . '" class="edit btn btn-primary btn-sm m-1"><i class="fa fa-eye"></i></a></td>';
+                $btn .= '<td><a href="' . route('surveys.edit', $row->id) . '" class="edit btn btn-primary btn-sm m-1"><i class="fa fa-edit"></i></a></td>';
+                $btn .= '<td><form action="' . route('surveys.destroy', $row->id) . '" method="POST" class="delete_form" style="display:inline">';
                 $btn .= '<input type="hidden" name="_method" value="DELETE">';
                 $btn .= csrf_field();
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm m-1"><i class="fa fa-trash"></i></button>';
-                $btn .= '</form>';
+                $btn .= '</form></td>';
                 return $btn;
             })
             ->editColumn('created_at', function ($row) {

@@ -15,13 +15,13 @@
                 <div class="card">
                     {{-- card header --}}
                     <div class="card-header">
-                        <h3>Survey Answers</h3>
+                        <h3>{{ __('Survey Answers') }}</h3>
                     </div>
                     {{-- card body --}}
                     <div class="card-body">
                         {{-- survey divs --}}
                         @if($total>0)
-                        <div class="col-3 text-end function-lable">Total Answers {{ $total_answers }} out of {{ $total }}</div>
+                        <div class="col-3 text-end function-lable">{{ __('Total Answers') }} {{ $total_answers }} {{ __('out of') }} {{ $total }}</div>
                             <div class="col-9 text-start function-progress">
                                 <div class="progress" style="height: 31px">
                                     <div class="progress-bar @if(($total_answers/$total)<0.5) bg-danger @elseif(($total_answers/$total)==1) bg-success @else bg-warning @endif" role="progressbar"
@@ -31,7 +31,7 @@
                             </div>
                         @endif
                             @if($leaders>0)
-                        <div class="col-3 text-end function-lable">Total Leaders Answers {{ $leaders_answers }} out of {{ $leaders }}</div>
+                        <div class="col-3 text-end function-lable">{{ __('Total Leaders Answers') }} {{ $leaders_answers }} out of {{ $leaders }}</div>
                             <div class="col-9 text-start function-progress">
                                 <div class="progress" style="height: 31px">
                                     <div class="progress-bar @if(($leaders_answers/$leaders)<0.5) bg-danger @elseif(($leaders_answers/$leaders)==1) bg-success @else bg-warning @endif" role="progressbar"
@@ -41,7 +41,7 @@
                             </div>
                             @endif
                             @if($hr>0)
-                        <div class="col-3 text-end function-lable">Total HR Answers {{ $hr_answers }} out of {{ $hr }}</div>
+                        <div class="col-3 text-end function-lable">Total HR Answers {{ $hr_answers }} {{ __('out of') }} {{ $hr }}</div>
                             <div class="col-9 text-start function-progress">
                                 <div class="progress" style="height: 31px">
                                     <div class="progress-bar @if(($hr_answers/$hr)<0.5) bg-danger @elseif(($hr_answers/$hr)==1) bg-success @else bg-warning @endif" role="progressbar"
@@ -51,7 +51,7 @@
                             </div>
                             @endif
                             @if($emp>0)
-                        <div class="col-3 text-end function-lable">Total Employee Answers {{ $emp_answers }} out of {{ $emp }}</div>
+                        <div class="col-3 text-end function-lable">{{ __('Total Employee Answers') }} {{ $emp_answers }} {{ __('out of') }} {{ $emp }}</div>
                             <div class="col-9 text-start function-progress">
                                 <div class="progress" style="height: 31px">
                                     <div class="progress-bar @if(($emp_answers/$emp)<0.5) bg-danger @elseif(($emp_answers/$emp)==1) bg-success @else bg-warning @endif" role="progressbar"

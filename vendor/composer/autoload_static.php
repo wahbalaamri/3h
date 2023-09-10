@@ -377,8 +377,8 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -613,6 +613,8 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\DailyReminder' => __DIR__ . '/../..' . '/app/Console/Commands/DailyReminder.php',
+        'App\\Console\\Commands\\TestCommand' => __DIR__ . '/../..' . '/app/Console/Commands/TestCommand.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Exports\\PrioritiesAnswersExport' => __DIR__ . '/../..' . '/app/Exports/PrioritiesAnswersExport.php',
@@ -640,6 +642,7 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'App\\Http\\Controllers\\RequestServiceController' => __DIR__ . '/../..' . '/app/Http/Controllers/RequestServiceController.php',
         'App\\Http\\Controllers\\SectorsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SectorsController.php',
         'App\\Http\\Controllers\\SurveyAnswersController' => __DIR__ . '/../..' . '/app/Http/Controllers/SurveyAnswersController.php',
+        'App\\Http\\Controllers\\SurveySettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SurveySettingsController.php',
         'App\\Http\\Controllers\\SurveysController' => __DIR__ . '/../..' . '/app/Http/Controllers/SurveysController.php',
         'App\\Http\\Controllers\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/UsersController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
@@ -672,6 +675,7 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'App\\Http\\Requests\\StoreDepartmentsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreDepartmentsRequest.php',
         'App\\Http\\Requests\\StoreRequestServiceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreRequestServiceRequest.php',
         'App\\Http\\Requests\\StoreSectorsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreSectorsRequest.php',
+        'App\\Http\\Requests\\StoreSurveySettingsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreSurveySettingsRequest.php',
         'App\\Http\\Requests\\SurveyAnswerStoreRequest' => __DIR__ . '/../..' . '/app/Http/Requests/SurveyAnswerStoreRequest.php',
         'App\\Http\\Requests\\SurveyAnswerUpdateRequest' => __DIR__ . '/../..' . '/app/Http/Requests/SurveyAnswerUpdateRequest.php',
         'App\\Http\\Requests\\SurveyStoreRequest' => __DIR__ . '/../..' . '/app/Http/Requests/SurveyStoreRequest.php',
@@ -680,7 +684,10 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'App\\Http\\Requests\\UpdateDepartmentsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateDepartmentsRequest.php',
         'App\\Http\\Requests\\UpdateRequestServiceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateRequestServiceRequest.php',
         'App\\Http\\Requests\\UpdateSectorsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateSectorsRequest.php',
+        'App\\Http\\Requests\\UpdateSurveySettingsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateSurveySettingsRequest.php',
+        'App\\Jobs\\SendQueueEmail' => __DIR__ . '/../..' . '/app/Jobs/SendQueueEmail.php',
         'App\\Mail\\SendSurvey' => __DIR__ . '/../..' . '/app/Mail/SendSurvey.php',
+        'App\\Mail\\test' => __DIR__ . '/../..' . '/app/Mail/test.php',
         'App\\Models\\Clients' => __DIR__ . '/../..' . '/app/Models/Clients.php',
         'App\\Models\\Companies' => __DIR__ . '/../..' . '/app/Models/Companies.php',
         'App\\Models\\Departments' => __DIR__ . '/../..' . '/app/Models/Departments.php',
@@ -693,7 +700,9 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'App\\Models\\PrioritiesAnswers' => __DIR__ . '/../..' . '/app/Models/PrioritiesAnswers.php',
         'App\\Models\\RequestService' => __DIR__ . '/../..' . '/app/Models/RequestService.php',
         'App\\Models\\Sectors' => __DIR__ . '/../..' . '/app/Models/Sectors.php',
+        'App\\Models\\SendingSurveySettings' => __DIR__ . '/../..' . '/app/Models/SendingSurveySettings.php',
         'App\\Models\\SurveyAnswers' => __DIR__ . '/../..' . '/app/Models/SurveyAnswers.php',
+        'App\\Models\\SurveySettings' => __DIR__ . '/../..' . '/app/Models/SurveySettings.php',
         'App\\Models\\Surveys' => __DIR__ . '/../..' . '/app/Models/Surveys.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\freeSurveyAnswers' => __DIR__ . '/../..' . '/app/Models/freeSurveyAnswers.php',
@@ -701,6 +710,7 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'App\\Policies\\DepartmentsPolicy' => __DIR__ . '/../..' . '/app/Policies/DepartmentsPolicy.php',
         'App\\Policies\\RequestServicePolicy' => __DIR__ . '/../..' . '/app/Policies/RequestServicePolicy.php',
         'App\\Policies\\SectorsPolicy' => __DIR__ . '/../..' . '/app/Policies/SectorsPolicy.php',
+        'App\\Policies\\SurveySettingsPolicy' => __DIR__ . '/../..' . '/app/Policies/SurveySettingsPolicy.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
@@ -899,7 +909,9 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'Database\\Factories\\PrioritiesAnswersFactory' => __DIR__ . '/../..' . '/database/factories/PrioritiesAnswersFactory.php',
         'Database\\Factories\\RequestServiceFactory' => __DIR__ . '/../..' . '/database/factories/RequestServiceFactory.php',
         'Database\\Factories\\SectorsFactory' => __DIR__ . '/../..' . '/database/factories/SectorsFactory.php',
+        'Database\\Factories\\SendingSurveySettingsFactory' => __DIR__ . '/../..' . '/database/factories/SendingSurveySettingsFactory.php',
         'Database\\Factories\\SurveyAnswersFactory' => __DIR__ . '/../..' . '/database/factories/SurveyAnswersFactory.php',
+        'Database\\Factories\\SurveySettingsFactory' => __DIR__ . '/../..' . '/database/factories/SurveySettingsFactory.php',
         'Database\\Factories\\SurveysFactory' => __DIR__ . '/../..' . '/database/factories/SurveysFactory.php',
         'Database\\Factories\\UserFactory' => __DIR__ . '/../..' . '/database/factories/UserFactory.php',
         'Database\\Seeders\\CompaniesSeeder' => __DIR__ . '/../..' . '/database/seeders/CompaniesSeeder.php',
@@ -907,6 +919,7 @@ class ComposerStaticInit4309db2092bf73a8695af79e3b4dccb6
         'Database\\Seeders\\DepartmentsSeeder' => __DIR__ . '/../..' . '/database/seeders/DepartmentsSeeder.php',
         'Database\\Seeders\\RequestServiceSeeder' => __DIR__ . '/../..' . '/database/seeders/RequestServiceSeeder.php',
         'Database\\Seeders\\SectorsSeeder' => __DIR__ . '/../..' . '/database/seeders/SectorsSeeder.php',
+        'Database\\Seeders\\SurveySettingsSeeder' => __DIR__ . '/../..' . '/database/seeders/SurveySettingsSeeder.php',
         'Database\\Seeders\\UserSeeder' => __DIR__ . '/../..' . '/database/seeders/UserSeeder.php',
         'DeepCopy\\DeepCopy' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/DeepCopy.php',
         'DeepCopy\\Exception\\CloneException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/CloneException.php',

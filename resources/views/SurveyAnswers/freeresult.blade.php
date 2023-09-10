@@ -12,12 +12,12 @@
             {{-- start function --}}
             <div id="Function" class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Results</h3>
+                    <h3 class="card-title">{{ __('Results') }}</h3>
                 </div>
                 <div class="card-body text-capitalize" style="font-family: emoji;letter-spacing: 2px;">
 
                     <div class="col-{{ count($functions) }} text-start h3 text-white p-3" style="background-color: #376092;border-radius: 45px 45px 45px 45px;width: 89%; -webkit-box-shadow: 5px 5px 20px 5px #ABABAB;
-                        box-shadow: 5px 5px 20px 5px #ABABAB;">Key functions
+                        box-shadow: 5px 5px 20px 5px #ABABAB;">{{ __('Key functions') }}
                     </div>
                     <div class="row  padding-left-10px">
                         @foreach ($functions as $function )
@@ -49,12 +49,12 @@
             {{-- start dasboard --}}
             <div id="key" class="card mt-4">
                 <div class="card-header">
-                    <h3 class="card-title">Key improvement areas </h3>
+                    <h3 class="card-title">{{ ('Key improvement areas') }} </h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-3 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Overall Performance
+                            style="background-color: #DCE6F2 ; color:#376092 !important;">{{ __('Overall Performance') }}
                             <div class="mt-5">
                                 <div class="circle-wrap">
                                     <div class="circle">
@@ -66,19 +66,19 @@
                                         <div class="mask full-{{ $overallResult }}">
                                             <div class="fill-{{ $overallResult }}"></div>
                                         </div>
-                                        <div class="inside-circle"> {{ $overallResult }}%<p>Performance score</p>
+                                        <div class="inside-circle"> {{ $overallResult }}%<p>{{ __('Performance score') }}</p>
                                         </div>
 
 
                                     </div>
                                 </div>
                                 <div class="pt-3">
-                                    Overall performance of HR functionality,
+                                    {{ __('Overall performance of HR functionality,') }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-4 m-1 rounded text-center h3 p-3"
-                            style="background-color: #DCE6F2 ; color:#376092 !important;">Key improvement areas
+                            style="background-color: #DCE6F2 ; color:#376092 !important;">{{ __('Key improvement areas') }}
 
                             @for ($i=0; $i<5; $i++) <div class="mt-5 text-start">
                                 <span class="h5"> {{ $asc_perform[$i]['function'] }}</span>
@@ -98,7 +98,7 @@
 
                     </div>
                     <div class="col-4 m-1 rounded text-center h3 p-3"
-                        style="background-color: #DCE6F2 ; color:#376092 !important;">Strength Areas
+                        style="background-color: #DCE6F2 ; color:#376092 !important;">{{ __('Strength Areas') }}
                         @for($i=(count($asc_perform)-1); $i>=(count($asc_perform)-3); $i--) <div
                             class="mt-5 text-start">
                             <span class="h5"> {{ $asc_perform[$i]['function'] }}</span>
@@ -118,13 +118,13 @@
             {{-- start HR View --}}
             <div id="HRaverages" class="card mt-4">
                 <div class="card-header">
-                    <h3 class="card-title ">Averages by functions
+                    <h3 class="card-title ">{{ __('Averages by functions') }}
                     </h3>
                 </div>
                 <div class="card-body" style="background-color: #DCE6F2 ; color:#376092 !important;">
                     <div class="row text-center">
                         <div class="m-1 rounded text-center h5 p-3">
-                            People management performance – HR Team view Average scores by people functions
+                            {{ __('People management performance – HR Team view Average scores by people functions') }}
                         </div>
                     </div>
                     <div class="row">

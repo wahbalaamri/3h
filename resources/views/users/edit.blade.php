@@ -14,8 +14,8 @@
             {{-- card to display all users --}}
             <div class="card pb-5 mb-5">
                 <div class="card-header">
-                    <h3 class="card-title float-start">{{ $user==null? 'Add New User': 'Edit User Details' }}</h3>
-                    <a href="{{ route('users.index') }}" class="btn btn-primary float-end">Back</a>
+                    <h3 class="card-title float-start">{{ $user==null? __('Add New User'): __('Edit User Details') }}</h3>
+                    <a href="{{ route('users.index') }}" class="btn btn-primary float-end">{{ __('Back') }}</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ $user==null? route('users.store'): route('users.update', $user->id) }}"
@@ -35,11 +35,11 @@
                             {{-- select user client --}}
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="user_client"> Select Company</label>
+                                    <label for="user_client"> {{ __('Select Company') }}</label>
                                     <select name="user_client" id="user_client"
                                         class="form-control @error('user_client') is-invalid @enderror" {{
                                         Auth()->user()->company_id!=null? 'disabled': '' }}>
-                                        <option value="">Select Company</option>
+                                        <option value="">{{ __('Select Company') }}</option>
                                         @foreach ($clients as $client)
                                         <option value="{{ $client->id }}" {{ old('user_client',Auth()->
                                             user()->company_id)==$client->id? 'selected': '' }}>{{ $client->ClientName
@@ -55,22 +55,22 @@
                             {{-- user Type --}}
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="user_type">User Type</label>
+                                    <label for="user_type">{{ __('User Type') }}</label>
                                     <select name="user_type" id="user_type"
                                         class="form-control @error('user_type') is-invalid @enderror">
-                                        <option value="">Select User Type</option>
+                                        <option value="">{{ __('Select User Type') }}</option>
                                         @if(Auth()->user()->company_id==null)
                                         <option value="superadmin" {{ old('user_type',$user!=null && $user->
                                             user_type)=='superadmin'?
                                             'selected':
-                                            '' }}>Super Admin</option>
+                                            '' }}>{{ __('Super Admin') }}</option>
                                         @endif
                                         <option value="admin" {{ old('user_type',$user!=null ? $user->
                                             user_type:'')=='admin'? 'selected':
-                                            '' }}>Admin</option>
+                                            '' }}>{{ __('Admin') }}</option>
                                         <option value="user" {{ old('user_type',$user!=null ? $user->
                                             user_type:'')=='user'? 'selected': ''
-                                            }}>User</option>
+                                            }}>{{ __('User') }}</option>
                                     </select>
                                     @error('user_type')
                                     <p class="text-danger">{{ $message }}</p>
@@ -80,9 +80,9 @@
                             {{-- user name --}}
                             <div class="col-6">
                                 <div class="form-group mt-2">
-                                    <label for="name" class="mb-2">User Name</label>
+                                    <label for="name" class="mb-2">{{ __('User Name') }}</label>
                                     <input type="text" class="form-control @error('user_name') is-invalid @enderror"
-                                        name="user_name" placeholder="Enter User Name" id="user_name"
+                                        name="user_name" placeholder="{{ __('Enter User Name') }}" id="user_name"
                                         value="{{ old('user_name',$user!=null? $user->name:"") }}">
                                     @error('user_name')
                                     <p class="text-danger">{{ $message }}</p>
@@ -92,12 +92,11 @@
                             {{-- user Email --}}
                             <div class="col-6">
                                 <div class="form-group mt-2">
-                                    <label for="name" class="mb-2">User Email<small><mark
+                                    <label for="name" class="mb-2">{{ __('User Email') }}<small><mark
                                                 class="text-info text-xs fs-6 text-uppercase"
-                                                style="font-size: 0.7rem !important"> it will be used for
-                                                login</mark></small></label>
+                                                style="font-size: 0.7rem !important"> {{ __('it will be used for login') }}</mark></small></label>
                                     <input type="email" class="form-control @error('user_email') is-invalid @enderror"
-                                        name="user_email" placeholder="Enter User Name" id="user_email"
+                                        name="user_email" placeholder="{{ __('Enter User Email') }}" id="user_email"
                                         value="{{ old('user_email',$user!=null? $user->email:"") }}">
                                     @error('user_email')
                                     <p class="text-danger">{{ $message }}</p>
@@ -107,8 +106,8 @@
                         </div>
                         {{-- submit button --}}
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary mt-2 float-end">{{ $user==null? 'Add User':
-                                'Update User' }}</button>
+                            <button type="submit" class="btn btn-primary mt-2 float-end">{{ $user==null?  __('Add User') :
+                                __('Update User') }}</button>
                         </div>
                 </div>
             </div>

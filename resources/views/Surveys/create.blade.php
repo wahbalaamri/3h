@@ -15,7 +15,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-6">
-                            <h3 class="card-title">Create Survey</h3>
+                            <h3 class="card-title">{{ __('Create Survey') }}</h3>
                         </div>
                         {{-- add new survey button --}}
                         <div class="col-6 text-end">
@@ -32,18 +32,18 @@
                     <form action="{{ route('surveys.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
-                            <label for="SurveyTitle">Survey Title</label>
+                            <label for="SurveyTitle">{{ __('Survey Title') }}</label>
                             <input type="text" class="form-control @error('SurveyTitle') is-invalid @enderror"
-                                id="SurveyTitle" name="SurveyTitle" placeholder="Enter Survey Title">
+                                id="SurveyTitle" name="SurveyTitle" placeholder="{{ __('Enter Survey Title') }}">
                             @error('SurveyTitle')
                             <p class="text-danger">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="PlanId">Plan Name</label>
+                            <label for="PlanId">{{ __('Plan Name') }}</label>
                             <select class="form-control @error('PlanId') is-invalid @enderror" id="PlanId" name="PlanId"
                                 required>
-                                <option value="">Select Plan</option>
+                                <option value="">{{ __('Select Plan') }}</option>
                                 @foreach ($plans as $plan)
                                 <option value="{{ $plan->id }}">{{ $plan->PlanTitle }}</option>
                                 @endforeach
@@ -53,10 +53,10 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="ClientId">Client Name</label>
+                            <label for="ClientId">{{ __('Client Name') }}</label>
                             <select class="form-control @error('ClientId') is-invalid @enderror" id="ClientId"
                                 name="ClientId" disabled>
-                                <option value="">Select Client</option>
+                                <option value="">{{ __('Select Client') }}</option>
                                 @foreach ($clients as $client)
                                 <option value="{{ $client->id }}" @if($client->id==$client_id) selected @endif>{{
                                     $client->ClientName }}</option>
@@ -67,7 +67,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="SurveyDes">Survey Description</label>
+                            <label for="SurveyDes">{{ __('Survey Description') }}</label>
                             <input type="text" class="form-control @error('SurveyDes') is-invalid @enderror"
                                 id="SurveyDes" name="SurveyDes" placeholder="Enter Survey Description">
                             @error('SurveyDes')
@@ -75,11 +75,11 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="SurveyStat">Survey Status</label>
+                            <label for="SurveyStat">{{ __('Survey Status') }}</label>
                             <select class="form-control @error('SurveyStat') is-invalid @enderror" required
                                 id="SurveyStat" name="SurveyStat">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
+                                <option value="1">{{ __('Active') }}</option>
+                                <option value="0">{{ __('Inactive') }}</option>
                             </select>
                             @error('SurveyStat')
                             <p class="text-danger">{{ $message }}</p>
@@ -87,7 +87,7 @@
                         </div>
                         {{-- submit button --}}
                         <div class="form-group text-end mt-1">
-                            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                            <button type="submit" class="btn btn-primary btn-sm">{{ __('Submit') }}</button>
                         </div>
                     </form>
                 </div>

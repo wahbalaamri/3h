@@ -15,25 +15,25 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-6">
-                                <h3 class="card-title">Surveys</h3>
+                                <h3 class="card-title">{{ __('Surveys') }}</h3>
                             </div>
                             {{-- add new survey button --}}
                             <div class="col-6 text-end">
-                                <a href="{{ route('surveys.create') }}" class="btn btn-primary">Add New Survey</a>
+                                <a href="{{ route('surveys.create') }}" class="btn btn-primary">{{ __('Add New Survey') }}</a>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p>Surveys List</p>
+                        <p>{{ __('Surveys List') }}</p>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th scope="col">Survey Name</th>
-                                    <th scope="col">Plan</th>
-                                    <th scope="col">Client Name</th>
-                                    <th scope="col">Survey Type</th>
-                                    <th scope="col">Survey Status</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">{{ __('Survey Name') }}</th>
+                                    <th scope="col">{{ __('Plan') }}</th>
+                                    <th scope="col">{{ __('Client Name') }}</th>
+                                    <th scope="col">{{ __('Survey Type') }}</th>
+                                    <th scope="col">{{ __('Survey Status') }}</th>
+                                    <th scope="col">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,14 +49,14 @@
                                         <td>{{ $survey->SurveyStat }}</td>
                                         <td>
                                             <a href="{{ route('surveys.show', $survey->id) }}"
-                                                class="btn btn-primary">View</a>
+                                                class="btn btn-primary">{{ __('View') }}</a>
                                             <a href="{{ route('surveys.edit', $survey->id) }}"
-                                                class="btn btn-primary">Edit</a>
+                                                class="btn btn-primary">{{ __('Edit') }}</a>
                                             <form action="{{ route('surveys.destroy', $survey->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                             </form>
                                         </td>
                                     </tr>

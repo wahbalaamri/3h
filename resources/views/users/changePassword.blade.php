@@ -15,7 +15,7 @@
             <div class="card pb-5 mb-5">
                 <div class="card-header">
                     <h3 class="card-title float-start">{{ 'change User Password' }}</h3>
-                    <a href="{{ route('users.index') }}" class="btn btn-primary float-end">Back</a>
+                    <a href="{{ route('users.index') }}" class="btn btn-primary float-end">{{ __('Back') }}</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('users.storeNewPass', $id) }}" method="POST" id="form">
@@ -29,11 +29,11 @@
                         <div class="row justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="old_password">Old Password</label>
+                                    <label for="old_password">{{ __('Old Password') }}</label>
                                     <div class="input-group">
                                         <input type="password" name="old_password" id="old_password"
                                             class="form-control @error('old_password') is-invalid @enderror"
-                                            placeholder="Enter Old Password">
+                                            placeholder="{{ __('Enter Old Password') }}">
                                         <div class="input-group-text">
                                             <i class="fas fa-eye" onclick="showpass(this)"></i>
                                         </div>
@@ -48,11 +48,11 @@
                         <div class="row justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="new_password">New Password</label>
+                                    <label for="new_password">{{ __('New Password') }}</label>
                                     <div class="input-group">
                                         <input type="password" name="new_password" id="new_password"
                                             class="form-control @error('new_password') is-invalid @enderror"
-                                            placeholder="Enter New Password">
+                                            placeholder="{{ __('Enter New Password') }}">
                                         <div class="input-group-text">
                                             <i class="fas fa-eye" onclick="showpass(this)"></i>
                                         </div>
@@ -67,11 +67,11 @@
                         <div class="row justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="confirm_password">Confirm Password</label>
+                                    <label for="confirm_password">{{ __('Confirm Password') }}</label>
                                     <div class="input-group">
                                         <input type="password" name="confirm_password" id="confirm_password"
                                             class="form-control @error('confirm_password') is-invalid @enderror"
-                                            placeholder="Enter Confirm Password">
+                                            placeholder="{{ __('Enter Confirm Password') }}">
                                         <div class="input-group-text">
                                             <i class="fas fa-eye" onclick="showpass(this)"></i>
                                         </div>
@@ -86,8 +86,7 @@
                         <div class="row justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary float-end mt-2">Change
-                                        Password</button>
+                                    <button type="submit" class="btn btn-primary float-end mt-2">{{ __('Change Password') }}</button>
                                 </div>
                             </div>
                         </div>

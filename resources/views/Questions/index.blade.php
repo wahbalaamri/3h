@@ -12,21 +12,21 @@
         <?php $x = 1; ?>
         @foreach ($functions as $function)
         <?php $x = $loop->iteration; ?>
-        <li class="nav-item">
+        <li class="nav-item" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
             <a class="nav-link" href="#step-{{ $loop->iteration }}">
                 <div class="num">{{ $loop->iteration }}</div>
-                {{ $function->FunctionTitle }}
+                {{ App()->getLocale()=='ar'? $function->FunctionTitleAr: $function->FunctionTitle }}
             </a>
         </li>
         @endforeach
-        @if ($can_ansewer_to_priorities)
-        <?php $x++; ?>
+        {{-- @if ($can_ansewer_to_priorities)
+
         <li class="nav-item">
             <a class="nav-link" href="#step-{{ $x }}">
                 <div class="num">{{ $x }}</div>Priorities
             </a>
         </li>
-        @endif
+        @endif --}}
         {{-- <li class="nav-item">
             <a class="nav-link" href="#step-2">
                 <span class="num">2</span>
@@ -67,13 +67,12 @@
             aria-labelledby="step-{{ $loop->iteration }}">
             <?php $counter = 0; ?>
             <div class="alert alert-success text-center" style="font-size: 1.4rem">
-                Please read the following statements and indicate your agreement and disagreement wherein 1 indicates total disagreement and 6 indicates high agreement
+                {{ __('Please read the following statements and indicate your agreement and disagreement wherein 1
+                indicates total disagreement and 6 indicates high agreement') }}
             </div>
             <div class="Qcontainer">
-                <p style="font-size: 1.8rem; letter-spacing: 4px" class="h2 text-info text-center">1 is the lowest &
-                    6 is the
-                    highest
-                </p>
+                <p style="font-size: 1.8rem; letter-spacing: 4px" class="h2 text-info text-center">{{ __('1 is the
+                    lowest & 6 is the highest') }}</p>
                 @foreach ($function->functionPractices as $practice)
                 <?php
                             $practiceQuestion = $practice->practiceQuestions != null ? $practice->practiceQuestions : null;
@@ -88,7 +87,8 @@
                 <?php $counter++; ?>
                 <p style="font-size: 1.4rem;">{{ $counter }}.
                     @if ($practiceQuestion != null)
-                    {{ $practiceQuestion->Question != null ? $practiceQuestion->Question : 'No' }}
+                    {{ $practiceQuestion->Question != null ? App()->getLocale()=='ar'?$practiceQuestion->QuestionAr:
+                    $practiceQuestion->Question : 'No' }}
                     @endif
                 </p>
                 <div id="{{ $practiceQuestion->id }}" class="rb pquestions" data-QId="{{ $practiceQuestion->id }}"
@@ -135,7 +135,8 @@
                 <?php $counter++; ?>
                 <p style="font-size: 1.4rem;">{{ $counter }}.
                     @if ($practiceQuestion != null)
-                    {{ $practiceQuestion->Question != null ? $practiceQuestion->Question : 'No' }}
+                    {{ $practiceQuestion->Question != null ? App()->getLocale()=='ar'?$practiceQuestion->QuestionAr:
+                    $practiceQuestion->Question : 'No' }}
                     @endif
                 </p>
                 <div id="{{ $practiceQuestion->id }}" class="rb pquestions" data-QId="{{ $practiceQuestion->id }}"
@@ -183,7 +184,8 @@
                 <?php $counter++; ?>
                 <p style="font-size: 1.4rem;">{{ $counter }}.
                     @if ($practiceQuestion != null)
-                    {{ $practiceQuestion->Question != null ? $practiceQuestion->Question : 'No' }}
+                    {{ $practiceQuestion->Question != null ? App()->getLocale()=='ar'?$practiceQuestion->QuestionAr:
+                    $practiceQuestion->Question : 'No' }}
                     @endif
                 </p>
                 <div id="{{ $practiceQuestion->id }}" class="rb pquestions" data-QId="{{ $practiceQuestion->id }}"
@@ -227,7 +229,8 @@
                 <?php $counter++; ?>
                 <p style="font-size: 1.4rem;">{{ $counter }}.
                     @if ($practiceQuestion != null)
-                    {{ $practiceQuestion->Question != null ? $practiceQuestion->Question : 'No' }}
+                    {{ $practiceQuestion->Question != null ? App()->getLocale()=='ar'?$practiceQuestion->QuestionAr:
+                    $practiceQuestion->Question : 'No' }}
                     @endif
                 </p>
                 <div id="{{ $practiceQuestion->id }}" class="rb pquestions" data-QId="{{ $practiceQuestion->id }}"

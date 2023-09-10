@@ -14,8 +14,8 @@
             {{-- card to display all users --}}
             <div class="card pb-5 mb-5">
                 <div class="card-header">
-                    <h3 class="card-title float-start">Users</h3>
-                    <a href="{{ route('users.create') }}" class="btn btn-primary float-end">Add User</a>
+                    <h3 class="card-title float-start">{{ __('Users') }}</h3>
+                    <a href="{{ route('users.create') }}" class="btn btn-primary float-end">{{ __('Add User') }}</a>
                 </div>
                 <div class="card-body">
                     @if (count($users)>0)
@@ -23,10 +23,10 @@
                         <table class="table table-hover">
                             <thead>
                                 <th>#</th>
-                                <th>User Type</th>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>Actions</th>
+                                <th>{{ __('User Type') }}</th>
+                                <th>{{ __('User') }}</th>
+                                <th>{{ __('Email') }}</th>
+                                <th>{{ __('Actions') }}</th>
                             </thead>
                             <tbody>
                                 @foreach ($users as $user)
@@ -53,7 +53,7 @@
                         </table>
                     </div>
                     @else
-                    <p>No users found</p>
+                    <p>{{ __('No users found') }}</p>
                     @endif
                 </div>
             </div>

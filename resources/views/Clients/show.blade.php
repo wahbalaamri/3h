@@ -14,11 +14,10 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="">
-                        <h3 class="card-title {{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Client
-                            Details') }}</h3>
+                        <h3 class="card-title {{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Client Details') }}</h3>
 
                         <a href="{{ route('clients.edit', $client->id) }}"
-                            class="btn btn-success btn-sm {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">Edit</a>
+                            class="btn btn-success btn-sm {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">{{ __('Edit') }}</a>
 
                     </div>
                 </div>
@@ -57,7 +56,7 @@
                                                             class="table table table-bordered data-table">
                                                             <thead>
                                                                 <tr>
-                                                                    <td colspan="10" class="">
+                                                                    <td colspan="13" class="">
                                                                         <a href="{{ route('surveys.CreateNewSurvey',$client->id) }}"
                                                                             class="btn btn-sm btn-primary {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">{{
                                                                             __('Create New Survey') }}</a>
@@ -69,11 +68,11 @@
                                                                     <th scope="">{{ __('Plan') }}</th>
                                                                     <th scope="">{{ __('Survey Status') }}</th>
                                                                     <th scope="">{{ __('Survey Date') }}</th>
-                                                                    <th scope="">{{ __('Respondents') }}</th>
-                                                                    <th scope="">{{ __('Send Remainder') }}</th>
+                                                                    {{-- <th scope="">{{ __('Respondents') }}</th>
+                                                                    <th scope="">{{ __('Send Remainder') }}</th> --}}
                                                                     <th scope="">{{ __('Send Survey') }}</th>
                                                                     <th scope="">{{ __('Result') }}</th>
-                                                                    <th scope="">{{ __('Survey Actions') }}</th>
+                                                                    <th colspan="3"  scope="">{{ __('Survey Actions') }}</th>
                                                                 </tr>
                                                             </thead>
                                                         </table>
@@ -108,7 +107,7 @@
                                                                     <th scope="">#</th>
                                                                     <th scope="">{{ __('Sector Name') }}</th>
                                                                     <th scope="">{{ __('Sector Companies') }}</th>
-                                                                    <th scope="">{{ __('Sector Actions') }}</th>
+                                                                    <th scope="">{{ __('Actions') }}</th>
                                                                 </tr>
                                                             </thead>
                                                         </table>
@@ -146,15 +145,14 @@
                                                         <tr>
                                                             <td colspan="4"> <a href="#CreateNewCompny"
                                                                     id="CreateCompanyUrl" data-bs-toggle="modal"
-                                                                    class="btn btn-sm btn-success float-end">{{ __('Add
-                                                                    Company') }}</a>
+                                                                    class="btn btn-sm btn-success float-end">{{ __('Add Company') }}</a>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>{{ __('#') }}</th>
                                                             <th>{{ __('Company Name') }}</th>
                                                             <th>{{ __('Departments') }}</th>
-                                                            <th>{{ __('Company Actions') }}</th>
+                                                            <th>{{ __('Actions') }}</th>
                                                         </tr>
                                                     </thead>
                                                 </table>
@@ -190,14 +188,13 @@
                                                         <tr>
                                                             <td colspan="4"> <a href="#CreateNewDepartment"
                                                                     id="CreateDeptUrl" data-bs-toggle="modal"
-                                                                    class="btn btn-sm btn-success float-end">{{ __('Add
-                                                                    Department') }}</a>
+                                                                    class="btn btn-sm btn-success float-end">{{ __('Add Department') }}</a>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>{{ __('#') }}</th>
                                                             <th>{{ __('Department Name') }}</th>
-                                                            <th>{{ __('Department Actions') }}</th>
+                                                            <th>{{ __('Actions') }}</th>
                                                         </tr>
                                                     </thead>
                                                 </table>
@@ -235,7 +232,6 @@
                                 <th>{{ __('#') }}</th>
                                 <th>{{ __('Email') }}</th>
                                 <th>{{ __('Type') }}</th>
-
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -284,8 +280,7 @@
                                         </div>
                                         <div class="col-md-12 mt-1">
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-sm btn-primary">{{ __('Create
-                                                    Sector') }}</button>
+                                                <button type="submit" class="btn btn-sm btn-primary">{{ __('Create Sector') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -306,7 +301,7 @@
             <div class="modal-header">
                 <div class="row">
                     <div class="col-6">
-                        <h1 class="modal-title fs-5 float-end" id="CreateNewCompnyLabel">{{ __('Create Company') }}
+                        <h1 class="modal-title fs-5 float-end" id="CreateNewCompnyLabel">{{ __('Add New Company') }}
                         </h1>
                     </div>
                     <div class="col-6">
@@ -343,7 +338,7 @@
                             </div>
                             {{-- submit button --}}
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary">{{ __('Create Company') }}</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
                             </div>
                         </form>
                     </div>
@@ -358,7 +353,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="CreateNewDepartmentLabel">{{ __('Create New Department') }}</h5>
+                <h5 class="modal-title" id="CreateNewDepartmentLabel">{{ __('Add New Department') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -372,8 +367,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="department_name_en" class="form-label">{{ __('Department Name in
-                                            English')
+                                        <label for="department_name_en" class="form-label">{{ __('Department Name in English')
                                             }}</label>
                                         <input type="text" class="form-control" id="department_name_en"
                                             name="department_name_en" value="{{ old('department_name_en') }}">
@@ -381,8 +375,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="department_name_ar" class="form-label">{{ __('Department Name in
-                                            Arabic')
+                                        <label for="department_name_ar" class="form-label">{{ __('Department Name in Arabic')
                                             }}</label>
                                         <input type="text" class="form-control" id="department_name_ar"
                                             name="department_name_ar" value="{{ old('department_name_ar') }}">
@@ -391,8 +384,7 @@
                                 {{-- parent department --}}
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="parent_department_id" class="form-label">{{ __('Parent
-                                            Department')}}
+                                        <label for="parent_department_id" class="form-label">{{ __('Parent Department')}}
                                         </label>
                                         <select class="form-control" name="parent_department_id"
                                             id="parent_department_id">
@@ -409,7 +401,7 @@
                             </div>
                             {{-- submit button --}}
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary">{{ __('Create Department') }}</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
                             </div>
                         </form>
                     </div>
@@ -424,6 +416,7 @@
 <script>
     var GetCompaniesURl='';
     $(document).ready(function() {
+        console.log("{{ route('clients.getClients',$client->id) }}");
         //surveysDataTable
         $('#surveysDataTable').DataTable({
             processing: true,
@@ -436,11 +429,11 @@
             {data: 'PlanId', name: 'PlanId'},
             {data: 'SurveyStat', name: 'SurveyStat'},
             {data: 'created_at', name: 'created_at'},
-            {data: 'respondents', name: 'respondents'},
+            // {data: 'respondents', name: 'respondents'},
             {data: 'send_survey', name: 'send_survey'},
-        {data: 'send_reminder', name: 'send_reminder'},
-               {data: 'survey_result',name: 'survey_result' },
-               {data: 'action', name: 'action', orderable: false, searchable: false},
+            // {data: 'send_reminder', name: 'send_reminder'},
+            {data: 'survey_result',name: 'survey_result' },
+            {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
         $('#sectorsDataTable').DataTable({
@@ -583,6 +576,7 @@ $("#GetSurveys").click(function(){
                 },
             ]
         });
+        $("#Emails-data-table").css('width', '100%');
     }
 
 </script>

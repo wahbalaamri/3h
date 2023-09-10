@@ -105,6 +105,9 @@ class SurveyAnswersController extends Controller
     }
     public function result($id)
     {
+        $term = '';
+        $term1 = '';
+        $term2 = '';
         $surveyEmails = Emails::where('SurveyId', $id)->get();
         $respondent = $surveyEmails->pluck('id')->all();
         $client = Surveys::find($id)->clients;
@@ -126,10 +129,18 @@ class SurveyAnswersController extends Controller
         });
         //get count of distinct AnsweredBy
         $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
-        if ($count_respondent_answers < count($respondent)) {
+        if ($count_respondent_answers < 1) {
             $data = [
-                'respondent' => count($respondent),
+                'respondent' => 1,
                 'respondent_answers' => $count_respondent_answers,
+                'leaders' => 1,
+                'hr' => 1,
+                'emp' => 1,
+                'leaders_answers' => 0,
+                'hr_answers' => 0,
+                'emp_answers' => 0,
+                'total' => 1,
+                'total_answers' => 0,
             ];
             return view('SurveyAnswers.notComplet')->with($data);
         }
@@ -252,11 +263,15 @@ class SurveyAnswersController extends Controller
         $eNPS_Promotors = 0; // it's from 75-100
         $eNPS_Passives = 0; // from 55-75
         $eNPS_Detractors = 0; // from 0-55
+        Log::alert('respondent: '.count($respondent));
         foreach ($respondent as $respond_id) {
             $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
             $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
             $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
+            Log::alert(' EE_index_questions: ');
+            Log::alert($EE_index_questions);
             $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
+            Log::alert('respond_id: '.$respond_id.' individual_EE_Index: '.$individual_EE_Index);
             if ($individual_eNPS >= 75) {
                 $eNPS_Promotors++;
             } elseif ($individual_eNPS >= 55) {
@@ -272,6 +287,9 @@ class SurveyAnswersController extends Controller
                 $EE_Index_Actively_Disengaged++;
             }
         }
+        Log::alert('EE_Index_Engaged: '.$EE_Index_Engaged);
+        Log::alert('EE_Index_Nuetral: '.$EE_Index_Nuetral);
+        Log::alert('EE_Index_Actively_Disengaged: '.$EE_Index_Actively_Disengaged);
         $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
         $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
         $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
@@ -291,8 +309,6 @@ class SurveyAnswersController extends Controller
         usort($highest_practices, function ($a, $b) {
             return $b['practice_perc'] <=> $a['practice_perc'];
         });
-        Log::alert($companies_list);
-        Log::alert($deps_list);
         $data = [
             'overall_per_fun' => $overall_per_fun,
             'driver_functions' => $driver_functions,
@@ -312,7 +328,11 @@ class SurveyAnswersController extends Controller
             'survey_id' => $id,
             'not_home' => false,
             'isDep' => false,
-            'type' => '1'
+            'type' => '1',
+            'term'=> __('Organizational wide') ,
+            'term1'=> __('Sectors') ,
+            'term2'=> __('Sector') ,
+            'id'=>$id
         ];
         return view('SurveyAnswers.result')->with($data);
     }
@@ -393,6 +413,9 @@ class SurveyAnswersController extends Controller
     }
     public function SectorResult($id, $sector_id)
     {
+        $term = '';
+        $term1 = '';
+        $term2 = '';
         $companies_id = Companies::where('sector_id', $sector_id)->pluck('id')->all();
         $departments_id = Departments::whereIn('company_id', $companies_id)->pluck('id')->all();
         $surveyEmails = Emails::where('SurveyId', $id)->whereIn('dep_id', $departments_id)->get();
@@ -416,13 +439,13 @@ class SurveyAnswersController extends Controller
         });
         //get count of distinct AnsweredBy
         $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
-        if ($count_respondent_answers < count($respondent)) {
-            $data = [
-                'respondent' => count($respondent),
-                'respondent_answers' => $count_respondent_answers,
-            ];
-            return view('SurveyAnswers.notComplet')->with($data);
-        }
+        // if ($count_respondent_answers < count($respondent)) {
+        //     $data = [
+        //         'respondent' => count($respondent),
+        //         'respondent_answers' => $count_respondent_answers,
+        //     ];
+        //     return view('SurveyAnswers.notComplet')->with($data);
+        // }
         $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
         if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
             $data = [
@@ -572,8 +595,6 @@ class SurveyAnswersController extends Controller
         usort($highest_practices, function ($a, $b) {
             return $b['practice_perc'] <=> $a['practice_perc'];
         });
-        Log::alert($companies_list);
-        Log::alert($deps_list);
         $data = [
             'overall_per_fun' => $overall_per_fun,
             'driver_functions' => $driver_functions,
@@ -593,13 +614,19 @@ class SurveyAnswersController extends Controller
             'survey_id' => $id,
             'not_home' => true,
             'isDep' => false,
-            'type' => '2'
+            'type' => '2',
+           'term'=> __('Sector') ,
+           'term1'=> __('Companies') ,
+           'term2'=> __('Company') ,
+           'id'=>$id
         ];
         return view('SurveyAnswers.result')->with($data);
     }
     public function CompanyResult($id, $company_id)
     {
-
+        $term = '';
+        $term1 = '';
+        $term2 = '';
         $departments_id = Departments::where('company_id', $company_id)->pluck('id')->all();
         $surveyEmails = Emails::where('SurveyId', $id)->whereIn('dep_id', $departments_id)->get();
         $respondent = $surveyEmails->pluck('id')->all();
@@ -622,13 +649,13 @@ class SurveyAnswersController extends Controller
         });
         //get count of distinct AnsweredBy
         $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
-        if ($count_respondent_answers < count($respondent)) {
-            $data = [
-                'respondent' => count($respondent),
-                'respondent_answers' => $count_respondent_answers,
-            ];
-            return view('SurveyAnswers.notComplet')->with($data);
-        }
+        // if ($count_respondent_answers < count($respondent)) {
+        //     $data = [
+        //         'respondent' => count($respondent),
+        //         'respondent_answers' => $count_respondent_answers,
+        //     ];
+        //     return view('SurveyAnswers.notComplet')->with($data);
+        // }
         $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
         if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
             $data = [
@@ -774,8 +801,6 @@ class SurveyAnswersController extends Controller
         usort($highest_practices, function ($a, $b) {
             return $b['practice_perc'] <=> $a['practice_perc'];
         });
-        Log::alert($companies_list);
-        Log::alert($deps_list);
         $data = [
             'overall_per_fun' => $overall_per_fun,
             'driver_functions' => $driver_functions,
@@ -795,14 +820,20 @@ class SurveyAnswersController extends Controller
             'survey_id' => $id,
             'not_home' => true,
             'isDep' => false,
-            'type' => '3'
+            'type' => '3',
+            'term'=> __('Company') ,
+            'term1'=> __('Departments') ,
+            'term2'=> __('Department'),
+            'id'=>$id
         ];
         return view('SurveyAnswers.result')->with($data);
     }
 
     public function DepartmentResult($id, $dep_id)
     {
-
+        $term = '';
+        $term1 = '';
+        $term2 = '';
         $surveyEmails = Emails::where('SurveyId', $id)->where('dep_id', $dep_id)->get();
         $respondent = $surveyEmails->pluck('id')->all();
         $client = Surveys::find($id)->clients;
@@ -824,13 +855,13 @@ class SurveyAnswersController extends Controller
         });
         //get count of distinct AnsweredBy
         $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
-        if ($count_respondent_answers < count($respondent)) {
-            $data = [
-                'respondent' => count($respondent),
-                'respondent_answers' => $count_respondent_answers,
-            ];
-            return view('SurveyAnswers.notComplet')->with($data);
-        }
+        // if ($count_respondent_answers < count($respondent)) {
+        //     $data = [
+        //         'respondent' => count($respondent),
+        //         'respondent_answers' => $count_respondent_answers,
+        //     ];
+        //     return view('SurveyAnswers.notComplet')->with($data);
+        // }
         $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
         if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
             $data = [
@@ -947,8 +978,6 @@ class SurveyAnswersController extends Controller
         usort($highest_practices, function ($a, $b) {
             return $b['practice_perc'] <=> $a['practice_perc'];
         });
-        Log::alert($companies_list);
-        Log::alert($deps_list);
         $data = [
             'overall_per_fun' => $overall_per_fun,
             'driver_functions' => $driver_functions,
@@ -968,7 +997,11 @@ class SurveyAnswersController extends Controller
             'survey_id' => $id,
             'not_home' => true,
             'isDep' => true,
-            'type' => '4'
+            'type' => '4',
+            'term'=> __('Department') ,
+            'term1'=> __('Departments') ,
+            'term2'=> __('Department'),
+            'id'=>$id
         ];
         return view('SurveyAnswers.result')->with($data);
     }

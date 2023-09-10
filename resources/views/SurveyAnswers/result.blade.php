@@ -13,35 +13,7 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-10" id="finalResult">
-            @php
-            $term='';
-            $term1='';
-            $term2='';
-            if ($type=='1')
-            //for Organization
-            {$term='Organizational';
-            $term1='Sectors';
-            $term2='Sector';
-            }
-            elseif ($type=='2')
-            //for sector
-            {$term='Sector';
-            $term1='Companies';
-            $term2='Company';
-            }
-            elseif ($type=='3')
-            //for company
-            {$term='Company';
-            $term1='Departments';
-            $term2='Department';
-            }
-            else
-            //for department
-            {$term='Department';
-            $term1='Departments';
-            $term2='Department';
-            }
-            @endphp
+
             {{-- card for sector , company and department selection --}}
             <div class="card shadow p-3 mb-5 bg-white rounded">
                 {{-- card header --}}
@@ -52,9 +24,10 @@
                 {{-- card body --}}
                 <div class="card-body">
                     @if ($not_home)
-                        <div class="row">
-                            <a href="{{ route('survey-answers.result',$survey_id) }}" class="btn btn-primary" id="GetSector">{{ __('Back To Organizational View')}}</a>
-                        </div>
+                    <div class="row">
+                        <a href="{{ route('survey-answers.result',$survey_id) }}" class="btn btn-primary"
+                            id="GetSector">{{ __('Back To Organizational View')}}</a>
+                    </div>
                     @endif
                     <div class="row">
                         <div class="col-md-3 col-sm-12">
@@ -111,7 +84,7 @@
                     <h2 class="card-title">
                         {{-- color text orange with later spacing 1 --}}
                         <span class="text-orange space-x-6">
-                            {{ __('Dashboard-'.$term.' Wide') }}
+                            {{ __('Dashboard-')}}{{ $term }}
                         </span>
                     </h2>
                 </div>
@@ -122,12 +95,11 @@
                         <div class="col-md-4">
                             <div class="card bg-light p-3 mb-3 rounded">
                                 {{-- header with blue background --}}
-                                <div class="card-header bg-primary">
+                                <div class="card-header bg-info">
                                     {{-- centerlize items --}}
                                     <div class="d-flex justify-content-center align-items-center">
                                         <h3 class="card-title text-white text-center pt-4 pb-4">{{
-                                            __('Employee
-                                            Engagement Index') }}</h3>
+                                            __('Employee Engagement Index') }}</h3>
                                     </div>
                                 </div>
                                 {{-- body --}}
@@ -141,7 +113,7 @@
                                             speed-2
                                             @elseif($EE_Index<=65)
                                             speed-3
-                                            @elseif($EE_Index<=85)
+                                            @elseif($EE_Index<=80)
                                             speed-4
                                             @else
                                             speed-5
@@ -154,17 +126,18 @@
                                         <div class="col-12 mt-5">
                                             <div class="row">
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-success"
-                                                            style="height:{{ $EE_Index_Engaged }}%">
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-success @if ($EE_Index_Engaged <=0)
+                                                        text-danger
+                                                    @endif" style="height:{{ $EE_Index_Engaged }}%">
                                                             <span>{{ $EE_Index_Engaged }}%</span>
                                                         </div>
                                                     </div>
                                                     <span class="caption h6">{{ __('Engaged') }}</span>
                                                 </div>
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-warning"
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-warning @if ($EE_Index_Nuetral<=0) text-danger @endif"
                                                             style="height:{{ $EE_Index_Nuetral }}%">
                                                             <span>{{ $EE_Index_Nuetral }}%</span>
                                                         </div>
@@ -172,15 +145,15 @@
                                                     <span class="caption h6">{{ __('Nuetral') }}</span>
                                                 </div>
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-danger"
-                                                            style="height:{{ $EE_Index_Actively_Disengaged }}%">
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-danger @if ($EE_Index_Actively_Disengaged<=0)
+                                                        text-danger
+                                                    @endif" style="height:{{ $EE_Index_Actively_Disengaged }}%">
                                                             <span>{{ $EE_Index_Actively_Disengaged
                                                                 }}%</span>
                                                         </div>
                                                     </div>
-                                                    <span class="caption h6">{{ __('Actively
-                                                        Disengaged') }}</span>
+                                                    <span class="caption h6">{{ __('Actively Disengaged') }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -192,12 +165,11 @@
                         <div class="col-md-4">
                             <div class="card bg-light p-3 mb-3 rounded">
                                 {{-- header with blue background --}}
-                                <div class="card-header bg-primary">
+                                <div class="card-header bg-info">
                                     {{-- centerlize items --}}
                                     <div class="d-flex justify-content-center align-items-center">
                                         <h3 class="card-title text-white text-center pt-4 pb-4">{{
-                                            __('Employee
-                                            Engagement Drivers') }}</h3>
+                                            __('Employee Engagement Drivers') }}</h3>
                                     </div>
                                 </div>
                                 {{-- body --}}
@@ -207,7 +179,7 @@
                                         <div class="col-12">
                                             <div class="caption">
                                                 <h3 class="h3">{{ $fun['fun_title'] }}</h3>
-                                                <h5 class="h6">({{ $fun['fun_des'] }})</h5>
+                                                {{-- <h5 class="h6">({{ $fun['fun_des'] }})</h5> --}}
                                             </div>
                                             <div class="speedometer
                                             @if ($fun['fun_perc']<=25)
@@ -234,12 +206,11 @@
                         <div class="col-md-4">
                             <div class="card bg-light p-3 mb-3 rounded">
                                 {{-- header with blue background --}}
-                                <div class="card-header bg-primary">
+                                <div class="card-header bg-info">
                                     {{-- centerlize items --}}
                                     <div class="d-flex justify-content-center align-items-center">
                                         <h3 class="card-title text-white text-center pt-2 pb-2">{{
-                                            __('Employee Net
-                                            Promotor Score (eNPS)') }}</h3>
+                                            __('Employee Net Promotor Score (eNPS)') }}</h3>
                                     </div>
                                 </div>
                                 {{-- body --}}
@@ -266,32 +237,34 @@
                                         <div class="col-12 mt-5">
                                             <div class="row">
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-success"
-                                                            style="height:{{ $eNPS_Promotors }}%">
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-success @if ($eNPS_Promotors<=0)
+                                                            text-danger
+                                                        @endif" style="height:{{ $eNPS_Promotors }}%">
                                                             <span>{{ $eNPS_Promotors }}%</span>
                                                         </div>
                                                     </div>
-                                                    <span class="caption h6">{{ __('Promotors')
-                                                        }}</span>
+                                                    <span class="caption h6">{{ __('Promotors')}}</span>
                                                 </div>
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-warning"
-                                                            style="height:{{ $eNPS_Passives }}%">
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-warning @if ($eNPS_Passives<=0)
+                                                        text-danger
+                                                    @endif" style="height:{{ $eNPS_Passives }}%">
                                                             <span>{{ $eNPS_Passives }}%</span>
                                                         </div>
                                                     </div>
-                                                    <span class="caption h6">{{ __('Passives') }}</span>
+                                                    <span class="caption h6 pt-3">{{ __('Passives') }}</span>
                                                 </div>
                                                 <div class="col-md-4 col-sm-12">
-                                                    <div class="custom-progress">
-                                                        <div class="custom-progress-bar bg-danger"
-                                                            style="height:{{ $eNPS_Detractors }}%">
+                                                    <div class="custom-progress mb-3">
+                                                        <div class="custom-progress-bar bg-danger @if ($eNPS_Detractors<=0)
+                                                        text-danger
+                                                    @endif" style="height:{{ $eNPS_Detractors }}%">
                                                             <span>{{ $eNPS_Detractors }}%</span>
                                                         </div>
                                                     </div>
-                                                    <span class="caption h6">{{ __('Detractors')
+                                                    <span class="caption h6 pt-3">{{ __('Detractors')
                                                         }}</span>
                                                 </div>
                                             </div>
@@ -307,13 +280,12 @@
             <div class="card shadow p-3 mb-5 bg-white rounded">
                 {{-- header --}}
                 <div class="card-header d-flex align-items-center">
-                    <h2 class="h4 text-orange">{{ __('Engagement Drivers Result - '.$term.' Wide')
-                        }}</h2>
+                    <h2 class="h4 text-orange">{{ __('Engagement Drivers Result - ')}}{{ $term }}</h2>
                 </div>
                 {{-- body --}}
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-sm-12 pt-5 pb-5 bg-primary shadow p-3 rounded">
+                        <div class="col-sm-12 pt-5 pb-5 bg-info shadow p-3 rounded">
                             <h3 class="text-white">{{ __('Engagement Drivers') }}</h3>
                         </div>
                     </div>
@@ -328,7 +300,7 @@
                                             <div class="col-12">
                                                 <div class="caption">
                                                     <h3 class="h3">{{ $fun_result['fun_title'] }}</h3>
-                                                    <h5 class="h5">({{ $fun_result['fun_des'] }})</h5>
+                                                    {{-- <h5 class="h5">({{ $fun_result['fun_des'] }})</h5> --}}
                                                 </div>
                                             </div>
                                             <div class="col-12">
@@ -361,7 +333,8 @@
                                                 bg-success text-white
                                             @endif
                                             ">
-                                                {{ $practice['PracticeTitle'] }}
+                                                {{ $practice['PracticeTitle'] }} {{-- -- {{ $practice['practice_perc']
+                                                }} --}}
                                             </div>
                                             @endif
                                             @endforeach
@@ -378,7 +351,7 @@
             <div class="card shadow p-3 mb-5 bg-white rounded">
                 {{-- header --}}
                 <div class="card-header d-flex align-items-center">
-                    <h2 class="h4 text-orange">{{ __('Top and Bottom Scores - '.$term.' Wide') }}
+                    <h2 class="h4 text-orange">{{ __('Top and Bottom Scores - ')}}{{ $term }}.
                     </h2>
                 </div>
                 {{-- body --}}
@@ -389,7 +362,7 @@
                             {{-- card --}}
                             <div class="card p-3 mb-5 rounded">
                                 {{-- header --}}
-                                <div class="card-header d-flex align-items-center bg-primary">
+                                <div class="card-header d-flex align-items-center bg-info">
                                     <h3 class="h3 text-white">{{ __('Key Strengths') }}</h3>
                                 </div>
                                 {{-- body --}}
@@ -427,7 +400,7 @@
                             {{-- card --}}
                             <div class="card p-3 mb-5 rounded">
                                 {{-- header --}}
-                                <div class="card-header d-flex align-items-center bg-primary">
+                                <div class="card-header d-flex align-items-center bg-info">
                                     <h3 class="h3 text-white">{{ __('Key Improvement Areas') }}</h3>
                                 </div>
                                 {{-- body --}}
@@ -472,7 +445,7 @@
             <div class="card shadow p-3 mb-5 bg-white rounded">
                 {{-- header --}}
                 <div class="card-header d-flex align-items-center">
-                    <h2 class="h4 text-orange">{{ __('Heat Map - Engagement Drivers Result across '.$term1) }}</h2>
+                    <h2 class="h4 text-orange">{{ __('Heat Map - Engagement Drivers Result across ') }}{{ $term1 }}</h2>
                 </div>
                 {{-- body --}}
                 <div class="card-body">
@@ -551,6 +524,14 @@
                 </div>
             </div>
             @endif
+            <div class="row text-start">
+                <div class="col-4 p-3 ">
+
+                    <a href="{{ route('surveys.DownloadSurvey',$id) }}" class="btn btn-success mt-3" style="border-radius: 10px;
+            -webkit-box-shadow: 5px 5px 20px 5px #ababab;
+            box-shadow: 5px 5px 20px 5px #ababab;">{{ __('Download Survey Answers') }}</a>
+                </div>
+            </div>
         </div>
         {{-- =============================================================== --}}
     </div>
