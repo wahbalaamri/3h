@@ -14,10 +14,12 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="">
-                        <h3 class="card-title {{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Client Details') }}</h3>
+                        <h3 class="card-title {{ App()->getLocale()=='ar'? 'float-end':'float-start' }}">{{ __('Client
+                            Details') }}</h3>
 
                         <a href="{{ route('clients.edit', $client->id) }}"
-                            class="btn btn-success btn-sm {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">{{ __('Edit') }}</a>
+                            class="btn btn-success btn-sm {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">{{
+                            __('Edit') }}</a>
 
                     </div>
                 </div>
@@ -68,13 +70,80 @@
                                                                     <th scope="">{{ __('Plan') }}</th>
                                                                     <th scope="">{{ __('Survey Status') }}</th>
                                                                     <th scope="">{{ __('Survey Date') }}</th>
-                                                                    {{-- <th scope="">{{ __('Respondents') }}</th>
-                                                                    <th scope="">{{ __('Send Remainder') }}</th> --}}
+                                                                    <th scope="">{{ __('Open Ended Questions') }}</th>
+                                                                    <th scope="">{{ __('Respondents') }}</th>
                                                                     <th scope="">{{ __('Send Survey') }}</th>
+                                                                    <th scope="">{{ __('Send Remainder') }}</th>
                                                                     <th scope="">{{ __('Result') }}</th>
-                                                                    <th colspan="3"  scope="">{{ __('Survey Actions') }}</th>
+                                                                    <th colspan="3" scope="">{{ __('Survey Actions') }}
+                                                                    </th>
                                                                 </tr>
                                                             </thead>
+                                                            <tbody>
+                                                                @foreach ($client->surveys as $survey)
+                                                                <tr>
+                                                                    <td>{{ $loop->iteration }}</td>
+                                                                    <td>{{ $survey->SurveyTitle }}</td>
+                                                                    <td>{{ app()->getLocale()=='ar'?
+                                                                        $survey->plan->PlanTitleAr:$survey->plan->PlanTitle
+                                                                        }}</td>
+                                                                    <td>
+                                                                        <div class="form-check form-switch"><input
+                                                                                class="form-check-input" type="checkbox"
+                                                                                role="switch"
+                                                                                id="flexSwitchCheckChecked{{ $survey->id }}"
+                                                                                {{ $survey->SurveyStat? 'checked':'' }}
+                                                                            onchange="ChangeCheck(this,'{{ $survey->id
+                                                                            }}')" ><label class="form-check-label"
+                                                                                for="flexSwitchCheckChecked{{ $survey->id }}">{{
+                                                                                $survey->SurveyStat?'Active':'In-Active'
+                                                                                }}</label></div>
+                                                                    </td>
+                                                                    <td>{{ $survey->created_at->format('d-m-Y') }}</td>
+                                                                    <td>
+                                                                        <a data-bs-toggle="modal"
+                                                                            href="#RespondentEmails"
+                                                                            onclick="GetRespondentsEmails('{{ $survey->id }}')"
+                                                                            class="btn btn-success btn-sm"> {{
+                                                                            __('Respondents') }}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="/emails/send-survey/{{ $survey->id }}/{{ $survey->ClientId }}"
+                                                                            class="btn btn-success btn-sm">{{
+                                                                            __('Survey') }}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="/emails/send-reminder/{{ $survey->id }}/{{ $survey->ClientId }}"
+                                                                            class="btn btn-info btn-sm ">{{
+                                                                            __('Reminder') }}</a>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <a href="{{ route('survey-answers.result',  $survey->id) }}"
+                                                                            class="btn btn-info btn-sm">{{ __('Result')
+                                                                            }}</a>
+                                                                    </td>
+                                                                    <td><a href="{{route('surveys.show', $survey->id)}}"
+                                                                            class="edit btn btn-primary btn-sm m-1"><i
+                                                                                class="fa fa-eye"></i></a></td>
+                                                                    <td><a href="{{ route('surveys.edit', $survey->id)}}"
+                                                                            class="edit btn btn-primary btn-sm m-1"><i
+                                                                                class="fa fa-edit"></i></a></td>
+                                                                    <td>
+                                                                        <form
+                                                                            action="{{route('surveys.destroy', $survey->id)}}"
+                                                                            method="POST" class="delete_form"
+                                                                            style="display:inline"><input type="hidden"
+                                                                                name="_method"
+                                                                                value="DELETE">@csrf<button
+                                                                                type="submit"
+                                                                                class="btn btn-danger btn-sm m-1"><i
+                                                                                    class="fa fa-trash"></i></button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -145,7 +214,8 @@
                                                         <tr>
                                                             <td colspan="4"> <a href="#CreateNewCompny"
                                                                     id="CreateCompanyUrl" data-bs-toggle="modal"
-                                                                    class="btn btn-sm btn-success float-end">{{ __('Add Company') }}</a>
+                                                                    class="btn btn-sm btn-success float-end">{{ __('Add
+                                                                    Company') }}</a>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -188,7 +258,8 @@
                                                         <tr>
                                                             <td colspan="4"> <a href="#CreateNewDepartment"
                                                                     id="CreateDeptUrl" data-bs-toggle="modal"
-                                                                    class="btn btn-sm btn-success float-end">{{ __('Add Department') }}</a>
+                                                                    class="btn btn-sm btn-success float-end">{{ __('Add
+                                                                    Department') }}</a>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -280,7 +351,8 @@
                                         </div>
                                         <div class="col-md-12 mt-1">
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-sm btn-primary">{{ __('Create Sector') }}</button>
+                                                <button type="submit" class="btn btn-sm btn-primary">{{ __('Create
+                                                    Sector') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -367,7 +439,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="department_name_en" class="form-label">{{ __('Department Name in English')
+                                        <label for="department_name_en" class="form-label">{{ __('Department Name in
+                                            English')
                                             }}</label>
                                         <input type="text" class="form-control" id="department_name_en"
                                             name="department_name_en" value="{{ old('department_name_en') }}">
@@ -375,7 +448,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="department_name_ar" class="form-label">{{ __('Department Name in Arabic')
+                                        <label for="department_name_ar" class="form-label">{{ __('Department Name in
+                                            Arabic')
                                             }}</label>
                                         <input type="text" class="form-control" id="department_name_ar"
                                             name="department_name_ar" value="{{ old('department_name_ar') }}">
@@ -384,7 +458,8 @@
                                 {{-- parent department --}}
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="parent_department_id" class="form-label">{{ __('Parent Department')}}
+                                        <label for="parent_department_id" class="form-label">{{ __('Parent
+                                            Department')}}
                                         </label>
                                         <select class="form-control" name="parent_department_id"
                                             id="parent_department_id">
@@ -416,26 +491,26 @@
 <script>
     var GetCompaniesURl='';
     $(document).ready(function() {
-        console.log("{{ route('clients.getClients',$client->id) }}");
+        // console.log("{{ route('clients.getClients',$client->id) }}");
         //surveysDataTable
-        $('#surveysDataTable').DataTable({
-            processing: true,
-            serverSide: true,
-            bDestroy: true,
-            ajax: "{{ route('clients.getClients',$client->id) }}",
-            columns: [
-            {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-            {data: 'SurveyTitle', name: 'SurveyTitle'},
-            {data: 'PlanId', name: 'PlanId'},
-            {data: 'SurveyStat', name: 'SurveyStat'},
-            {data: 'created_at', name: 'created_at'},
-            // {data: 'respondents', name: 'respondents'},
-            {data: 'send_survey', name: 'send_survey'},
-            // {data: 'send_reminder', name: 'send_reminder'},
-            {data: 'survey_result',name: 'survey_result' },
-            {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
-        });
+        // $('#surveysDataTable').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     bDestroy: true,
+        //     ajax: "{{ route('clients.getClients',$client->id) }}",
+        //     columns: [
+        //     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        //     {data: 'SurveyTitle', name: 'SurveyTitle'},
+        //     {data: 'PlanId', name: 'PlanId'},
+        //     {data: 'SurveyStat', name: 'SurveyStat'},
+        //     {data: 'created_at', name: 'created_at'},
+        //     // {data: 'respondents', name: 'respondents'},
+        //     {data: 'send_survey', name: 'send_survey'},
+        //     // {data: 'send_reminder', name: 'send_reminder'},
+        //     {data: 'survey_result',name: 'survey_result' },
+        //     {data: 'action', name: 'action', orderable: false, searchable: false},
+        //     ]
+        // });
         $('#sectorsDataTable').DataTable({
             processing: true,
             serverSide: true,
@@ -496,28 +571,28 @@
                 ]
             });
     }
-$("#GetSurveys").click(function(){
-    console.log("{{ $client->id }}");
-    $('#surveysDataTable').DataTable({
-        processing: true,
-        serverSide: true,
-        bDestroy: true,
-        ajax: "{{ route('clients.getClients',$client->id) }}",
-        columns: [
-            {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-            {data: 'SurveyTitle', name: 'SurveyTitle'},
-            {data: 'PlanId', name: 'PlanId'},
-            {data: 'SurveyStat', name: 'SurveyStat'},
-            {data: 'created_at', name: 'created_at'},
-             {data: 'respondents', name: 'respondents'},
-            {data: 'send_survey', name: 'send_survey'},
-            {data: 'send_reminder', name: 'send_reminder'},
-               {data: 'survey_result',name: 'survey_result' },
-               {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
-        });
-        $('#surveysDataTable').css('width', '100%');
-    })
+// $("#GetSurveys").click(function(){
+//     console.log("{{ $client->id }}");
+//     $('#surveysDataTable').DataTable({
+//         processing: true,
+//         serverSide: true,
+//         bDestroy: true,
+//         ajax: "{{ route('clients.getClients',$client->id) }}",
+//         columns: [
+//             {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+//             {data: 'SurveyTitle', name: 'SurveyTitle'},
+//             {data: 'PlanId', name: 'PlanId'},
+//             {data: 'SurveyStat', name: 'SurveyStat'},
+//             {data: 'created_at', name: 'created_at'},
+//              {data: 'respondents', name: 'respondents'},
+//             {data: 'send_survey', name: 'send_survey'},
+//             {data: 'send_reminder', name: 'send_reminder'},
+//                {data: 'survey_result',name: 'survey_result' },
+//                {data: 'action', name: 'action', orderable: false, searchable: false},
+//             ]
+//         });
+//         $('#surveysDataTable').css('width', '100%');
+//     })
  ChangeCheck =(current,id)=>{
 
     //check if current checkbox checked

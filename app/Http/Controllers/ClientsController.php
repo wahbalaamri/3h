@@ -53,7 +53,8 @@ class ClientsController extends Controller
     public function show(Request $request, Clients $client)
     {
         $departments = Departments::all();
-        return response()->view('Clients.show', compact('client', 'departments'));
+        $client_survyes=Surveys::where('ClientId', $client->id)->get();
+        return response()->view('Clients.show', compact('client', 'departments','client_survyes'));
     }
 
     /**

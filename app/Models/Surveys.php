@@ -61,4 +61,9 @@ class Surveys extends Model
     {
         return $this->belongsTo(EmailContent::class);
     }
+    //hasmany open ended question
+    public function OpenEndQ()
+    {
+        return $this->hasMany(OpenEndedQuestions::class,'survey_id');
+    }
 }

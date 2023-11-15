@@ -34,7 +34,7 @@ class Clients extends Model
 
     public function surveys()
     {
-        return $this->hasMany(Surveys::class);
+        return $this->hasMany(Surveys::class,'ClientId');
     }
 
     public function emails()
