@@ -11,6 +11,7 @@ use App\Models\SurveyAnswers;
 use App\Models\Surveys;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class QuestionnairController extends Controller
 {
@@ -127,5 +128,64 @@ class QuestionnairController extends Controller
             'plan_id' => $free_plan->id,
         ];
         return view('Questions.index')->with($data);
+    }
+    function generateSurveyUrlForm()
+    {
+        return view('Surveys.generateSurveyURl');
+    }
+    function generateSurveyUrl(Request $request){
+        //get email id from request
+        $email_id = $request->email;
+        //get mobile number from request
+        $mobile_number = $request->mobile;
+        //get employee id from request
+        // $employee_id = $request->employee_id;
+        //check any of them not null and add it to where elequent querey
+        $where = [];
+        if($email_id != null){
+            $where[] = ['Email','=',$email_id];
+        }
+        if($mobile_number != null){
+            $where[] = ['Mobile','=',$mobile_number];
+        }
+        // if($employee_id != null){
+        //     $where[] = ['Emp_id','=',$employee_id];
+        // }
+        //check is $where is empty return back with error
+        if(empty($where)){
+            return back()->with('error',__('Please enter at least one of the following: email, mobile number or employee id'));
+        }
+        //get email details from database
+        $id=Emails::where($where)->first();
+        //check if email details is null return back with error
+        if($id == null){
+            return back()->with('error',__('No email found with this data'));
+        }
+        //redirect to survey page with email id
+        return redirect()->route('survey',$id->id);
+
+    }
+    public function surveyQRCode()
+    {
+        $data = QrCode::generate(
+            route('survey.generateSurveyUrlForm'),
+        );
+        return view('home.QRcode', compact('data'));
+    }
+    function testRadio()
+    {
+        $survey = Surveys::where([['id', 11], ['SurveyStat', '=', true]])->first();
+        $planId = $survey->plan->id;
+        $functions = Functions::where([['Status', '=', 1], ['PlanId', '=', $survey->PlanId]])->get();
+        $can_ansewer_to_priorities = false;
+        $data = [
+            'functions' => $functions,
+            // 'user_type' => $user_type,
+            'can_ansewer_to_priorities' => $can_ansewer_to_priorities,
+            'SurveyId' => 11,
+            // 'email_id' => $id,
+            'plan_id' => $planId,
+        ];
+        return view('Surveys.testing')->with($data);
     }
 }

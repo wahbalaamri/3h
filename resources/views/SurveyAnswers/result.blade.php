@@ -531,6 +531,12 @@
             -webkit-box-shadow: 5px 5px 20px 5px #ababab;
             box-shadow: 5px 5px 20px 5px #ababab;">{{ __('Download Survey Answers') }}</a>
                 </div>
+                <div class="col-4 p-3 ">
+
+                    <a href="{{ route('survey-answers.resultPDF',$id) }}" class="btn btn-success mt-3" style="border-radius: 10px;
+            -webkit-box-shadow: 5px 5px 20px 5px #ababab;
+            box-shadow: 5px 5px 20px 5px #ababab;">{{ __('Download Survey Result PDF') }}</a>
+                </div>
             </div>
         </div>
         {{-- =============================================================== --}}

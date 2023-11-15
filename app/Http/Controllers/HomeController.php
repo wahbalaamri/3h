@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PartnerShipPlans;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class HomeController extends Controller
 {
@@ -27,4 +28,5 @@ class HomeController extends Controller
         $plans= PartnerShipPlans::where('Status',1)->get();
         return view('home')->with('plans',$plans);
     }
+
 }

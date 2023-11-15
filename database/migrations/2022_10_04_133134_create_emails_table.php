@@ -19,7 +19,11 @@ class CreateEmailsTable extends Migration
             $table->integer('dep_id');
             $table->integer('ClientId');
             $table->integer('SurveyId');
-            $table->string('Email');
+            $table->string('Email')->nullable();
+            $table->string('Mobile')->nullable();
+            $table->string('Emp_id')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('age_generation')->nullable();
             $table->integer('EmployeeType');
             $table->integer('AddedBy');
             $table->timestamps();

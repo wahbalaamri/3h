@@ -15,6 +15,14 @@ return new class extends Migration
     {
         Schema::create('sending_survey_settings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('survey_id')->constrained()->onDelete('cascade');
+            //starts sending on
+            $table->dateTime('starts_sending_on');
+            //ends sending on
+            $table->dateTime('ends_sending_on');
+            // Repetitive
+            $table->boolean('repetitive')->default(false);
+
             $table->timestamps();
         });
     }

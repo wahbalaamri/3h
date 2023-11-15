@@ -17,6 +17,7 @@ class CreateFunctionsTable extends Migration
             $table->id();
             $table->string('FunctionTitle');
             $table->string('FunctionTitleAr');
+            $table->string('FunctionTitleIn')->nullable();
             $table->integer('PlanId');
             $table->text('Respondent');
             $table->boolean('Status');

@@ -17,6 +17,7 @@ class CreatePracticeQuestionsTable extends Migration
             $table->id();
             $table->string('Question');
             $table->string('QuestionAr');
+            $table->string('QuestionIn')->nullable();
             $table->integer('PracticeId');
             $table->integer('Respondent');
             $table->boolean('Status');

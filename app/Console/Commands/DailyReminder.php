@@ -27,14 +27,14 @@ class DailyReminder extends Command
      */
     public function handle()
     {
-        $emails = ['wahb@hrfactoryapp.com', 'nabahan@extramiles-om.com ','wahb.alaamri@gmail.com'];
-        $data = [
-            'subject' => 'This Email To test daily Schedule Reminder',
-            'body' => 'Hi there this is autmatic test to send an email',
-        ];
-        $job = (new \App\Jobs\SendQueueEmail($data, $emails))
-            ->delay(now()->addSeconds(2));
-        dispatch($job);
+        // $emails = ['wahb@hrfactoryapp.com', 'nabahan@extramiles-om.com ','wahb.alaamri@gmail.com'];
+        // $data = [
+        //     'subject' => 'This Email To test daily Schedule Reminder',
+        //     'body' => 'Hi there this is autmatic test to send an email',
+        // ];
+        // $job = (new \App\Jobs\SendQueueEmail($data, $emails))
+        //     ->delay(now()->addSeconds(2));
+        // dispatch($job);
         return Command::SUCCESS;
     }
 }

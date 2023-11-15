@@ -27,6 +27,10 @@ Route::get('/', [Home::class, 'index'])->name('home.index');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/survey/{id}', [App\Http\Controllers\QuestionnairController::class, 'index'])->name('survey');
+Route::get('/SurveyUrlForm', [App\Http\Controllers\QuestionnairController::class, 'generateSurveyUrlForm'])->name('survey.generateSurveyUrlForm');
+Route::get('/testRadio', [App\Http\Controllers\QuestionnairController::class, 'testRadio'])->name('survey.testRadio');
+Route::post('/GenerateSurveyURL', [App\Http\Controllers\QuestionnairController::class, 'generateSurveyUrl'])->name('survey.generateSurveyUrl');
+Route::get('/surveyQRCode', [App\Http\Controllers\QuestionnairController::class, 'surveyQRCode'])->name('surveyQRCode');
 Route::get('/FreeSurvey', [App\Http\Controllers\QuestionnairController::class, 'fressSurvey'])->name('FreeSurvey');
 Route::post('/questionnair/saveAnswer', [App\Http\Controllers\QuestionnairController::class, 'saveAnswer'])->name('questionnair.saveAnswer');
 
@@ -97,6 +101,7 @@ Route::resource('surveys', App\Http\Controllers\SurveysController::class)->middl
 Route::get('survey-answers/freeSurveyResult/{id}', [App\Http\Controllers\SurveyAnswersController::class, 'ShowFreeResult'])->name('survey-answers.freeSurveyResult');
 Route::resource('survey-answers', App\Http\Controllers\SurveyAnswersController::class)->middleware('auth');
 Route::get('/survey-answers/result/{id}', [App\Http\Controllers\SurveyAnswersController::class, 'result'])->name('survey-answers.result')->middleware('auth');
+Route::get('/survey-answers/resultPDF/{id}', [App\Http\Controllers\SurveyAnswersController::class, 'resultPDF'])->name('survey-answers.resultPDF')->middleware('auth');
 Route::get('/survey-answers/SectorResult/{id}/{sctor}', [App\Http\Controllers\SurveyAnswersController::class, 'SectorResult'])->name('survey-answers.SectorResult')->middleware('auth');
 Route::get('/survey-answers/CompanyResult/{id}/{company}', [App\Http\Controllers\SurveyAnswersController::class, 'CompanyResult'])->name('survey-answers.CompanyResult')->middleware('auth');
 Route::get('/survey-answers/DepartmentResult/{id}/{dep}', [App\Http\Controllers\SurveyAnswersController::class, 'DepartmentResult'])->name('survey-answers.DepartmentResult')->middleware('auth');
@@ -121,6 +126,7 @@ Route::get('departments/getForSelect/{id}',[DepartmentsController::class,'GetFor
 Route::get('companies/getForSelect/{id}',[CompaniesController::class,'GetForSelect'])->name('companies.getSelect')->middleware('auth');
 // route to change language
 Route::get('lang/{locale}', function () {
+
     session()->put('locale', request()->locale);
     return redirect()->back();
 })->name('lang.swap');
