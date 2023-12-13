@@ -14,10 +14,12 @@
         "laravel/ui": "^4.0",
         "maatwebsite/excel": "^3.1",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/laravel-permission": "^6.1",
         "twbs/bootstrap-icons": "^1.9",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.9",
         "fakerphp/faker": "^1.9.1",
         "laravel-shift/blueprint": "^2.4",
         "laravel/pint": "^1.0",

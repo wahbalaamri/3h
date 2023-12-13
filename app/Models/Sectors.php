@@ -25,4 +25,9 @@ class Sectors extends Model
     {
         return $this->hasMany(Companies::class,'sector_id');
     }
+    //has many Emails
+    public function emails()
+    {
+        return $this->hasMany(Emails::class,'sector_id');
+    }
 }

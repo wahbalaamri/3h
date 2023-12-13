@@ -39,6 +39,6 @@ class Functions extends Model
 
     public function functionPractices()
     {
-        return $this->hasMany(FunctionPractice::class,'FunctionId');
+        return $this->hasMany(FunctionPractice::class,'FunctionId')->orderBy('ordering');
     }
 }

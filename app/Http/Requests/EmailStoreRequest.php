@@ -24,11 +24,12 @@ class EmailStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'Email' => ['required', 'string','email'],
+            'Email' => ['nullable', 'string','email'],
+            'Mobile' => ['nullable'],
             'SurveyId' => ['required', 'integer'],
             'ClientId' => ['required', 'integer'],
             'EmployeeType' => ['required', 'integer'],
-            'DepartmentId' => ['required'],
+            // 'DepartmentId' => ['required'],
             'AddedBy' => ['required', 'integer'],
         ];
     }

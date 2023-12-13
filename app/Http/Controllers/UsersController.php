@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Clients;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
@@ -163,8 +165,23 @@ class UsersController extends Controller
             // error with message to old_password
             return back()
                 ->withInput()
-                ->withErrors(['old_password'=>'Old password is incorrect']);
+                ->withErrors(['old_password' => 'Old password is incorrect']);
             // return redirect()->back()->with('error', 'Old password is incorrect');
         }
+    }
+    function setup_users()
+    {
+        $role = Role::create(['name' => 'admin']);
+        $role = Role::create(['name' => 'statisticsViewer']);
+        $user = User::where('email', 'admin@hrfactoryapp.com')->first();
+        $user->assignRole('admin');
+        //create new user
+        $user = new User();
+        $user->name = "alzubair";
+        $user->email = "alzubair" . '@hrfactoryapp.com';
+        $user->password = Hash::make('password');
+        $user->user_type = 'alzubair';
+        $user->save();
+        $user->assignRole('statisticsViewer');
     }
 }

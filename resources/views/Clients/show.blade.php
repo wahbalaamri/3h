@@ -58,7 +58,7 @@
                                                             class="table table table-bordered data-table">
                                                             <thead>
                                                                 <tr>
-                                                                    <td colspan="13" class="">
+                                                                    <td colspan="14" class="">
                                                                         <a href="{{ route('surveys.CreateNewSurvey',$client->id) }}"
                                                                             class="btn btn-sm btn-primary {{ App()->getLocale()=='ar'? 'float-start':'float-end' }}">{{
                                                                             __('Create New Survey') }}</a>
@@ -74,6 +74,7 @@
                                                                     <th scope="">{{ __('Respondents') }}</th>
                                                                     <th scope="">{{ __('Send Survey') }}</th>
                                                                     <th scope="">{{ __('Send Remainder') }}</th>
+                                                                    <th scope="">{{ __('Statistics') }}</th>
                                                                     <th scope="">{{ __('Result') }}</th>
                                                                     <th colspan="3" scope="">{{ __('Survey Actions') }}
                                                                     </th>
@@ -93,13 +94,17 @@
                                                                                 role="switch"
                                                                                 id="flexSwitchCheckChecked{{ $survey->id }}"
                                                                                 {{ $survey->SurveyStat? 'checked':'' }}
-                                                                            onchange="ChangeCheck(this,'{{ $survey->id
-                                                                            }}')" ><label class="form-check-label"
+                                                                            onchange="ChangeCheck(this,'{{ $survey->id}}')" ><label class="form-check-label"
                                                                                 for="flexSwitchCheckChecked{{ $survey->id }}">{{
                                                                                 $survey->SurveyStat?'Active':'In-Active'
                                                                                 }}</label></div>
                                                                     </td>
                                                                     <td>{{ $survey->created_at->format('d-m-Y') }}</td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="SetUpOEQ('{{ $survey->id }}')">
+                                                                            {{ count($survey->OpenEndQ)==0? 'No Open Ended Questions':count($survey->OpenEndQ).' Open Ended Questions' }}
+                                                                          </button>
+                                                                        </td>
                                                                     <td>
                                                                         <a data-bs-toggle="modal"
                                                                             href="#RespondentEmails"
@@ -119,7 +124,12 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <a href="{{ route('survey-answers.result',  $survey->id) }}"
+                                                                        <a href="{{ route('survey-answers.statistics',  [ $survey->id,$survey->ClientId ]) }}"
+                                                                            class="btn btn-secondary btn-sm">{{ __('Statistics')
+                                                                            }}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ route('survey-answers.alzubair_result',  [$survey->id,'comp',15]) }}{{-- {{ route('survey-answers.result',  $survey->id) }} --}}"
                                                                             class="btn btn-info btn-sm">{{ __('Result')
                                                                             }}</a>
                                                                     </td>
@@ -283,8 +293,44 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">{{ __('open ended Questions') }}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="OEQuestions" class="table-responsive">
+                <table id="OEQuestions-data-table" class="table table-bordered data-table">
+                    <thead>
+                        <tr>
+                            <td colspan="4"> <a href="#" id="CreateAddOEQUrl"
+                                    class="btn btn-sm btn-success float-end">{{ __('Add Open Ended Question') }}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ __('#') }}</th>
+                            <th>{{ __('Question in English') }}</th>
+                            <th>{{ __('Question in Arabic') }}</th>
+                            <th>{{ __('Question in Hindi') }}</th>
+                            <th colspan="2">{{ __('Action') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
 <div class="modal fade" id="RespondentEmails" aria-hidden="true" aria-labelledby="RespondentEmailsLabel" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="RespondentEmailsLabel">{{ __('Respondent Emails') }}</h1>
@@ -295,7 +341,10 @@
                     <table id="Emails-data-table" class="table table-bordered data-table">
                         <thead>
                             <tr>
-                                <td colspan="4"> <a href="#" id="CreateEmailUrl"
+                                <td colspan="2"> <a href="#" id="ExprotRespondents"
+                                        class="btn btn-sm btn-success float-start">{{ __('Exprot Respondents') }}</a>
+                                </td>
+                                <td colspan="3"> <a href="#" id="CreateEmailUrl"
                                         class="btn btn-sm btn-success float-end">{{ __('Add Emails') }}</a>
                                 </td>
                             </tr>
@@ -303,6 +352,7 @@
                                 <th>{{ __('#') }}</th>
                                 <th>{{ __('Email') }}</th>
                                 <th>{{ __('Type') }}</th>
+                                <th>{{ __('Send Survey Individually') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -624,6 +674,7 @@
     GetRespondentsEmails =(id)=>{
         //set create url
         $("#CreateEmailUrl").attr("href","{{ url('emails/CreateNewEmails')}}/{{ $client->id }}/"+id);
+        $("#ExprotRespondents").attr("href","{{ url('emails/ExportEmails')}}/{{ $client->id }}/"+id);
         //Emails-data-table
         $('#Emails-data-table').DataTable({
             processing: true,
@@ -644,6 +695,12 @@
                     name: 'EmployeeType'
                 },
                 {
+                    data: 'SendSurvey',
+                    name: 'SendSurvey',
+                    orderable: false,
+                    searchable: false
+                },
+                {
                     data: 'action',
                     name: 'action',
                     orderable: false,
@@ -652,6 +709,35 @@
             ]
         });
         $("#Emails-data-table").css('width', '100%');
+    }
+    SetUpOEQ=(id)=>{
+        $("#CreateAddOEQUrl").attr('href',"{{ url('surveys/addNewOEQ') }}/"+id);
+        //OEQuestions-data-table
+        $('#OEQuestions-data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            bDestroy: true,
+            ajax: "{{ url('surveys/getOEQ')}}/"+id,
+            columns: [
+                {
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex'
+                },
+                {
+                    data: 'question',
+                    name: 'question'
+                },
+                {
+                    data: 'question_ar',
+                    name: 'question_ar'
+                },
+                {
+                    data: 'question_in',
+                    name: 'question_in'
+                },
+
+            ]
+        });
     }
 
 </script>

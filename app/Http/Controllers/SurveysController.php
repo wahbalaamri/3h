@@ -11,7 +11,9 @@ use App\Models\PrioritiesAnswers;
 use App\Models\SurveyAnswers;
 use App\Models\Surveys;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class SurveysController extends Controller
 {
@@ -47,7 +49,7 @@ class SurveysController extends Controller
     {
         $survey = Surveys::create($request->validated());
 
-        return redirect()->route('clients.show',$survey->ClientId);
+        return redirect()->route('clients.show', $survey->ClientId);
     }
 
     /**
@@ -67,9 +69,9 @@ class SurveysController extends Controller
      */
     public function edit(Request $request, Surveys $survey)
     {
-        $plans=\App\Models\PartnerShipPlans::all();
-        $clients=\App\Models\Clients::all();
-        return view('Surveys.edit', compact('survey','plans','clients'));
+        $plans = \App\Models\PartnerShipPlans::all();
+        $clients = \App\Models\Clients::all();
+        return view('Surveys.edit', compact('survey', 'plans', 'clients'));
     }
 
     /**
@@ -81,7 +83,7 @@ class SurveysController extends Controller
     {
         $survey->update($request->validated());
 
-        return redirect()->route('clients.show',$survey->ClientId);
+        return redirect()->route('clients.show', $survey->ClientId);
     }
 
     /**
@@ -114,14 +116,71 @@ class SurveysController extends Controller
         $survey->save();
         return response()->json(['message' => 'Status change successfully.']);
     }
-    public function DownloadSurvey($id)
+    public function DownloadSurvey($id , $type, $type_id = null)
     {
 
-        return Excel::download(new SurveyAnswersExport($id), 'SurveyAnswersExport.xlsx');
+        return Excel::download(new SurveyAnswersExport($id, $type, $type_id), 'SurveyAnswersExport.xlsx');
     }
     public function DownloadPriorities($id)
     {
         return Excel::download(new PrioritiesAnswersExport($id), 'PrioritiesAnswersExport.xlsx');
         # code...
+    }
+    public function addOpenEndedQ($id)
+    {
+
+        $data = [
+            'survey' => $id,
+            'id' => null,
+            'client_id' => Surveys::find($id)->ClientId
+        ];
+        return view('Surveys.addOpenEndedQ')->with($data);
+    }
+    public function EditOpenEndedQ($id, $survey)
+    {
+
+        $data = [
+            'id' => $id,
+            'survey' => $survey,
+            'client_id' => Surveys::find($survey)->ClientId
+        ];
+        return view('Surveys.addOpenEndedQ')->with($data);
+    }
+    public function SaveOpenEndedQ(Request $request,  $survey)
+    {
+
+        $openEndedQ = new \App\Models\OpenEndedQuestions();
+        $openEndedQ->question = $request->question;
+        $openEndedQ->question_ar = $request->question_ar;
+        $openEndedQ->question_in = $request->question_in;
+        $openEndedQ->answer_type = "text";
+        $openEndedQ->survey_id = $survey;
+        $openEndedQ->save();
+
+        return redirect()->route('clients.show', Surveys::find($survey)->ClientId);
+    }
+    //UpdateOpenEndedQ
+    public function UpdateOpenEndedQ(Request $request, $id, $survey)
+    {
+
+
+        $openEndedQ = \App\Models\OpenEndedQuestions::find($id);
+        $openEndedQ->question = $request->question;
+        $openEndedQ->question_ar = $request->question_ar;
+        $openEndedQ->question_in = $request->question_in;
+        $openEndedQ->answer_type = "text";
+        $openEndedQ->save();
+
+        return redirect()->route('clients.show', Surveys::find($survey)->ClientId);
+    }
+
+    //getOEQ
+    public function getOEQ(Request $request, $id)
+    {
+        // Log::alert("ddd");
+        $openEndedQ = \App\Models\OpenEndedQuestions::where('survey_id',$id)->get();
+        //set up for yajra datatable
+        return DataTables::of($openEndedQ)
+        ->addIndexColumn()->make(true);
     }
 }

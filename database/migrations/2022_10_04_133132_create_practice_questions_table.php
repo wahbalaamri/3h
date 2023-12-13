@@ -20,6 +20,7 @@ class CreatePracticeQuestionsTable extends Migration
             $table->string('QuestionIn')->nullable();
             $table->integer('PracticeId');
             $table->integer('Respondent');
+            $table->integer('ordering')->nullable();
             $table->boolean('Status');
             $table->boolean('IsENPS');
             $table->timestamps();

@@ -31,6 +31,9 @@
                         @csrf
                         <div class="row">
                             <input type="hidden" name="reminder" id="reminder" value="{{ $reminder }}">
+                            @if($reminder==2)
+                            <input type="hidden" name="respondentID" id="respondentID" value="{{ $respondentID }}">
+                            @endif
                             {{-- select Client --}}
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
@@ -58,6 +61,48 @@
                                         @endforeach
                                     </select>
                                     @error('survey_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="SectorId">{{ __('Sector') }}</label>
+                                    <select name="SectorId" id="SectorId" onchange="setUpComapny('SectorId','CompanyId')"
+                                        class="form-control @error('SectorId') is-invalid @enderror" @if ($reminder!=2)
+                                        required
+                                        @else
+                                        disabled
+                                        @endif>
+                                        <option value="">{{ __('Select Sector') }}</option>
+                                        @foreach ($sectors as $sector)
+                                        <option value="{{ $sector->id }}" @if (old('SectorId')==$sector->id) selected
+                                            @endif>
+                                            {{ app()->getLocale()=='ar'? $sector->sector_name_ar:$sector->sector_name_en
+                                            }}</option>
+                                        @endforeach
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('SectorId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- select company --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="CompanyId">{{ __('Company') }}</label>
+                                    <select name="CompanyId" id="CompanyId"
+                                        class="form-control @error('CompanyId') is-invalid @enderror" @if ($reminder!=2)
+                                        required
+                                        @else
+                                        disabled
+                                        @endif>
+                                        <option value="">{{ __('Select Company') }}</option>
+
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('CompanyId')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -206,6 +251,28 @@
           ['view', ['fullscreen',  'help']]
         ]
         });
+        setUpComapny =(sec,comp) =>{
+        var SectorId = $("#"+sec).val();
+        if(SectorId){
+            $.ajax({
+                type:"GET",
+                url:"{{ url('companies/getForSelect') }}/"+SectorId,
+                success:function(res){
+                    if(res){
+                        $("#"+comp).empty();
+                        $("#"+comp).append('<option value="">{{ __("Select Company") }}</option>');
+                        $.each(res,function(key,value){
+                            $("#"+comp).append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
+                        });
+                    }else{
+                        $("#"+comp).empty();
+                    }
+                }
+            });
+        }else{
+            $("#"+comp).empty();
+        }
+    }
     });
     $('form').submit(function () {
         //disable client id

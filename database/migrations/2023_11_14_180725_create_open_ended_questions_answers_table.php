@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('open_ended_questions_answers', function (Blueprint $table) {
             $table->id();
             $table->integer('open_ended_question_id');
-            $table->integer('respondent_id');
+            $table->uuid('respondent_id');
             $table->integer('survey_id');
             $table->string('answer');
             $table->timestamps();

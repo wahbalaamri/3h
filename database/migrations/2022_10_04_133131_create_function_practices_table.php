@@ -19,6 +19,7 @@ class CreateFunctionPracticesTable extends Migration
             $table->string('PracticeTitleAr');
             $table->integer('FunctionId');
             $table->boolean('Status');
+            $table->integer('ordering')->nullable();
             $table->timestamps();
         });
     }

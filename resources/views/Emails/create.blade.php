@@ -63,7 +63,7 @@
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="SectorId">{{ __('Sector') }}</label>
-                                    <select name="SectorId" id="SectorId"
+                                    <select name="SectorId" id="SectorId" onchange="setUpComapny('SectorId','CompanyId')"
                                         class="form-control @error('SectorId') is-invalid @enderror">
                                         <option value="">{{ __('Select Sector') }}</option>
                                         @foreach ($sectors as $sector)
@@ -83,7 +83,7 @@
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="CompanyId">{{ __('Company') }}</label>
-                                    <select name="CompanyId" id="CompanyId"
+                                    <select name="CompanyId" id="CompanyId" onchange="setUpDep('CompanyId','DepartmentId')"
                                         class="form-control @error('CompanyId') is-invalid @enderror">
                                         <option value="">{{ __('Select Company') }}</option>
 
@@ -121,6 +121,19 @@
                                         value="{{ old('Email') }}" placeholder="Email">
                                     {{-- validation --}}
                                     @error('Email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- employee Mobile --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="Mobile">{{ __('Mobile') }}</label>
+                                    <input type="text" name="Mobile" id="Mobile"
+                                        class="form-control @error('Mobile') is-invalid @enderror"
+                                        value="{{ old('Mobile') }}" placeholder="Mobile">
+                                    {{-- validation --}}
+                                    @error('Mobile')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -163,7 +176,7 @@
                     <h3 class="card-title">{{ __('Create Email (Upload File)') }}</h3>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('emails.saveUpload') }}" method="POST" enctype="multipart/form-data"
+                    <form action="{{ route('emails.saveUploadZ') }}" method="POST" enctype="multipart/form-data"
                         id="uploadForm" class="d-inline">
                         @csrf
                         <div class="row">
@@ -197,6 +210,56 @@
                                             {{ $client->ClientName }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            {{-- select sector --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="SectorId_up">{{ __('Sector') }}</label>
+                                    <select name="SectorId_up" id="SectorId_up" onchange="setUpComapny('SectorId_up','CompanyId_up')"
+                                        class="form-control @error('SectorId_up') is-invalid @enderror">
+                                        <option value="">{{ __('Select Sector') }}</option>
+                                        @foreach ($sectors as $sector)
+                                        <option value="{{ $sector->id }}" @if (old('SectorId_up')==$sector->id) selected
+                                            @endif>
+                                            {{ app()->getLocale()=='ar'? $sector->sector_name_ar:$sector->sector_name_en
+                                            }}</option>
+                                        @endforeach
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('SectorId_up')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- select company --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="CompanyId_up">{{ __('Company') }}</label>
+                                    <select name="CompanyId_up" id="CompanyId_up" onchange="setUpDep('CompanyId_up','DepartmentId_up')"
+                                        class="form-control @error('CompanyId_up') is-invalid @enderror">
+                                        <option value="">{{ __('Select Company') }}</option>
+
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('CompanyId_up')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- select department --}}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="DepartmentId_up">{{ __('Department') }}</label>
+                                    <select name="DepartmentId_up" id="DepartmentId_up"
+                                        class="form-control @error('DepartmentId_up') is-invalid @enderror">
+                                        <option value="">{{ __('Select Department') }}</option>
+
+                                    </select>
+                                    {{-- validation --}}
+                                    @error('DepartmentId_up')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -318,50 +381,75 @@
         $("#ClientIdU").attr('disabled', false);
     })
     // on sector select update company select
-    $('#SectorId').change(function(){
-        var SectorId = $(this).val();
+    // $('#SectorId').change(function(){
+    //     var SectorId = $(this).val();
+    //     if(SectorId){
+    //         $.ajax({
+    //             type:"GET",
+    //             url:"{{ url('companies/getForSelect') }}/"+SectorId,
+    //             success:function(res){
+    //                 if(res){
+    //                     $("#CompanyId").empty();
+    //                     $("#CompanyId").append('<option value="">{{ __("Select Company") }}</option>');
+    //                     $.each(res,function(key,value){
+    //                         $("#CompanyId").append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
+    //                     });
+    //                 }else{
+    //                     $("#CompanyId").empty();
+    //                 }
+    //             }
+    //         });
+    //     }else{
+    //         $("#CompanyId").empty();
+    //     }
+    // });
+    setUpComapny =(sec,comp) =>{
+        var SectorId = $("#"+sec).val();
         if(SectorId){
             $.ajax({
                 type:"GET",
                 url:"{{ url('companies/getForSelect') }}/"+SectorId,
                 success:function(res){
                     if(res){
-                        $("#CompanyId").empty();
-                        $("#CompanyId").append('<option value="">{{ __("Select Company") }}</option>');
+                        $("#"+comp).empty();
+                        $("#"+comp).append('<option value="">{{ __("Select Company") }}</option>');
                         $.each(res,function(key,value){
-                            $("#CompanyId").append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
+                            $("#"+comp).append('<option value="'+value.id+'">'+value.company_name_en+'</option>');
                         });
                     }else{
-                        $("#CompanyId").empty();
+                        $("#"+comp).empty();
                     }
                 }
             });
         }else{
-            $("#CompanyId").empty();
+            $("#"+comp).empty();
         }
-    });
+    }
     // on Company select update department select
-    $('#CompanyId').change(function(){
-        var CompanyId = $(this).val();
+    setUpDep=(comp,dep)=>{
+
+
+        var CompanyId = $("#"+comp).val();
+        console.log(CompanyId);
         if(CompanyId){
             $.ajax({
                 type:"GET",
                 url:"{{ url('departments/getForSelect') }}/"+CompanyId,
                 success:function(res){
                     if(res){
-                        $("#DepartmentId").empty();
-                        $("#DepartmentId").append('<option value="">{{ __("Select Department") }}</option>');
+                        $("#"+dep).empty();
+                        $("#"+dep).append('<option value="">{{ __("Select Department") }}</option>');
                         $.each(res,function(key,value){
-                            $("#DepartmentId").append('<option value="'+value.id+'">'+value.dep_name_en+'</option>');
+                            $("#"+dep).append('<option value="'+value.id+'">'+value.dep_name_en+'</option>');
                         });
                     }else{
-                        $("#DepartmentId").empty();
+                        $("#"+dep).empty();
                     }
                 }
             });
         }else{
             $("#DepartmentId").empty();
         }
-    });
+    }
 </script>
 @endsection

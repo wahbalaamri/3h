@@ -18,6 +18,8 @@ class CreateEmailsTable extends Migration
             //department
             $table->integer('dep_id');
             $table->integer('ClientId');
+            $table->integer('comp_id')->nullable();
+            $table->integer('sector_id')->nullable();
             $table->integer('SurveyId');
             $table->string('Email')->nullable();
             $table->string('Mobile')->nullable();

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Mail\test;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,22 +9,26 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\SendSurvey;
+use Illuminate\Support\Facades\Log;
 
-class SendQueueEmail implements ShouldQueue
+class SendQueueEmail  implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $emails;
-    private $data;
+
+	protected $details;
+	protected $users;
+    public $timeout = 7200; // 2 hours
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($data,$emails)
+    public function __construct($details,$users)
     {
+		$this->details = $details;
+		$this->users = $users;
         //
-        $this->emails=$emails;
-        $this->data=$data;
     }
 
     /**
@@ -35,8 +38,17 @@ class SendQueueEmail implements ShouldQueue
      */
     public function handle()
     {
-			$data=$this->data;
-            Mail::to($this->emails)->send(new test($data));
+        //
 
+		//Mail::to($value->Email)->send(new SendSurvey($data));
+
+		foreach ($this->users as $key => $value) {
+
+            //$input['name'] = $value->name;
+            $input['email'] = $value->Email;
+			$data=$this->details;
+			$data['id']=$value->id;
+            Mail::to($value->Email)->send(new SendSurvey($data));
+        }
     }
 }

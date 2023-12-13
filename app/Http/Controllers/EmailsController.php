@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RespondentsExport;
 use App\Http\Requests\EmailByUploadStoreRequest;
 use App\Http\Requests\EmailStoreRequest;
 use App\Http\Requests\EmailUpdateRequest;
 use App\Mail\SendSurvey;
 use App\Models\Clients;
+use App\Models\Companies;
 use App\Models\EmailContent;
 use App\Models\Emails;
 use App\Models\Sectors;
@@ -19,6 +21,7 @@ use Maatwebsite\Excel\Exceptions\NoTypeDetectedException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use ImportUser;
 use Symfony\Component\Console\Input\Input as InputInput;
 use Yajra\DataTables\Facades\DataTables;
@@ -60,16 +63,31 @@ class EmailsController extends Controller
     public function store(EmailStoreRequest $request)
     {
         // dd( $request->get('ClientId'));
-        $request->validated();
+        if ($request->Email != null || $request->Mobile != null) {
+
+            $byEmail = $request->Email != null ? Emails::where([['SurveyId', $request->get('SurveyId')], ['Email', $request->Email]])->count() : 0;
+            $byMobile = $request->Mobile != null ? Emails::where([['SurveyId', $request->get('SurveyId')], ['Mobile', $request->Mobile]])->count() : 0;
+        } else {
+
+            return redirect()->back()->withErrors(['You must provide Either Employee Email or Mobile']);
+        }
+        if ($byEmail > 0 || $byMobile > 0) {
+            //return back with error
+            return redirect()->back()->withErrors(['This Email or Mobile already Exists']);
+        }
         //save new email
         $email = new Emails();
         $email->ClientId = $request->get('ClientId');
         $email->SurveyId = $request->get('SurveyId');
         $email->Email = $request->get('Email');
-        $email->EmployeeType=$request->EmployeeType;
+        $email->Mobile = $request->get('Mobile');
+        $email->sector_id = $request->SectorId;
+        $email->comp_id = $request->CompanyId;
+        $email->EmployeeType = $request->EmployeeType;
         //department id
-        $email->dep_id = $request->get('DepartmentId');
-        $email->AddedBy=Auth()->user()->id;
+        // $email->dep_id = $request->get('DepartmentId');
+        $email->dep_id = 0;
+        $email->AddedBy = Auth()->user()->id;
         $email->save();
         return redirect()->route('clients.show', $request->get('ClientId'));
     }
@@ -174,6 +192,64 @@ class EmailsController extends Controller
             return view('Emails.create')->with('error', 'Please Upload File');
         }
     }
+    public function saveUploadZ(Request $request)
+    {
+
+        if ($request->hasFile('EmailFile')) {
+            $file = $request->file('EmailFile')->getRealPath();
+
+            // Excel::toArray([],$filePath);
+            $array = array();
+            $tss = Excel::toArray($array, $request->file('EmailFile'));
+            $emails = Excel::toArray([], $request->file('EmailFile'));
+            foreach ($emails[0] as $key => $value) {
+                //ignor table head title
+                $usr_email = null;
+                if ($key > 0) {
+
+                    if (str_contains($value[2], '@')) {
+                        $usr_email = $value[2];
+                    }
+                    Log::info("Sector: " . $value[0]);
+                    Log::info("company: " . $value[1]);
+                    $company_id = null;
+                    $sector_ = null;
+                    $old_email = Emails::where([['Email', $usr_email], ['Mobile', $value[3]], ['ClientId', $request->get('ClientIdU')], ['SurveyId', $request->get('SurveyIdU')]])->first();
+                    $sector_ = Sectors::where([['sector_name_en', 'LIKE', '%' . $value[0] . '%'], ['client_id', $request->get('ClientIdU')]])->first();
+                    $company_id = $sector_ !=null ? Companies::where('sector_id', $sector_->id)->where('company_name_en', 'LIKE', "%" . $value[1] . "%")->first()->id : null;
+                    if ($sector_ != null && $company_id != null) {
+                        if ($usr_email != null && $old_email != null) {
+                            $old_email->ClientId = $request->get('ClientIdU');
+                            $old_email->SurveyId = $request->get('SurveyIdU');
+                            $old_email->Email = $usr_email;
+                            $old_email->Mobile = $value[3];
+                            $old_email->sector_id = $sector_->id;
+                            $old_email->comp_id = $company_id;
+                            $old_email->dep_id = 0;
+                            $old_email->EmployeeType = 0;
+                            $old_email->save();
+                        } else {
+
+                            $email = new Emails();
+                            $email->ClientId = $request->get('ClientIdU');
+                            $email->SurveyId = $request->get('SurveyIdU');
+                            $email->Email = $usr_email;
+                            $email->Mobile = $value[3];
+                            $email->sector_id = $sector_->id;
+                            $email->comp_id = $company_id;
+                            $email->dep_id = 0;
+                            $email->EmployeeType = 0;
+                            $email->AddedBy = Auth()->user()->id;
+                            $email->save();
+                        }
+                    }
+                }
+            }
+            return redirect()->route('clients.show', $request->ClientIdU);
+        } else {
+            return view('Emails.create')->with('error', 'Please Upload File');
+        }
+    }
     public function copy(Request $request)
     {
         $ClientID = $request->get('ClientIdC');
@@ -270,6 +346,7 @@ class EmailsController extends Controller
         $data = [
             'clients' => Clients::all(),
             'surveys' => Surveys::all(),
+            'sectors' => Sectors::where('client_id', $ClientID)->get(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
             'reminder' => 0
@@ -278,36 +355,56 @@ class EmailsController extends Controller
     }
     public function sendTheSurvey(Request $request)
     {
-        Log::alert($request->reminder);
-        if ($request->reminder == 0)
-            $emails = Emails::where([['ClientId', '=', $request->client_id], ['SurveyId', '=', $request->survey_id]])->get();
+        // Log::alert($request->reminder);
+        if ($request->reminder == 2) {
+            $emails = Emails::where('id', $request->respondentID)->get();
+        } elseif ($request->reminder == 0)
+            $emails = Emails::where([['ClientId', '=', $request->client_id], ['SurveyId', '=', $request->survey_id], ['comp_id', $request->CompanyId]])->whereNotNull('Email')->get();
         else {
-            $emails = Emails::where([['ClientId', '=', $request->client_id], ['SurveyId', '=', $request->survey_id]])
+            $emails = Emails::where([['ClientId', '=', $request->client_id], ['SurveyId', '=', $request->survey_id], ['comp_id', $request->CompanyId]])->whereNotNull('Email')
                 ->whereNotIn('id', SurveyAnswers::where('SurveyId', $request->survey_id)->distinct()->pluck('AnsweredBy')->ToArray())
                 ->get();
-            Log::info($emails);
+            // Log::info($emails);
         }
-        Log::alert($emails);
-        foreach ($emails as $key => $value) {
-            Log::alert($value);
-            $data = [
-                'email' => $value->Email,
-                'id' => $value->id,
-                'subject' => $request->subject,
-                'body_header' => $request->body_header,
-                'body_footer' => $request->body_footer,
-            ];
-            Mail::to($value->Email)->send(new SendSurvey($data));
-            Log::alert($data);
-            // sleep(2);
-        }
+        // Log::alert($emails);
+        // foreach ($emails as $key => $value) {
+        // Log::alert($value);
+        $data = [
+            //         'email' => $value->Email,
+            //         'id' => $value->id,
+            'subject' => $request->subject,
+            'body_header' => $request->body_header,
+            'body_footer' => $request->body_footer,
+        ];
+        $job = (new \App\Jobs\SendQueueEmail($data, $emails))
+            ->delay(now()->addSeconds(2));
+
+        dispatch($job);
+        // Log::alert($data);
+        // sleep(2);
+        // }
         return redirect()->route('clients.show', $request->client_id);
+    }
+    public function sendIndividual(Request $request, $ID)
+    {
+        $email = Emails::find($ID);
+        $data = [
+            'clients' => Clients::all(),
+            'surveys' => Surveys::all(),
+            'sectors' => Sectors::where('client_id', $email->ClientId)->get(),
+            'surveyId' => $email->SurveyId,
+            'clientId' => $email->ClientId,
+            'reminder' => 2,
+            'respondentID' => $email->id
+        ];
+        return view('Emails.CreateEmail')->with($data);
     }
     public function sendReminder(Request $request, $SurveyID, $ClientID)
     {
         $data = [
             'clients' => Clients::all(),
             'surveys' => Surveys::all(),
+            'sectors' => Sectors::where('client_id', $ClientID)->get(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
             'reminder' => 1
@@ -317,7 +414,7 @@ class EmailsController extends Controller
 
     public function getEmails($ClientID, $SurveyID)
     {
-        $emails = Emails::where([['ClientId', '=', $ClientID], ['SurveyId', '=', $SurveyID]])->get();
+        $emails = Emails::where([['ClientId', '=', $ClientID], ['SurveyId', '=', $SurveyID]])->whereNotNull('Email')->get();
         //datatable
         return DataTables::of($emails)
             ->addIndexColumn()
@@ -328,6 +425,12 @@ class EmailsController extends Controller
                 $btn .= csrf_field();
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm m-1"><i class="fa fa-trash"></i></button>';
                 $btn .= '</form>';
+                return $btn;
+            })
+            ->addColumn('SendSurvey', function ($row) {
+
+                $btn = '<a href="' . route('emails.sendIndividual', $row->id) . '" class="btn btn-sm m-1 btn-primary">Send Individually</a>';
+
                 return $btn;
             })
             ->editColumn('EmployeeType', function ($row) {
@@ -342,17 +445,22 @@ class EmailsController extends Controller
                         return 'Others';
                 }
             })
+            ->rawColumns(['SendSurvey', 'action'])
             ->make(true);
     }
     public function CreateNewEmails($ClientID, $SurveyID)
     {
         $data = [
-            'sectors'=>Sectors::where('client_id',$ClientID)->get(),
+            'sectors' => Sectors::where('client_id', $ClientID)->get(),
             'clients' => Clients::all(),
             'surveys' => Surveys::where('ClientId', '=', $ClientID)->get(),
             'surveyId' => $SurveyID,
             'clientId' => $ClientID,
         ];
         return view('Emails.create')->with($data);
+    }
+    function ExportEmails($client_id, $survey_id)
+    {
+        return Excel::download(new RespondentsExport($client_id, $survey_id), 'Respondents.xlsx');
     }
 }
