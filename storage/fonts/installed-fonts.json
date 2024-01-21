@@ -1,0 +1,20 @@
+{
+    "inter": {
+        "100": "D:\\hr\\3h\\storage\\fonts\/inter_100_0919dd1e8f1f330c6a8894e030756398",
+        "200": "D:\\hr\\3h\\storage\\fonts\/inter_200_6c4145425c3acc9920c72ae89b2a52c6",
+        "300": "D:\\hr\\3h\\storage\\fonts\/inter_300_ffc5f81dee6c59552a98700cb9ce21c6",
+        "normal": "D:\\hr\\3h\\storage\\fonts\/inter_normal_3ba32a48b7860dfb008d0b1457da683a",
+        "500": "inter_500_5227956572435006df168ae4e07c5148"
+    },
+    "kalam": {
+        "bold": "kalam_bold_8cb22151368a355dcb7248c43aa58256"
+    },
+    "cairo": {
+        "200": "D:\\hr\\3h\\storage\\fonts\/cairo_200_016e91f80693ea9a39f3f8b45871b529",
+        "300": "D:\\hr\\3h\\storage\\fonts\/cairo_300_adebfb94605daa8752959c1403988edc",
+        "normal": "D:\\hr\\3h\\storage\\fonts\/cairo_normal_040a14ebcb2e69e83169c84ef0a92e85",
+        "600": "D:\\hr\\3h\\storage\\fonts\/cairo_600_c4edbe142aaa1d274fb274a9a7754ee7",
+        "bold": "D:\\hr\\3h\\storage\\fonts\/cairo_bold_a802969112dc5002963c9b3638d30968",
+        "900": "cairo_900_6f19b0b0462c8d77af13d2d4d9663041"
+    }
+}

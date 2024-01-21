@@ -266,7 +266,7 @@
                                         data-bs-multi-step-form>
                                         @csrf
                                         <div class="progressbar">
-                                            <div class="progress" id="progress"></div>
+                                            <div class="progress-a" id="progress"></div>
 
                                             <div class="progress-step stpactive" data-title="Intro"></div>
                                             @foreach ($functions as $function)

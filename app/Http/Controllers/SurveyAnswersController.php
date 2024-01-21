@@ -14,6 +14,7 @@ use App\Models\PartnerShipPlans;
 use App\Models\PracticeQuestions;
 use App\Models\PrioritiesAnswers;
 use App\Models\Sectors;
+use App\Models\Clients;
 use App\Models\SurveyAnswers;
 use App\Models\Surveys;
 use Barryvdh\DomPDF\Facade\PDF;
@@ -137,9 +138,7 @@ class SurveyAnswersController extends Controller
         $this->id = $id;
         //chunck survey answers
         $respondent_answersx = SurveyAnswers::chunk(1000, function ($respondent_answers) {
-            // Log::info("test me: 0");
             foreach ($respondent_answers->where('SurveyId', '=', $this->id) as $res) {
-                // Log::info("test me: 1");
                 $this->respondent_answers->push($res);
             }
             // Log::info("test me: 2");
@@ -266,11 +265,11 @@ class SurveyAnswersController extends Controller
                 $function_practices_ids = FunctionPractice::where('FunctionId', $d_fun->id)->pluck('id')->all();
                 //get Practice questions
                 $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
-                Log::info('145457454574');
-                Log::info(($practices_questions));
+                // Log::info('145457454574');
+                // Log::info(($practices_questions));
                 $sector_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $sector_emails)->avg('AnswerValue'), 2);
-                Log::info('======');
-                Log::info($sector_avg);
+                // Log::info('======');
+                // Log::info($sector_avg);
                 //formate the $company_avg
                 $sector_fun_result = [
                     //add functiontitle
@@ -284,8 +283,8 @@ class SurveyAnswersController extends Controller
                 'sector_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
                 'functions' => $fun_sector_result
             ];
-            Log::info("dddd");
-            Log::info($sector_result);
+            // Log::info("dddd");
+            // Log::info($sector_result);
             array_push($result_per_sector, $sector_result);
         }
         //get function_practices IDs
@@ -1045,514 +1044,307 @@ class SurveyAnswersController extends Controller
         ];
         return view('SurveyAnswers.result')->with($data);
     }
-    public function resultPDF($id)
+    public function resultPDF($id, $type, $type_id = null)
     {
-        $term = '';
-        $term1 = '';
-        $term2 = '';
-        $surveyEmails = Emails::where('SurveyId', $id)->get();
-        $respondent = $surveyEmails->pluck('id')->all();
-        $client = Surveys::find($id)->clients;
-        $sectors = $client->sectors;
-        $companies = null;
-        $result_per_sector = array();
-        $fun_sector_result = array();
-        $result_per_company = array();
-        $overall_per_fun = array();
-        $overall_per_practice = array();
-        $used_scale = 5;
-        $companies_list = [];
-        $deps_list = [];
-        $respondent_answers = SurveyAnswers::where('SurveyId', '=', $id)->whereIn('AnsweredBy', $respondent)->get();
-        //substract 1 from respondent_answers->AnswerValue
-        $respondent_answers->transform(function ($item, $key) {
-            $item->AnswerValue = $item->AnswerValue - 1;
-            return $item;
-        });
-        //get count of distinct AnsweredBy
-        $count_respondent_answers = $respondent_answers->unique('AnsweredBy')->count();
-        if ($count_respondent_answers < 1) {
-            $data = [
-                'respondent' => 1,
-                'respondent_answers' => $count_respondent_answers,
-                'leaders' => 1,
-                'hr' => 1,
-                'emp' => 1,
-                'leaders_answers' => 0,
-                'hr_answers' => 0,
-                'emp_answers' => 0,
-                'total' => 1,
-                'total_answers' => 0,
-            ];
-            return view('SurveyAnswers.notComplet')->with($data);
-        }
-        $SurveyResult = SurveyAnswers::where('SurveyId', '=', $id)->get();
-        if ($SurveyResult->count() == 0 && $surveyEmails->count() == 0) {
-            $data = [
-                'leaders' => 1,
-                'hr' => 1,
-                'emp' => 1,
-                'leaders_answers' => 0,
-                'hr_answers' => 0,
-                'emp_answers' => 0,
-                'total' => 1,
-                'total_answers' => 0,
-            ];
-            return view('SurveyAnswers.notComplet')->with($data);
-        }
-        $planID = Surveys::where('id', $id)->first()->PlanId;
-        $functions = Functions::where('PlanId', $planID)->get();
-        $driver_functions = $functions->where('IsDriver', true);
-        // driver_function_Ids
-        $driver_function_Ids = $driver_functions->pluck('id')->all();
-        //foreach
-        foreach ($driver_functions as $d_function) {
-            $discription = "";
-            if ($d_function->FunctionTitle == 'Head')
-                $discription = __('Intellectual Stimulation');
-            elseif ($d_function->FunctionTitle == 'Hand')
-                $discription = __('Enablement');
-            else
-                $discription = __('Emotional Connection');
-            //get function_practices IDs
-            $function_practices_ids = FunctionPractice::where('FunctionId', $d_function->id)->pluck('id')->all();
-            //get Practice questions
-            $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
-            //get client all average AnswerValue
-            $client_all_avg = $respondent_answers->whereIn('QuestionId', $practices_questions)->avg('AnswerValue');
-            $function_result = [
-                'fun_title' => App()->getLocale() == 'en' ? $d_function->FunctionTitle : $d_function->FunctionTitleAr,
-                'fun_des' => $discription,
-                'fun_id' => $d_function->id,
-                'fun_perc' => round(($client_all_avg / $used_scale), 2) * 100,
-            ];
-            array_push($overall_per_fun, $function_result);
-            foreach ($function_practices_ids as $fp_id) {
-                $practice = FunctionPractice::find($fp_id);
-                $practice_questions = PracticeQuestions::where('PracticeId', $fp_id)->pluck('id')->all();
-                $practice_avg = $respondent_answers->whereIn('QuestionId', $practice_questions)->avg('AnswerValue');
-                $practice_result = [
-                    'PracticeId' => $fp_id,
-                    'FunctionId' => $d_function->id,
-                    'PracticeTitle' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
-                    'practice_perc' => round(($practice_avg / $used_scale), 2) * 100,
-                ];
-                array_push($overall_per_practice, $practice_result);
-            }
-        }
-
-        foreach ($sectors as $sector) {
-
-            $sector_emails = [];;
-            $companies = $sector->companies;
-            $companies_list = array_merge($companies_list, $companies->toArray());
-
-            foreach ($companies as $company) {
-                //get Departments for Each Company
-                $deps_list = array_merge($deps_list, $company->departments->toArray());
-                $departments = $company->departments->pluck('id')->all();
-                //get all employees for each department
-                $Emails = Emails::whereIn('dep_id', $departments)->pluck('id')->all();
-                //push each id in $emails to Sector Emails
-                foreach ($Emails as $em) {
-                    array_push($sector_emails, $em);
-                }
-
-                // //get all employees answers for each department with format
-                // $company_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $Emails)->avg('AnswerValue'), 2);
-                // //formate the $company_avg
-                // $company_result = [
-                //     'company_name_en' => $company->company_name_en,
-                //     'company_name_ar' => $company->company_name_ar,
-                //     'company_perc' => round(($company_avg / $used_scale), 2) * 100,
-                // ];
-                // array_push($result_per_company, $company_result);
-            }
-            //get all employees answers for each department with format
-            foreach ($driver_functions as $d_fun) {
-                //get function_practices IDs
-                $function_practices_ids = FunctionPractice::where('FunctionId', $d_fun->id)->pluck('id')->all();
-                //get Practice questions
-                $practices_questions = PracticeQuestions::whereIn('PracticeId', $function_practices_ids)->pluck('id')->all();
-                $sector_avg = round($respondent_answers->whereIn('QuestionId', $practices_questions)->whereIn('AnsweredBy', $sector_emails)->avg('AnswerValue'), 2);
-                //formate the $company_avg
-                $sector_fun_result = [
-                    //add functiontitle
-                    'FunctionTitle' => App()->getLocale() == 'en' ? $d_fun->FunctionTitle : $d_fun->FunctionTitleAr,
-                    'fun_id' => $d_fun->id,
-                    'sect_perc' => round(($sector_avg / $used_scale), 2) * 100,
-                ];
-                array_push($fun_sector_result, $sector_fun_result);
-            }
-            $sector_result = [
-                'sector_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
-                'functions' => $fun_sector_result
-            ];
-            array_push($result_per_sector, $sector_result);
-        }
-        //get function_practices IDs
-        $EE_index_Practices_id = FunctionPractice::where('FunctionId', $functions->where('IsDriver', false)->first()->id)->pluck('id')->all();
-        //get Practice questions
-        $EE_index_questions = PracticeQuestions::whereIn('PracticeId', $EE_index_Practices_id)->pluck('id')->all();
-        $EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->avg('AnswerValue');
-        $EE_Index = round(($EE_Index / $used_scale), 2) * 100;
-        $eNPS_Question_id = PracticeQuestions::where('IsENPS', true)->first()->id;
-        $eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->avg('AnswerValue');
-        $eNPS = round(($eNPS / $used_scale), 2) * 100;
-        $EE_Index_Engaged = 0; // it's from 75-100
-        $EE_Index_Nuetral = 0; // from 55-75
-        $EE_Index_Actively_Disengaged = 0; // from 0-55
-        $eNPS_Promotors = 0; // it's from 75-100
-        $eNPS_Passives = 0; // from 55-75
-        $eNPS_Detractors = 0; // from 0-55
-        Log::alert('respondent: ' . count($respondent));
-        foreach ($respondent as $respond_id) {
-            $individual_eNPS = $respondent_answers->where('QuestionId', $eNPS_Question_id)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
-            $individual_eNPS = round(($individual_eNPS / $used_scale), 2) * 100;
-            $individual_EE_Index = $respondent_answers->whereIn('QuestionId', $EE_index_questions)->where('AnsweredBy', $respond_id)->avg('AnswerValue');
-            Log::alert(' EE_index_questions: ');
-            Log::alert($EE_index_questions);
-            $individual_EE_Index = round(($individual_EE_Index / $used_scale), 2) * 100;
-            Log::alert('respond_id: ' . $respond_id . ' individual_EE_Index: ' . $individual_EE_Index);
-            if ($individual_eNPS >= 75) {
-                $eNPS_Promotors++;
-            } elseif ($individual_eNPS >= 55) {
-                $eNPS_Passives++;
-            } else {
-                $eNPS_Detractors++;
-            }
-            if ($individual_EE_Index >= 75) {
-                $EE_Index_Engaged++;
-            } elseif ($individual_EE_Index >= 55) {
-                $EE_Index_Nuetral++;
-            } else {
-                $EE_Index_Actively_Disengaged++;
-            }
-        }
-        Log::alert('EE_Index_Engaged: ' . $EE_Index_Engaged);
-        Log::alert('EE_Index_Nuetral: ' . $EE_Index_Nuetral);
-        Log::alert('EE_Index_Actively_Disengaged: ' . $EE_Index_Actively_Disengaged);
-        $eNPS_Promotors = round(($eNPS_Promotors / count($respondent)), 2) * 100;
-        $eNPS_Passives = round(($eNPS_Passives / count($respondent)), 2) * 100;
-        $eNPS_Detractors = round(($eNPS_Detractors / count($respondent)), 2) * 100;
-        $EE_Index_Engaged = round(($EE_Index_Engaged / count($respondent)), 2) * 100;
-        $EE_Index_Nuetral = round(($EE_Index_Nuetral / count($respondent)), 2) * 100;
-        $EE_Index_Actively_Disengaged = round(($EE_Index_Actively_Disengaged / count($respondent)), 2) * 100;
-        // copy $overall_per_practice and sort the copy asc
-        $overall_per_practice_sorted = $overall_per_practice;
-        usort($overall_per_practice_sorted, function ($a, $b) {
-            return $a['practice_perc'] <=> $b['practice_perc'];
-        });
-        //get first three lowest items
-        $lowest_practices = array_slice($overall_per_practice_sorted, 0, 3);
-        //get first three highest items
-        $highest_practices = array_slice($overall_per_practice_sorted, -3, 3);
-        //sorte highest_practices desc
-        usort($highest_practices, function ($a, $b) {
-            return $b['practice_perc'] <=> $a['practice_perc'];
-        });
-        $data = [
-            'overall_per_fun' => $overall_per_fun,
-            'driver_functions' => $driver_functions,
-            'overall_per_practice' => $overall_per_practice,
-            'result_per_sector' => $result_per_sector,
-            'EE_Index' => $EE_Index,
-            'eNPS' => $eNPS,
-            'eNPS_Promotors' => $eNPS_Promotors,
-            'eNPS_Passives' => $eNPS_Passives,
-            'eNPS_Detractors' => $eNPS_Detractors,
-            'EE_Index_Engaged' => $EE_Index_Engaged,
-            'EE_Index_Nuetral' => $EE_Index_Nuetral,
-            'EE_Index_Actively_Disengaged' => $EE_Index_Actively_Disengaged,
-            'highest_practices' => $highest_practices,
-            'lowest_practices' => $lowest_practices,
-            'sectors' => $sectors,
-            'survey_id' => $id,
-            'not_home' => false,
-            'isDep' => false,
-            'type' => '1',
-            'term' => __('Organizational wide'),
-            'term1' => __('Sectors'),
-            'term2' => __('Sector'),
-            'id' => $id
-        ];
-
-        $survey_id = $id;
-        $not_home = false;
-        $isDep = false;
-        $type = '1';
-        $term = __('Organizational wide');
-        $term1 = __('Sectors');
-        $term2 = __('Sector');
-        $pdf = PDF::loadView('SurveyAnswers.resultpdf', compact('overall_per_fun', 'driver_functions', 'overall_per_practice', 'result_per_sector', 'EE_Index', 'eNPS', 'eNPS_Promotors', 'eNPS_Passives', 'eNPS_Detractors', 'EE_Index_Engaged', 'EE_Index_Nuetral', 'EE_Index_Actively_Disengaged', 'highest_practices', 'lowest_practices', 'sectors', 'survey_id', 'not_home', 'isDep', 'type', 'term', 'term1', 'term2', 'id'))/* ->with($data) */;
+        ini_set('max_execution_time', 1800);
+        $data = $this->get_result($id, $type, $type_id);
+        // return view('SurveyAnswers.resultpdf')->with($data);
+        $pdf = PDF::loadView('SurveyAnswers.resultpdf', $data);
         return $pdf->download('result.pdf');
         // return view('SurveyAnswers.resultpdf')->with($data);
     }
     public function alzubair_result($id, $type, $type_id = null)
     {
-        Log::info($type_id);
-        $overall_per_fun = array();
-        $driver_functions_practice = array();
-        $practice_results = [];
-        $ENPS_data_array = [];
-        $outcome_functions_practice = array();
-        $Outcome_practice_results = [];
-        $function_results = [];
-        $outcome_function_results = [];
-        $outcome_function_results_1 = array();
-        $entity = "";
-        $this->id = $id;
-        if ($type == "comp") { //find the company name
-            $entity = Companies::find($type_id)->company_name_en;
-        }
-        foreach (Surveys::find($id)->plan->functions->where('IsDriver', true) as $function) {
-            $function_Nuetral_sum = 0;
-            $function_Favorable_sum = 0;
-            $function_UnFavorable_sum = 0;
-            $function_Nuetral_count = 0;
-            $function_Favorable_count = 0;
-            $function_UnFavorable_count = 0;
-            foreach ($function->functionPractices as $practice) {
-                //get sum of answer value from survey answers
-                if ($type == 'all')
-                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type == 'comp') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
-                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type == 'sec') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
-                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
+        $data = $this->get_result($id, $type, $type_id);
+        return view('SurveyAnswers.new-results')->with($data);
+        // $overall_per_fun = array();
+        // $driver_functions_practice = array();
+        // $practice_results = [];
+        // $ENPS_data_array = [];
+        // $outcome_functions_practice = array();
+        // $Outcome_practice_results = [];
+        // $function_results = [];
+        // $outcome_function_results = [];
+        // $outcome_function_results_1 = array();
+        // $entity = "";
+        // $this->id = $id;
+        // if ($type == "comp") { //find the company name
+        //     $entity = Companies::find($type_id)->company_name_en;
+        // }
+        // //sector
+        // elseif ($type == "sec") {
+        //     $entity = Sectors::find($type_id)->sector_name_en;
+        // }
+        // //client
+        // else {
+        //     $entity = Surveys::find($id)->clients->ClientName;
+        // }
+        // foreach (Surveys::find($id)->plan->functions->where('IsDriver', true) as $function) {
+        //     $function_Nuetral_sum = 0;
+        //     $function_Favorable_sum = 0;
+        //     $function_UnFavorable_sum = 0;
+        //     $function_Nuetral_count = 0;
+        //     $function_Favorable_count = 0;
+        //     $function_UnFavorable_count = 0;
+        //     foreach ($function->functionPractices as $practice) {
+        //         //get sum of answer value from survey answers
+        //         if ($type == 'all')
+        //             $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+        //             $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+        //             $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
 
-                if ($Favorable_result) {
-                    $sum_answer_value_Favorable = $Favorable_result->sum;
-                    $Favorable_count = $Favorable_result->count;
-                } else {
-                    $sum_answer_value_Favorable = 0;
-                    $Favorable_count = 0;
-                }
-                if ($type == 'all')
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type == 'comp') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type == 'sec') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                dd($UnFavorable_result);
-                if ($UnFavorable_result) {
-                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
-                    $UnFavorable_count = $UnFavorable_result->count;
-                } else {
-                    $sum_answer_value_UnFavorable = 0;
-                    $UnFavorable_count = 0;
-                }
-                if ($type == 'all')
-                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type = 'comp') {
-                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
-                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type = 'sec') {
-                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
-                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
+        //         if ($Favorable_result) {
+        //             $sum_answer_value_Favorable = $Favorable_result->sum;
+        //             $Favorable_count = $Favorable_result->count;
+        //         } else {
+        //             $sum_answer_value_Favorable = 0;
+        //             $Favorable_count = 0;
+        //         }
+        //         if ($type == 'all')
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
 
-                if ($Nuetral_result) {
-                    $sum_answer_value_Nuetral = $Nuetral_result->sum;
-                    $Nuetral_count = $Nuetral_result->count;
-                } else {
-                    $sum_answer_value_Nuetral = 0;
-                    $Nuetral_count = 0;
-                }
-                $practice_results = [
-                    'function' => $function->id,
-                    'practice_id' => $practice->id,
-                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
-                    'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    'Favorable_score' => number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    'UnFavorable_score' => number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    //get count of Favorable answers
-                    'Favorable_count' => $Favorable_count,
-                    //get count of UnFavorable answers
-                    'UnFavorable_count' => $UnFavorable_count,
-                    //get count of Nuetral answers
-                    'Nuetral_count' => $Nuetral_count,
-                ];
-                $function_Nuetral_sum += $sum_answer_value_Nuetral;
-                $function_Favorable_sum += $sum_answer_value_Favorable;
-                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
-                $function_Nuetral_count += $Nuetral_count;
-                $function_Favorable_count += $Favorable_count;
-                $function_UnFavorable_count += $UnFavorable_count;
-                array_push($driver_functions_practice, $practice_results);
-            }
-            //setup function_results
-            $function_results = [
-                'function' => $function->id,
-                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
-                'Nuetral_score' => number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
-                'Favorable_score' => number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
-                'UnFavorable_score' => number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
-                //get count of Favorable answers
-                'Favorable_count' => $function_Favorable_count,
-                //get count of UnFavorable answers
-                'UnFavorable_count' => $function_UnFavorable_count,
-                //get count of Nuetral answers
-                'Nuetral_count' => $function_Nuetral_count,
-            ];
-            array_push($overall_per_fun, $function_results);
-        }
-        // dd($overall_per_fun);
-        foreach (Surveys::find($id)->plan->functions->where('IsDriver', false) as $function) {
-            $function_Nuetral_sum = 0;
-            $function_Favorable_sum = 0;
-            $function_UnFavorable_sum = 0;
-            $function_Nuetral_count = 0;
-            $function_Favorable_count = 0;
-            $function_UnFavorable_count = 0;
-            foreach ($function->functionPractices as $practice) {
-                //get sum of answer value from survey answers
-                if ($type == 'all')
-                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type == 'comp') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
-                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type == 'sec') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
-                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                if ($Favorable_reslut) {
-                    $sum_answer_value_Favorable = $Favorable_reslut->sum;
-                    $Favorable_count = $Favorable_reslut->count;
-                } else {
-                    $sum_answer_value_Favorable = 0;
-                    $Favorable_count = 0;
-                }
-                if ($type == 'all')
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type == 'comp') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type == 'sec') {
-                    //get Emails id for a company
-                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
-                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                if ($UnFavorable_result) {
-                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
-                    $UnFavorable_count = $UnFavorable_result->count;
-                } else {
-                    $sum_answer_value_UnFavorable = 0;
-                    $UnFavorable_count = 0;
-                }
-                if ($type == 'all')
-                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
-                elseif ($type == 'comp') {
-                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
-                //sector
-                elseif ($type == 'sec') {
-                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
-                }
+        //         if ($UnFavorable_result) {
+        //             $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+        //             $UnFavorable_count = $UnFavorable_result->count;
+        //         } else {
+        //             $sum_answer_value_UnFavorable = 0;
+        //             $UnFavorable_count = 0;
+        //         }
+        //         if ($type == 'all')
+        //             $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+        //             $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+        //             $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         if ($Nuetral_result) {
+        //             $sum_answer_value_Nuetral = $Nuetral_result->sum;
+        //             $Nuetral_count = $Nuetral_result->count;
+        //         } else {
+        //             $sum_answer_value_Nuetral = 0;
+        //             $Nuetral_count = 0;
+        //         }
+        //         $practice_results = [
+        //             'function' => $function->id,
+        //             'practice_id' => $practice->id,
+        //             'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+        //             'Nuetral_score' => $sum_answer_value_Nuetral == 0 ? 0 : number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             'Favorable_score' => $sum_answer_value_Favorable == 0 ? 0 : number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             'UnFavorable_score' => $sum_answer_value_UnFavorable == 0 ? 0 : number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             //get count of Favorable answers
+        //             'Favorable_count' => $Favorable_count,
+        //             //get count of UnFavorable answers
+        //             'UnFavorable_count' => $UnFavorable_count,
+        //             //get count of Nuetral answers
+        //             'Nuetral_count' => $Nuetral_count,
+        //         ];
+        //         $function_Nuetral_sum += $sum_answer_value_Nuetral;
+        //         $function_Favorable_sum += $sum_answer_value_Favorable;
+        //         $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+        //         $function_Nuetral_count += $Nuetral_count;
+        //         $function_Favorable_count += $Favorable_count;
+        //         $function_UnFavorable_count += $UnFavorable_count;
+        //         array_push($driver_functions_practice, $practice_results);
+        //     }
+        //     //setup function_results
+        //     $function_results = [
+        //         'function' => $function->id,
+        //         'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+        //         'Nuetral_score' => $function_Nuetral_sum == 0 ? 0 : number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+        //         'Favorable_score' => $function_Favorable_sum == 0 ? 0 : number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+        //         'UnFavorable_score' => $function_UnFavorable_sum == 0 ? 0 : number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+        //         //get count of Favorable answers
+        //         'Favorable_count' => $function_Favorable_count,
+        //         //get count of UnFavorable answers
+        //         'UnFavorable_count' => $function_UnFavorable_count,
+        //         //get count of Nuetral answers
+        //         'Nuetral_count' => $function_Nuetral_count,
+        //     ];
+        //     array_push($overall_per_fun, $function_results);
+        // }
+        // // dd($overall_per_fun);
+        // foreach (Surveys::find($id)->plan->functions->where('IsDriver', false) as $function) {
+        //     $function_Nuetral_sum = 0;
+        //     $function_Favorable_sum = 0;
+        //     $function_UnFavorable_sum = 0;
+        //     $function_Nuetral_count = 0;
+        //     $function_Favorable_count = 0;
+        //     $function_UnFavorable_count = 0;
+        //     foreach ($function->functionPractices as $practice) {
+        //         //get sum of answer value from survey answers
+        //         if ($type == 'all')
+        //             $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+        //             $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+        //             $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         if ($Favorable_reslut) {
+        //             $sum_answer_value_Favorable = $Favorable_reslut->sum;
+        //             $Favorable_count = $Favorable_reslut->count;
+        //         } else {
+        //             $sum_answer_value_Favorable = 0;
+        //             $Favorable_count = 0;
+        //         }
+        //         if ($type == 'all')
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             //get Emails id for a company
+        //             $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+        //             $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue','<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         if ($UnFavorable_result) {
+        //             $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+        //             $UnFavorable_count = $UnFavorable_result->count;
+        //         } else {
+        //             $sum_answer_value_UnFavorable = 0;
+        //             $UnFavorable_count = 0;
+        //         }
+        //         if ($type == 'all')
+        //             $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+        //         elseif ($type == 'comp') {
+        //             $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
+        //         //sector
+        //         elseif ($type == 'sec') {
+        //             $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+        //         }
 
-                if ($sum_answer_value_Nuetral_result) {
-                    $sum_answer_value_Nuetral = $sum_answer_value_Nuetral_result->sum;
-                    $Nuetral_count = $sum_answer_value_Nuetral_result->count;
-                } else {
-                    $sum_answer_value_Nuetral = 0;
-                    $Nuetral_count = 0;
-                }
-                $Outcome_practice_results = [
-                    'function' => $function->id,
-                    'practice_id' => $practice->id,
-                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
-                    'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    'Favorable_score' => number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    'UnFavorable_score' => number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                    //get count of Favorable answers
-                    'Favorable_count' => $Favorable_count,
-                    //get count of UnFavorable answers
-                    'UnFavorable_count' => $UnFavorable_count,
-                    //get count of Nuetral answers
-                    'Nuetral_count' => $Nuetral_count,
-                ];
-                if ($practice->practiceQuestions->IsENPS) {
-                    $Favorable = number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
-                    $UnFavorable = number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
-                    $ENPS_data_array = [
-                        'function' => $function->id,
-                        'practice_id' => $practice->id,
-                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
-                        'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
-                        //get count of Favorable answers
-                        'Favorable_count' => $Favorable_count,
-                        //get count of UnFavorable answers
-                        'UnFavorable_count' => $UnFavorable_count,
-                        //get count of Nuetral answers
-                        'Nuetral_count' => $Nuetral_count,
-                        'Favorable_score' => $Favorable,
-                        'UnFavorable_score' => $UnFavorable,
-                        'ENPS_index' => ($Favorable - $UnFavorable),
-                    ];
-                }
-                $function_Nuetral_sum += $sum_answer_value_Nuetral;
-                $function_Favorable_sum += $sum_answer_value_Favorable;
-                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
-                $function_Nuetral_count += $Nuetral_count;
-                $function_Favorable_count += $Favorable_count;
-                $function_UnFavorable_count += $UnFavorable_count;
-                array_push($outcome_functions_practice, $Outcome_practice_results);
-            }
-            $out_come_favorable = number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
-            $out_come_unfavorable = number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
-            //setup function_results
-            $outcome_function_results = [
-                'function' => $function->id,
-                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
-                'Nuetral_score' => number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
-                'Favorable_score' => $out_come_favorable,
-                'UnFavorable_score' => $out_come_unfavorable,
-                //get count of Favorable answers
-                'Favorable_count' => $function_Favorable_count,
-                //get count of UnFavorable answers
-                'UnFavorable_count' => $function_UnFavorable_count,
-                //get count of Nuetral answers
-                'Nuetral_count' => $function_Nuetral_count,
-                'outcome_index' => $out_come_favorable - $out_come_unfavorable
-            ];
-            array_push($outcome_function_results_1, $outcome_function_results);
+        //         if ($sum_answer_value_Nuetral_result) {
+        //             $sum_answer_value_Nuetral = $sum_answer_value_Nuetral_result->sum;
+        //             $Nuetral_count = $sum_answer_value_Nuetral_result->count;
+        //         } else {
+        //             $sum_answer_value_Nuetral = 0;
+        //             $Nuetral_count = 0;
+        //         }
+        //         $Outcome_practice_results = [
+        //             'function' => $function->id,
+        //             'practice_id' => $practice->id,
+        //             'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+        //             'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             'Favorable_score' => number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             'UnFavorable_score' => number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //             //get count of Favorable answers
+        //             'Favorable_count' => $Favorable_count,
+        //             //get count of UnFavorable answers
+        //             'UnFavorable_count' => $UnFavorable_count,
+        //             //get count of Nuetral answers
+        //             'Nuetral_count' => $Nuetral_count,
+        //         ];
+        //         if ($practice->practiceQuestions->IsENPS) {
+        //             $Favorable = number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
+        //             $UnFavorable = number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
+        //             $ENPS_data_array = [
+        //                 'function' => $function->id,
+        //                 'practice_id' => $practice->id,
+        //                 'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+        //                 'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+        //                 //get count of Favorable answers
+        //                 'Favorable_count' => $Favorable_count,
+        //                 //get count of UnFavorable answers
+        //                 'UnFavorable_count' => $UnFavorable_count,
+        //                 //get count of Nuetral answers
+        //                 'Nuetral_count' => $Nuetral_count,
+        //                 'Favorable_score' => $Favorable,
+        //                 'UnFavorable_score' => $UnFavorable,
+        //                 'ENPS_index' => ($Favorable - $UnFavorable),
+        //             ];
+        //         }
+        //         $function_Nuetral_sum += $sum_answer_value_Nuetral;
+        //         $function_Favorable_sum += $sum_answer_value_Favorable;
+        //         $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+        //         $function_Nuetral_count += $Nuetral_count;
+        //         $function_Favorable_count += $Favorable_count;
+        //         $function_UnFavorable_count += $UnFavorable_count;
+        //         array_push($outcome_functions_practice, $Outcome_practice_results);
+        //     }
+        //     $out_come_favorable = number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
+        //     $out_come_unfavorable = number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
+        //     //setup function_results
+        //     $outcome_function_results = [
+        //         'function' => $function->id,
+        //         'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+        //         'Nuetral_score' => number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+        //         'Favorable_score' => $out_come_favorable,
+        //         'UnFavorable_score' => $out_come_unfavorable,
+        //         //get count of Favorable answers
+        //         'Favorable_count' => $function_Favorable_count,
+        //         //get count of UnFavorable answers
+        //         'UnFavorable_count' => $function_UnFavorable_count,
+        //         //get count of Nuetral answers
+        //         'Nuetral_count' => $function_Nuetral_count,
+        //         'outcome_index' => $out_come_favorable - $out_come_unfavorable
+        //     ];
+        //     array_push($outcome_function_results_1, $outcome_function_results);
+        // }
+        // // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->reverse()->toArray();
+        // // $ENPS_data_array = array_slice($ENPS_data_array, 0, 3);
+        // // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->toArray();
+        // $data = [
+        //     'drivers' => $driver_functions_practice,
+        //     'drivers_functions' => $overall_per_fun,
+        //     'outcomes' => $outcome_function_results_1,
+        //     'ENPS_data_array' => $ENPS_data_array,
+        //     'entity' => $entity,
+        //     'type' => $type,
+        //     'type_id' => $type_id,
+        //     'id' => $id
+        // ];
+
+    }
+    public function alzubair_resultC($id, $type, $type_id = null)
+    {
+        $data = $this->get_resultc($id, $type, $type_id);
+        return view('SurveyAnswers.new-results')->with($data);
+    }
+    public function alzubair_resultD($id, $type, $type_id = null)
+    {
+        if ($type == "comp") {
+            $data = $this->get_resultd($id, $type, $type_id);
+        } elseif ($type == "sec") {
+            $data = $this->get_SectorResult($id, $type, $type_id);
+        } else {
+            $data = $this->get_GroupResult($id, $type, $type_id);
         }
-        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->reverse()->toArray();
-        // $ENPS_data_array = array_slice($ENPS_data_array, 0, 3);
-        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->toArray();
-        $data = [
-            'drivers' => $driver_functions_practice,
-            'drivers_functions' => $overall_per_fun,
-            'outcomes' => $outcome_function_results_1,
-            'ENPS_data_array' => $ENPS_data_array,
-            'entity'=>$entity,
-            'type'=>$type,
-            'type_id'=>$type_id,
-            'id'=>$id
-        ];
+        // Log::info($data);
+        // $test = collect($data);
+        // return $data;
         return view('SurveyAnswers.new-results')->with($data);
     }
     function statistics($id, $clientID)
@@ -1591,7 +1383,7 @@ class SurveyAnswersController extends Controller
         $companies_ids = $companies_list->pluck('id')->all();
         //pluck departments IDs to an array
         $dep_ids = $dep_list->pluck('id')->all();
-        Log::info($dep_ids);
+        // Log::info($dep_ids);
         //get all emails where survey id =$id and foreach sectors
         $sector_emails = [];
 
@@ -1663,7 +1455,7 @@ class SurveyAnswersController extends Controller
 
                 switch ($company->company_name_en) {
                     case 'The Zubair Corporation':
-                        $number_of_emails_comp = 76 ;
+                        $number_of_emails_comp = 76;
                         break;
                     case 'BAZF':
                         $number_of_emails_comp = 34;
@@ -1823,5 +1615,1773 @@ class SurveyAnswersController extends Controller
             'company_details' => $companies_details,
         ];
         return view('SurveyAnswers.statistics')->with($data);
+    }
+    public function get_result($id, $type, $type_id = null)
+    {
+        $overall_per_fun = array();
+        $driver_functions_practice = array();
+        $heat_map = array();
+
+        $practice_results = [];
+        $ENPS_data_array = [];
+        $outcome_functions_practice = array();
+        $Outcome_practice_results = [];
+        $function_results = [];
+        $outcome_function_results = [];
+        $outcome_function_results_1 = array();
+        $entity = "";
+        $this->id = $id;
+        if ($type == "comp") { //find the company name
+            $entity = Companies::find($type_id)->company_name_en;
+        }
+        //sector
+        elseif ($type == "sec") {
+            $entity = Sectors::find($type_id)->sector_name_en;
+        }
+        //client
+        else {
+            $entity = Surveys::find($id)->clients->ClientName;
+        }
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', true) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                $Favorable_result = [];
+                $UnFavorable_result = [];
+                $Nuetral_result = [];
+                //get sum of answer value from survey answers
+                if ($type == 'all') {
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                } elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($Favorable_result) {
+                    $sum_answer_value_Favorable = $Favorable_result->sum;
+                    $Favorable_count = $Favorable_result->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'all')
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+                if ($type == 'all')
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Nuetral_result) {
+                    $sum_answer_value_Nuetral = $Nuetral_result->sum;
+                    $Nuetral_count = $Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => $sum_answer_value_Nuetral == 0 ? 0 : number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    'Favorable_score' => $sum_answer_value_Favorable == 0 ? 0 : number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    'UnFavorable_score' => $sum_answer_value_UnFavorable == 0 ? 0 : number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral answers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($driver_functions_practice, $practice_results);
+            }
+            //setup function_results
+            $function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => $function_Nuetral_sum == 0 ? 0 : number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+                'Favorable_score' => $function_Favorable_sum == 0 ? 0 : number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+                'UnFavorable_score' => $function_UnFavorable_sum == 0 ? 0 : number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+            ];
+            array_push($overall_per_fun, $function_results);
+        }
+        // dd($overall_per_fun);
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', false) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                //get sum of answer value from survey answers
+                if ($type == 'all')
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 5], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Favorable_reslut) {
+                    $sum_answer_value_Favorable = $Favorable_reslut->sum;
+                    $Favorable_count = $Favorable_reslut->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'all')
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereOr([['SurveyId', $this->id], ['AnswerValue', 1], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+                if ($type == 'all')
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($sum_answer_value_Nuetral_result) {
+                    $sum_answer_value_Nuetral = $sum_answer_value_Nuetral_result->sum;
+                    $Nuetral_count = $sum_answer_value_Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $Outcome_practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    'Favorable_score' => number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    'UnFavorable_score' => number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral answers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                if ($practice->practiceQuestions->IsENPS) {
+                    $Favorable = number_format(($sum_answer_value_Favorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
+                    $UnFavorable = number_format(($sum_answer_value_UnFavorable / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2);
+                    $ENPS_data_array = [
+                        'function' => $function->id,
+                        'practice_id' => $practice->id,
+                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                        'Nuetral_score' => number_format(($sum_answer_value_Nuetral / ($sum_answer_value_Favorable + $sum_answer_value_Nuetral + $sum_answer_value_UnFavorable)) * 100, 2),
+                        //get count of Favorable answers
+                        'Favorable_count' => $Favorable_count,
+                        //get count of UnFavorable answers
+                        'UnFavorable_count' => $UnFavorable_count,
+                        //get count of Nuetral answers
+                        'Nuetral_count' => $Nuetral_count,
+                        'Favorable_score' => $Favorable,
+                        'UnFavorable_score' => $UnFavorable,
+                        'ENPS_index' => ($Favorable - $UnFavorable),
+                    ];
+                }
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($outcome_functions_practice, $Outcome_practice_results);
+            }
+            $out_come_favorable = number_format(($function_Favorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
+            $out_come_unfavorable = number_format(($function_UnFavorable_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2);
+            //setup function_results
+            $outcome_function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => number_format(($function_Nuetral_sum / ($function_Favorable_sum + $function_Nuetral_sum + $function_UnFavorable_sum)) * 100, 2),
+                'Favorable_score' => $out_come_favorable,
+                'UnFavorable_score' => $out_come_unfavorable,
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+                'outcome_index' => $out_come_favorable
+            ];
+            array_push($outcome_function_results_1, $outcome_function_results);
+        }
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->reverse()->toArray();
+        // $ENPS_data_array = array_slice($ENPS_data_array, 0, 3);
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->toArray();
+        //get first three highest items
+        //sort $driver_functions_practice asc
+        $driver_functions_practice_asc = array_slice(collect($driver_functions_practice)->sortBy('Favorable_score')->toArray(), 0, 3);
+        //sort $driver_functions_practice desc
+        $driver_functions_practice_desc = array_slice(collect($driver_functions_practice)->sortByDesc('Favorable_score')->toArray(), 0, 3);
+
+        if ($type == 'all') {
+            //get all sectors of current client
+            $sectors = Sectors::where('client_id', Surveys::find($id)->ClientId)->get();
+            foreach ($sectors as $sector) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $sector->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count_HM = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($sum_answer_value_Favorable_HM / ($sum_answer_value_Favorable_HM + $sum_answer_value_Nuetral_HM + $sum_answer_value_UnFavorable_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $sum_answer_value_Favorable_HM;
+                        $function_UnFavorable_sum_HM += $sum_answer_value_UnFavorable_HM;
+                        $function_Nuetral_sum_HM += $sum_answer_value_Nuetral_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+                    'entity_id' => $sector->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =sec
+        elseif ($type == 'sec') {
+            //get all companies of current sector
+            $companies = Companies::where('sector_id', $type_id)->get();
+            foreach ($companies as $company) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $company->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($sum_answer_value_Favorable_HM / ($sum_answer_value_Favorable_HM + $sum_answer_value_Nuetral_HM + $sum_answer_value_UnFavorable_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $sum_answer_value_Favorable_HM;
+                        $function_UnFavorable_sum_HM += $sum_answer_value_UnFavorable_HM;
+                        $function_Nuetral_sum_HM += $sum_answer_value_Nuetral_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $company->company_name_en : $company->company_name_ar,
+                    'entity_id' => $company->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =comp
+        elseif ($type == 'comp') {
+            $heat_map = [];
+        }
+
+        $data = [
+            'drivers' => $driver_functions_practice,
+            'drivers_functions' => $overall_per_fun,
+            'outcomes' => $outcome_function_results_1,
+            'ENPS_data_array' => $ENPS_data_array,
+            'entity' => $entity,
+            'type' => $type,
+            'type_id' => $type_id,
+            'id' => $id,
+            'driver_practice_asc' => $driver_functions_practice_asc,
+            'driver_practice_desc' => $driver_functions_practice_desc,
+            'heat_map' => $heat_map,
+            'cal_type' => 'sum'
+        ];
+        return $data;
+    }
+    public function get_resultc($id, $type, $type_id = null)
+    {
+        $overall_per_fun = array();
+        $driver_functions_practice = array();
+        $heat_map = array();
+
+        $practice_results = [];
+        $ENPS_data_array = [];
+        $outcome_functions_practice = array();
+        $Outcome_practice_results = [];
+        $function_results = [];
+        $outcome_function_results = [];
+        $outcome_function_results_1 = array();
+        $entity = "";
+        $this->id = $id;
+        if ($type == "comp") { //find the company name
+            $entity = Companies::find($type_id)->company_name_en;
+        }
+        //sector
+        elseif ($type == "sec") {
+            $entity = Sectors::find($type_id)->sector_name_en;
+        }
+        //client
+        else {
+            $entity = "AL-Zubair Group";
+        }
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', true) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                $Favorable_result = [];
+                $UnFavorable_result = [];
+                $Nuetral_result = [];
+                //get sum of answer value from survey answers
+                if ($type == 'all') {
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                } elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($Favorable_result) {
+                    $sum_answer_value_Favorable = $Favorable_result->sum;
+                    $Favorable_count = $Favorable_result->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'all')
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+                if ($type == 'all')
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Nuetral_result) {
+                    $sum_answer_value_Nuetral = $Nuetral_result->sum;
+                    $Nuetral_count = $Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => $Nuetral_count == 0 ? 0 : number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'Favorable_score' => $Favorable_count == 0 ? 0 : number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'UnFavorable_score' => $UnFavorable_count == 0 ? 0 : number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral answers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($driver_functions_practice, $practice_results);
+            }
+            //setup function_results
+            $function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => $function_Nuetral_count == 0 ? 0 : number_format(($function_Nuetral_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'Favorable_score' => $function_Favorable_count == 0 ? 0 : number_format(($function_Favorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'UnFavorable_score' => $function_UnFavorable_count == 0 ? 0 : number_format(($function_UnFavorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+            ];
+            array_push($overall_per_fun, $function_results);
+        }
+        // dd($overall_per_fun);
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', false) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                //get sum of answer value from survey answers
+                if ($type == 'all')
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Favorable_reslut) {
+                    $sum_answer_value_Favorable = $Favorable_reslut->sum;
+                    $Favorable_count = $Favorable_reslut->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'all')
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+                if ($type == 'all')
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($sum_answer_value_Nuetral_result) {
+                    $sum_answer_value_Nuetral = $sum_answer_value_Nuetral_result->sum;
+                    $Nuetral_count = $sum_answer_value_Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $Outcome_practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'Favorable_score' => number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'UnFavorable_score' => number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral nswers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                if ($practice->practiceQuestions->IsENPS) {
+                    $Favorable = number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2);
+                    $UnFavorable = number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2);
+                    $ENPS_data_array = [
+                        'function' => $function->id,
+                        'practice_id' => $practice->id,
+                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                        'Nuetral_score' => number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                        //get count of Favorable answers
+                        'Favorable_count' => $Favorable_count,
+                        //get count of UnFavorable answers
+                        'UnFavorable_count' => $UnFavorable_count,
+                        //get count of Nuetral answers
+                        'Nuetral_count' => $Nuetral_count,
+                        'Favorable_score' => $Favorable,
+                        'UnFavorable_score' => $UnFavorable,
+                        'ENPS_index' => ($Favorable - $UnFavorable),
+                    ];
+                }
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($outcome_functions_practice, $Outcome_practice_results);
+            }
+            $out_come_favorable = number_format(($function_Favorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2);
+            $out_come_unfavorable = number_format(($function_UnFavorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2);
+            //setup function_results
+            $outcome_function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => number_format(($function_Nuetral_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'Favorable_score' => $out_come_favorable,
+                'UnFavorable_score' => $out_come_unfavorable,
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+                'outcome_index' => $out_come_favorable
+            ];
+            array_push($outcome_function_results_1, $outcome_function_results);
+        }
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->reverse()->toArray();
+        // $ENPS_data_array = array_slice($ENPS_data_array, 0, 3);
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->toArray();
+        //get first three highest items
+        //sort $driver_functions_practice asc
+        $driver_functions_practice_asc = array_slice(collect($driver_functions_practice)->sortBy('Favorable_score')->toArray(), 0, 3);
+        //sort $driver_functions_practice desc
+        $driver_functions_practice_desc = array_slice(collect($driver_functions_practice)->sortByDesc('Favorable_score')->toArray(), 0, 3);
+
+        if ($type == 'all') {
+            //get all sectors of current client
+            $sectors = Sectors::where('client_id', Surveys::find($id)->ClientId)->get();
+            foreach ($sectors as $sector) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $sector->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count_HM = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $Favorable_count_HM;
+                        $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+                        $function_Nuetral_sum_HM += $Nuetral_count_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+                    'entity_id' => $sector->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =sec
+        elseif ($type == 'sec') {
+            //get all companies of current sector
+            $companies = Companies::where('sector_id', $type_id)->get();
+            foreach ($companies as $company) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $company->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $Favorable_count_HM;
+                        $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+                        $function_Nuetral_sum_HM += $Nuetral_count_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $company->company_name_en : $company->company_name_ar,
+                    'entity_id' => $company->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =comp
+        elseif ($type == 'comp') {
+            $heat_map = [];
+        }
+
+        $data = [
+            'drivers' => $driver_functions_practice,
+            'drivers_functions' => $overall_per_fun,
+            'outcomes' => $outcome_function_results_1,
+            'ENPS_data_array' => $ENPS_data_array,
+            'entity' => $entity,
+            'type' => $type,
+            'type_id' => $type_id,
+            'id' => $id,
+            'driver_practice_asc' => $driver_functions_practice_asc,
+            'driver_practice_desc' => $driver_functions_practice_desc,
+            'heat_map' => $heat_map,
+            'cal_type' => 'count'
+        ];
+        return $data;
+    }
+    public function get_resultd($id, $type, $type_id = null)
+    {
+        $overall_per_fun = array();
+        $driver_functions_practice = array();
+        $heat_map = array();
+
+        $practice_results = [];
+        $ENPS_data_array = [];
+        $outcome_functions_practice = array();
+        $Outcome_practice_results = [];
+        $function_results = [];
+        $outcome_function_results = [];
+        $outcome_function_results_1 = array();
+        $entity = "";
+        $this->id = $id;
+        if ($type == "comp") { //find the company name
+            $entity = Companies::find($type_id)->company_name_en;
+        }
+        //sector
+        elseif ($type == "sec") {
+            $entity = Sectors::find($type_id)->sector_name_en;
+        }
+        //client
+        else {
+            $entity = "AL-Zubair Group";
+        }
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', true) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                //get sum of answer value from survey answers
+              if ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($Favorable_result) {
+                    $sum_answer_value_Favorable = $Favorable_result->sum;
+                    $Favorable_count = $Favorable_result->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+            if ($type == 'comp') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Nuetral_result) {
+                    $sum_answer_value_Nuetral = $Nuetral_result->sum;
+                    $Nuetral_count = $Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => $Nuetral_count == 0 ? 0 : number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'Favorable_score' => $Favorable_count == 0 ? 0 : number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'UnFavorable_score' => $UnFavorable_count == 0 ? 0 : number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral answers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($driver_functions_practice, $practice_results);
+            }
+            //setup function_results
+            $function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => $function_Nuetral_count == 0 ? 0 : number_format(($function_Nuetral_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'Favorable_score' => $function_Favorable_count == 0 ? 0 : number_format(($function_Favorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'UnFavorable_score' => $function_UnFavorable_count == 0 ? 0 : number_format(($function_UnFavorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+            ];
+            array_push($overall_per_fun, $function_results);
+        }
+        // dd($overall_per_fun);
+        foreach (Surveys::find($id)->plan->functions->where('IsDriver', false) as $function) {
+            $function_Nuetral_sum = 0;
+            $function_Favorable_sum = 0;
+            $function_UnFavorable_sum = 0;
+            $function_Nuetral_count = 0;
+            $function_Favorable_count = 0;
+            $function_UnFavorable_count = 0;
+            foreach ($function->functionPractices as $practice) {
+                //get sum of answer value from survey answers
+                if ($type == 'all')
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $Favorable_reslut = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($Favorable_reslut) {
+                    $sum_answer_value_Favorable = $Favorable_reslut->sum;
+                    $Favorable_count = $Favorable_reslut->count;
+                } else {
+                    $sum_answer_value_Favorable = 0;
+                    $Favorable_count = 0;
+                }
+                if ($type == 'all')
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    //get Emails id for a company
+                    $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $type_id)->pluck('id')->all();
+                    $UnFavorable_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                if ($UnFavorable_result) {
+                    $sum_answer_value_UnFavorable = $UnFavorable_result->sum;
+                    $UnFavorable_count = $UnFavorable_result->count;
+                } else {
+                    $sum_answer_value_UnFavorable = 0;
+                    $UnFavorable_count = 0;
+                }
+                if ($type == 'all')
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->first();
+                elseif ($type == 'comp') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+                //sector
+                elseif ($type == 'sec') {
+                    $sum_answer_value_Nuetral_result = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                }
+
+                if ($sum_answer_value_Nuetral_result) {
+                    $sum_answer_value_Nuetral = $sum_answer_value_Nuetral_result->sum;
+                    $Nuetral_count = $sum_answer_value_Nuetral_result->count;
+                } else {
+                    $sum_answer_value_Nuetral = 0;
+                    $Nuetral_count = 0;
+                }
+                $Outcome_practice_results = [
+                    'function' => $function->id,
+                    'practice_id' => $practice->id,
+                    'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                    'Nuetral_score' => number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'Favorable_score' => number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    'UnFavorable_score' => number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                    //get count of Favorable answers
+                    'Favorable_count' => $Favorable_count,
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => $UnFavorable_count,
+                    //get count of Nuetral nswers
+                    'Nuetral_count' => $Nuetral_count,
+                ];
+                if ($practice->practiceQuestions->IsENPS) {
+                    $Favorable = number_format(($Favorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2);
+                    $UnFavorable = number_format(($UnFavorable_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2);
+                    $ENPS_data_array = [
+                        'function' => $function->id,
+                        'practice_id' => $practice->id,
+                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                        'Nuetral_score' => number_format(($Nuetral_count / ($Favorable_count + $Nuetral_count + $UnFavorable_count)) * 100, 2),
+                        //get count of Favorable answers
+                        'Favorable_count' => $Favorable_count,
+                        //get count of UnFavorable answers
+                        'UnFavorable_count' => $UnFavorable_count,
+                        //get count of Nuetral answers
+                        'Nuetral_count' => $Nuetral_count,
+                        'Favorable_score' => $Favorable,
+                        'UnFavorable_score' => $UnFavorable,
+                        'ENPS_index' => ($Favorable - $UnFavorable),
+                    ];
+                }
+                $function_Nuetral_sum += $sum_answer_value_Nuetral;
+                $function_Favorable_sum += $sum_answer_value_Favorable;
+                $function_UnFavorable_sum += $sum_answer_value_UnFavorable;
+                $function_Nuetral_count += $Nuetral_count;
+                $function_Favorable_count += $Favorable_count;
+                $function_UnFavorable_count += $UnFavorable_count;
+                array_push($outcome_functions_practice, $Outcome_practice_results);
+            }
+            $out_come_favorable = number_format(($function_Favorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2);
+            $out_come_unfavorable = number_format(($function_UnFavorable_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2);
+            //setup function_results
+            $outcome_function_results = [
+                'function' => $function->id,
+                'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                'Nuetral_score' => number_format(($function_Nuetral_count / ($function_Favorable_count + $function_Nuetral_count + $function_UnFavorable_count)) * 100, 2),
+                'Favorable_score' => $out_come_favorable,
+                'UnFavorable_score' => $out_come_unfavorable,
+                //get count of Favorable answers
+                'Favorable_count' => $function_Favorable_count,
+                //get count of UnFavorable answers
+                'UnFavorable_count' => $function_UnFavorable_count,
+                //get count of Nuetral answers
+                'Nuetral_count' => $function_Nuetral_count,
+                'outcome_index' => $out_come_favorable
+            ];
+            array_push($outcome_function_results_1, $outcome_function_results);
+        }
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->reverse()->toArray();
+        // $ENPS_data_array = array_slice($ENPS_data_array, 0, 3);
+        // $ENPS_data_array = collect($ENPS_data_array)->sortBy('ENPS_index')->toArray();
+        //get first three highest items
+        //sort $driver_functions_practice asc
+        $driver_functions_practice_asc = array_slice(collect($driver_functions_practice)->sortBy('Favorable_score')->toArray(), 0, 3);
+        //sort $driver_functions_practice desc
+        $driver_functions_practice_desc = array_slice(collect($driver_functions_practice)->sortByDesc('Favorable_score')->toArray(), 0, 3);
+
+        if ($type == 'all') {
+            //get all sectors of current client
+            $sectors = Sectors::where('client_id', Surveys::find($id)->ClientId)->get();
+            foreach ($sectors as $sector) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $sector->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count_HM = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $Favorable_count_HM;
+                        $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+                        $function_Nuetral_sum_HM += $Nuetral_count_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+                    'entity_id' => $sector->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =sec
+        elseif ($type == 'sec') {
+            //get all companies of current sector
+            $companies = Companies::where('sector_id', $type_id)->get();
+            foreach ($companies as $company) {
+                $heat_map_indecators = array();
+                $ENPS_Favorable = null;
+                $ENPS_Pushed = false;
+                foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                    //$sum_function_answer_value_Favorable_HM
+                    $function_Favorable_sum_HM = 0;
+                    $function_UnFavorable_sum_HM = 0;
+                    $function_Nuetral_sum_HM = 0;
+                    foreach ($function->functionPractices as $practice) {
+                        $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $company->id)->pluck('id')->all();
+                        $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                        if ($Favorable_result_HM) {
+                            $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                            $Favorable_count_HM = $Favorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_Favorable_HM = 0;
+                            $Favorable_count = 0;
+                        }
+                        if ($UnFavorable_result_HM) {
+                            $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                            $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                        } else {
+                            $sum_answer_value_UnFavorable_HM = 0;
+                            $UnFavorable_count_HM = 0;
+                        }
+                        if ($Nuetral_result_HM) {
+                            $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                            $Nuetral_count_HM = $Nuetral_result_HM->count;
+                        } else {
+                            $sum_answer_value_Nuetral_HM = 0;
+                            $Nuetral_count_HM = 0;
+                        }
+                        if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                            $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                        }
+                        $function_Favorable_sum_HM += $Favorable_count_HM;
+                        $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+                        $function_Nuetral_sum_HM += $Nuetral_count_HM;
+                    }
+                    $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                    if ($function->IsDriver) {
+                        $title = explode(" ", $function->FunctionTitle);
+                        $title = $title[0];
+                    } else
+                        $title = 'Engagement';
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $out_come_favorable_HM,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                    if ($ENPS_Favorable && !$ENPS_Pushed) {
+                        $ENPS_Pushed = true;
+                        $outcome_function_results_HM = [
+                            'function_title' => $title,
+                            'score' => $ENPS_Favorable,
+                        ];
+                        array_push($heat_map_indecators, $outcome_function_results_HM);
+                    }
+                }
+                $heat_map_item = [
+                    'entity_name' => App()->getLocale() == 'en' ? $company->company_name_en : $company->company_name_ar,
+                    'entity_id' => $company->id,
+                    'indecators' => $heat_map_indecators,
+                ];
+                array_push($heat_map, $heat_map_item);
+            }
+        }
+        //if type =comp
+        elseif ($type == 'comp') {
+            $heat_map = [];
+        }
+
+        $data = [
+            'drivers' => $driver_functions_practice,
+            'drivers_functions' => $overall_per_fun,
+            'outcomes' => $outcome_function_results_1,
+            'ENPS_data_array' => $ENPS_data_array,
+            'entity' => $entity,
+            'type' => $type,
+            'type_id' => $type_id,
+            'id' => $id,
+            'driver_practice_asc' => $driver_functions_practice_asc,
+            'driver_practice_desc' => $driver_functions_practice_desc,
+            'heat_map' => $heat_map,
+            'cal_type' => 'countD'
+        ];
+        return $data;
+    }
+    public function get_SectorResult($id, $type, $type_id)
+    {
+        $data = [];
+        $functions = Surveys::find($id)->plan->functions;
+        $sector = Sectors::find($type_id);
+        foreach ($sector->companies as $company) {
+            //append data from get_resultd to data array
+            // $data = $data + $this->get_resultd($id, 'comp', $company->id);
+            array_push($data, $this->get_resultd($id, 'comp', $company->id));
+        }
+        $driver_functions = [];
+        $outcome_functions = [];
+        $ENPS_data_array1 = [];
+        $ENPS_data_array = [];
+        $practices = [];
+        $overall_per_fun = [];
+        $driver_functions_practice = [];
+        $outcome_function_results_1 = [];
+        $data_size = count($data);
+        foreach ($data as $singlData) {
+            foreach ($singlData['drivers_functions'] as $driver) {
+                array_push($driver_functions, $driver);
+            }
+            foreach ($singlData['outcomes'] as $outcome) {
+                array_push($outcome_functions, $outcome);
+            }
+            // foreach ($singlData['ENPS_data_array'] as $ENPS) {
+            array_push($ENPS_data_array, $singlData['ENPS_data_array']);
+            // }
+            foreach ($singlData['drivers'] as $practice) {
+                array_push($practices, $practice);
+            }
+        }
+        // Log::info($driver_functions);
+        foreach ($functions as $function) {
+            if ($function->IsDriver) {
+                $function_results = [
+                    'function' => $function->id,
+                    'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                    'Nuetral_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Nuetral_score') / $data_size, 2)),
+                    'Favorable_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Favorable_score') / $data_size, 2)),
+                    'UnFavorable_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('UnFavorable_score') / $data_size, 2)),
+                    //get count of Favorable answers
+                    'Favorable_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Favorable_count') / $data_size, 2)),
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('UnFavorable_count') / $data_size, 2)),
+                    //get count of Nuetral answers
+                    'Nuetral_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Nuetral_count') / $data_size, 2)),
+                ];
+                array_push($overall_per_fun, $function_results);
+                foreach ($function->functionPractices as $practice) {
+                    $practice_results = [
+                        'function' => $function->id,
+                        'practice_id' => $practice->id,
+                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                        'Nuetral_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Nuetral_score') / $data_size)),
+                        'Favorable_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Favorable_score') / $data_size)),
+                        'UnFavorable_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('UnFavorable_score') / $data_size)),
+                        //get count of Favorable answers
+                        'Favorable_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Favorable_count') / $data_size)),
+                        //get count of UnFavorable answers
+                        'UnFavorable_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('UnFavorable_count') / $data_size)),
+                        //get count of Nuetral answers
+                        'Nuetral_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Nuetral_count') / $data_size)),
+                    ];
+                    array_push($driver_functions_practice, $practice_results);
+                }
+            } else {
+                foreach ($function->functionPractices as $practice) {
+
+                    if ($practice->practiceQuestions->IsENPS) {
+                        $Favorable = floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Favorable_score') / $data_size, 2));
+                        $UnFavorable = floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('UnFavorable_score') / $data_size, 2));
+                        $ENPS_data_array1 = [
+                            'function' => $function->id,
+                            'practice_id' => $practice->id,
+                            'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                            'Nuetral_score' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Nuetral_score') / $data_size, 2)),
+                            //get count of Favorable answers
+                            'Favorable_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Favorable_count') / $data_size, 2)),
+                            //get count of UnFavorable answers
+                            'UnFavorable_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('UnFavorable_count') / $data_size, 2)),
+                            //get count of Nuetral answers
+                            'Nuetral_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Nuetral_count') / $data_size, 2)),
+                            'Favorable_score' => $Favorable,
+                            'UnFavorable_score' => $UnFavorable,
+                            'ENPS_index' => ($Favorable - $UnFavorable),
+                        ];
+                    }
+                }
+                $out_come_favorable = floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Favorable_score') / $data_size, 2));
+                $out_come_unfavorable = floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('UnFavorable_score') / $data_size, 2));
+                //setup function_results
+                $outcome_function_results = [
+                    'function' => $function->id,
+                    'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                    'Nuetral_score' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Nuetral_score') / $data_size, 2)),
+                    'Favorable_score' => $out_come_favorable,
+                    'UnFavorable_score' => $out_come_unfavorable,
+                    //get count of Favorable answers
+                    'Favorable_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Favorable_count') / $data_size, 2)),
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('UnFavorable_count') / $data_size, 2)),
+                    //get count of Nuetral answers
+                    'Nuetral_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Nuetral_count') / $data_size, 2)),
+                    'outcome_index' => $out_come_favorable
+                ];
+                array_push($outcome_function_results_1, $outcome_function_results);
+            }
+        }
+        $heat_map = [];
+        $companies = Companies::where('sector_id', $type_id)->get();
+        foreach ($companies as $company) {
+            $heat_map_indecators = array();
+            $ENPS_Favorable = null;
+            $ENPS_Pushed = false;
+            foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+                //$sum_function_answer_value_Favorable_HM
+                $function_Favorable_sum_HM = 0;
+                $function_UnFavorable_sum_HM = 0;
+                $function_Nuetral_sum_HM = 0;
+                foreach ($function->functionPractices as $practice) {
+                    $Emails = Emails::where('SurveyId', $this->id)->where('comp_id', $company->id)->pluck('id')->all();
+                    $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                    $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                    $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+                    if ($Favorable_result_HM) {
+                        $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+                        $Favorable_count_HM = $Favorable_result_HM->count;
+                    } else {
+                        $sum_answer_value_Favorable_HM = 0;
+                        $Favorable_count = 0;
+                    }
+                    if ($UnFavorable_result_HM) {
+                        $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+                        $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+                    } else {
+                        $sum_answer_value_UnFavorable_HM = 0;
+                        $UnFavorable_count_HM = 0;
+                    }
+                    if ($Nuetral_result_HM) {
+                        $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+                        $Nuetral_count_HM = $Nuetral_result_HM->count;
+                    } else {
+                        $sum_answer_value_Nuetral_HM = 0;
+                        $Nuetral_count_HM = 0;
+                    }
+                    if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+                        $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                        $ENPS_UnFavorable = number_format(($UnFavorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+                    }
+                    $function_Favorable_sum_HM += $Favorable_count_HM;
+                    $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+                    $function_Nuetral_sum_HM += $Nuetral_count_HM;
+                }
+                $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+                if ($function->IsDriver) {
+                    $title = explode(" ", $function->FunctionTitle);
+                    $title = $title[0];
+                } else
+                    $title = 'Engagement';
+                $outcome_function_results_HM = [
+                    'function_title' => $title,
+                    'score' => $out_come_favorable_HM,
+                ];
+                array_push($heat_map_indecators, $outcome_function_results_HM);
+                if ($ENPS_Favorable && !$ENPS_Pushed) {
+                    $ENPS_Pushed = true;
+                    $outcome_function_results_HM = [
+                        'function_title' => $title,
+                        'score' => $ENPS_Favorable-$ENPS_UnFavorable,
+                    ];
+                    array_push($heat_map_indecators, $outcome_function_results_HM);
+                }
+            }
+            $heat_map_item = [
+                'entity_name' => App()->getLocale() == 'en' ? $company->company_name_en : $company->company_name_ar,
+                'entity_id' => $company->id,
+                'indecators' => $heat_map_indecators,
+            ];
+            array_push($heat_map, $heat_map_item);
+        }
+        $driver_functions_practice_asc = array_slice(collect($driver_functions_practice)->sortBy('Favorable_score')->toArray(), 0, 3);
+        //sort $driver_functions_practice desc
+        $driver_functions_practice_desc = array_slice(collect($driver_functions_practice)->sortByDesc('Favorable_score')->toArray(), 0, 3);
+
+        $data = [
+            'drivers' => $driver_functions_practice,
+            'drivers_functions' => $overall_per_fun,
+            'outcomes' => $outcome_function_results_1,
+            'ENPS_data_array' => $ENPS_data_array1,
+            'entity' => Sectors::find($type_id)->sector_name_en,
+            'type' => $type,
+            'type_id' => $type_id,
+            'id' => $id,
+            'driver_practice_asc' => $driver_functions_practice_asc,
+            'driver_practice_desc' => $driver_functions_practice_desc,
+            'heat_map' => $heat_map,
+            'cal_type' => 'countD'
+        ];
+        return $data;
+    }
+    public function get_GroupResult($id, $type, $type_id)
+    {
+        $data = [];
+        $client = Surveys::find($id)->clients;
+        $functions = Surveys::find($id)->plan->functions;
+        foreach ($client->sectors as $sector) {
+            array_push($data, $this->get_SectorResult($id, 'sec', $sector->id));
+        }
+        $driver_functions = [];
+        $outcome_functions = [];
+        $ENPS_data_array1 = [];
+        $ENPS_data_array = [];
+        $practices = [];
+        $overall_per_fun = [];
+        $driver_functions_practice = [];
+        $outcome_function_results_1 = [];
+        $data_size = count($data);
+        foreach ($data as $singlData) {
+            foreach ($singlData['drivers_functions'] as $driver) {
+                array_push($driver_functions, $driver);
+            }
+            foreach ($singlData['outcomes'] as $outcome) {
+                array_push($outcome_functions, $outcome);
+            }
+            // foreach ($singlData['ENPS_data_array'] as $ENPS) {
+            array_push($ENPS_data_array, $singlData['ENPS_data_array']);
+            // }
+            foreach ($singlData['drivers'] as $practice) {
+                array_push($practices, $practice);
+            }
+        }
+        foreach ($functions as $function) {
+            if ($function->IsDriver) {
+                $function_results = [
+                    'function' => $function->id,
+                    'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                    'Nuetral_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Nuetral_score') / $data_size, 2)),
+                    'Favorable_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Favorable_score') / $data_size, 2)),
+                    'UnFavorable_score' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('UnFavorable_score') / $data_size, 2)),
+                    //get count of Favorable answers
+                    'Favorable_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Favorable_count') / $data_size, 2)),
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('UnFavorable_count') / $data_size, 2)),
+                    //get count of Nuetral answers
+                    'Nuetral_count' => floatval(number_format(collect($driver_functions)->where('function', $function->id)->sum('Nuetral_count') / $data_size, 2)),
+                ];
+                array_push($overall_per_fun, $function_results);
+                foreach ($function->functionPractices as $practice) {
+                    $practice_results = [
+                        'function' => $function->id,
+                        'practice_id' => $practice->id,
+                        'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                        'Nuetral_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Nuetral_score') / $data_size, 2)),
+                        'Favorable_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Favorable_score') / $data_size, 2)),
+                        'UnFavorable_score' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('UnFavorable_score') / $data_size, 2)),
+                        //get count of Favorable answers
+                        'Favorable_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Favorable_count') / $data_size, 2)),
+                        //get count of UnFavorable answers
+                        'UnFavorable_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('UnFavorable_count') / $data_size, 2)),
+                        //get count of Nuetral answers
+                        'Nuetral_count' => floatval(number_format(collect($practices)->where('practice_id', $practice->id)->sum('Nuetral_count') / $data_size, 2)),
+                    ];
+                    array_push($driver_functions_practice, $practice_results);
+                }
+            } else {
+                foreach ($function->functionPractices as $practice) {
+
+                    if ($practice->practiceQuestions->IsENPS) {
+                        $Favorable = floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Favorable_score') / $data_size, 2));
+                        $UnFavorable = floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('UnFavorable_score') / $data_size, 2));
+                        $ENPS_data_array1 = [
+                            'function' => $function->id,
+                            'practice_id' => $practice->id,
+                            'practice_title' => App()->getLocale() == 'en' ? $practice->PracticeTitle : $practice->PracticeTitleAr,
+                            'Nuetral_score' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Nuetral_score') / $data_size, 2)),
+                            //get count of Favorable answers
+                            'Favorable_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Favorable_count') / $data_size, 2)),
+                            //get count of UnFavorable answers
+                            'UnFavorable_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('UnFavorable_count') / $data_size, 2)),
+                            //get count of Nuetral answers
+                            'Nuetral_count' => floatval(number_format(collect($ENPS_data_array)->where('practice_id', $practice->id)->sum('Nuetral_count') / $data_size, 2)),
+                            'Favorable_score' => $Favorable,
+                            'UnFavorable_score' => $UnFavorable,
+                            'ENPS_index' => ($Favorable - $UnFavorable),
+                        ];
+                    }
+                }
+                $out_come_favorable = floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Favorable_score') / $data_size, 2));
+                $out_come_unfavorable = floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('UnFavorable_score') / $data_size, 2));
+                //setup function_results
+                $outcome_function_results = [
+                    'function' => $function->id,
+                    'function_title' => App()->getLocale() == 'en' ? $function->FunctionTitle : $function->FunctionTitleAr,
+                    'Nuetral_score' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Nuetral_score') / $data_size, 2)),
+                    'Favorable_score' => $out_come_favorable,
+                    'UnFavorable_score' => $out_come_unfavorable,
+                    //get count of Favorable answers
+                    'Favorable_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Favorable_count') / $data_size, 2)),
+                    //get count of UnFavorable answers
+                    'UnFavorable_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('UnFavorable_count') / $data_size, 2)),
+                    //get count of Nuetral answers
+                    'Nuetral_count' => floatval(number_format(collect($outcome_functions)->where('function', $function->id)->sum('Nuetral_count') / $data_size, 2)),
+                    'outcome_index' => $out_come_favorable
+                ];
+                array_push($outcome_function_results_1, $outcome_function_results);
+            }
+        }
+        $heat_map = [];
+
+        $sectors = Sectors::where('client_id', Surveys::find($id)->ClientId)->get();
+        foreach ($sectors as $sector) {
+            $heat_map_indecators1=[];
+            $sector_heatMap = collect($data)->where('type_id', $sector->id)->first();
+            $headAv=0;
+            $handAv=0;
+            $heartAv=0;
+            $outcomeAv=0;
+            $ENPSAv=0;
+            $headTitle='';
+            $handTitle='';
+            $heartTitle='';
+            $outcomeTitle='';
+            $ENPSTitle='';
+            foreach($sector_heatMap['heat_map'] as $comp)
+            {
+                $headAv += $comp['indecators'][0]['score'];
+                $handAv += $comp['indecators'][1]['score'];
+                $heartAv += $comp['indecators'][2]['score'];
+                $outcomeAv += $comp['indecators'][3]['score'];
+                $ENPSAv += $comp['indecators'][4]['score'];
+                $headTitle = $comp['indecators'][0]['function_title'];
+                $handTitle = $comp['indecators'][1]['function_title'];
+                $heartTitle = $comp['indecators'][2]['function_title'];
+                $outcomeTitle = $comp['indecators'][3]['function_title'];
+                $ENPSTitle = $comp['indecators'][4]['function_title'];
+
+            }
+            $outcome_function_results_HM1 = [
+                'function_title' => $headTitle,
+                'score' => floatval(number_format($headAv/count($sector_heatMap['heat_map']),2)),
+            ];
+            array_push($heat_map_indecators1, $outcome_function_results_HM1);
+            $outcome_function_results_HM1 = [
+                'function_title' => $handTitle,
+                'score' => floatval(number_format($handAv/count($sector_heatMap['heat_map']),2)),
+            ];
+            array_push($heat_map_indecators1, $outcome_function_results_HM1);
+            $outcome_function_results_HM1 = [
+                'function_title' => $heartTitle,
+                'score' => floatval(number_format($heartAv/count($sector_heatMap['heat_map']),2)),
+            ];
+            array_push($heat_map_indecators1, $outcome_function_results_HM1);
+            $outcome_function_results_HM1 = [
+                'function_title' => $outcomeTitle,
+                'score' => floatval(number_format($outcomeAv/count($sector_heatMap['heat_map']),2)),
+            ];
+            array_push($heat_map_indecators1, $outcome_function_results_HM1);
+            $outcome_function_results_HM1 = [
+                'function_title' => $ENPSTitle,
+                'score' => floatval(number_format($ENPSAv/count($sector_heatMap['heat_map']),2)),
+            ];
+            array_push($heat_map_indecators1, $outcome_function_results_HM1);
+            $heat_map_item1 = [
+                'entity_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+                'entity_id' => $sector->id,
+                'indecators' => $heat_map_indecators1,
+            ];
+            array_push($heat_map, $heat_map_item1);
+            // $heat_map_indecators = array();
+            // $ENPS_Favorable = null;
+            // $ENPS_Pushed = false;
+            // foreach (Surveys::find($id)->plan->functions/* ->where('IsDriver', false) */ as $function) {
+            //     //$sum_function_answer_value_Favorable_HM
+            //     $function_Favorable_sum_HM = 0;
+            //     $function_UnFavorable_sum_HM = 0;
+            //     $function_Nuetral_sum_HM = 0;
+            //     foreach ($function->functionPractices as $practice) {
+            //         $Emails = Emails::where('SurveyId', $this->id)->where('sector_id', $sector->id)->pluck('id')->all();
+            //         $Favorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '>=', 4], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+            //         $UnFavorable_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', '<=', 2], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+            //         $Nuetral_result_HM = SurveyAnswers::selectRaw('COUNT(AnswerValue) as count, SUM(AnswerValue) as sum')->where([['SurveyId', $this->id], ['AnswerValue', 3], ['QuestionId', $practice->practiceQuestions->id]])->whereIn('AnsweredBy', $Emails)->first();
+            //         if ($Favorable_result_HM) {
+            //             $sum_answer_value_Favorable_HM = $Favorable_result_HM->sum;
+            //             $Favorable_count_HM = $Favorable_result_HM->count;
+            //         } else {
+            //             $sum_answer_value_Favorable_HM = 0;
+            //             $Favorable_count_HM = 0;
+            //         }
+            //         if ($UnFavorable_result_HM) {
+            //             $sum_answer_value_UnFavorable_HM = $UnFavorable_result_HM->sum;
+            //             $UnFavorable_count_HM = $UnFavorable_result_HM->count;
+            //         } else {
+            //             $sum_answer_value_UnFavorable_HM = 0;
+            //             $UnFavorable_count_HM = 0;
+            //         }
+            //         if ($Nuetral_result_HM) {
+            //             $sum_answer_value_Nuetral_HM = $Nuetral_result_HM->sum;
+            //             $Nuetral_count_HM = $Nuetral_result_HM->count;
+            //         } else {
+            //             $sum_answer_value_Nuetral_HM = 0;
+            //             $Nuetral_count_HM = 0;
+            //         }
+            //         if ($practice->practiceQuestions->IsENPS && $ENPS_Favorable == null) {
+            //             $ENPS_Favorable = number_format(($Favorable_count_HM / ($Favorable_count_HM + $Nuetral_count_HM + $UnFavorable_count_HM)) * 100, 2);
+            //         }
+            //         $function_Favorable_sum_HM += $Favorable_count_HM;
+            //         $function_UnFavorable_sum_HM += $UnFavorable_count_HM;
+            //         $function_Nuetral_sum_HM += $Nuetral_count_HM;
+            //     }
+            //     $out_come_favorable_HM = number_format(($function_Favorable_sum_HM / ($function_Favorable_sum_HM + $function_Nuetral_sum_HM + $function_UnFavorable_sum_HM)) * 100, 2);
+            //     if ($function->IsDriver) {
+            //         $title = explode(" ", $function->FunctionTitle);
+            //         $title = $title[0];
+            //     } else
+            //         $title = 'Engagement';
+            //     $outcome_function_results_HM = [
+            //         'function_title' => $title,
+            //         'score' => $out_come_favorable_HM,
+            //     ];
+            //     array_push($heat_map_indecators, $outcome_function_results_HM);
+            //     if ($ENPS_Favorable && !$ENPS_Pushed) {
+            //         $ENPS_Pushed = true;
+            //         $outcome_function_results_HM = [
+            //             'function_title' => $title,
+            //             'score' => $ENPS_Favorable,
+            //         ];
+            //         array_push($heat_map_indecators, $outcome_function_results_HM);
+            //     }
+            // }
+            // $heat_map_item = [
+            //     'entity_name' => App()->getLocale() == 'en' ? $sector->sector_name_en : $sector->sector_name_ar,
+            //     'entity_id' => $sector->id,
+            //     'indecators' => $heat_map_indecators,
+            // ];
+            // array_push($heat_map, $heat_map_item);
+        }
+        $driver_functions_practice_asc = array_slice(collect($driver_functions_practice)->sortBy('Favorable_score')->toArray(), 0, 3);
+        //sort $driver_functions_practice desc
+        $driver_functions_practice_desc = array_slice(collect($driver_functions_practice)->sortByDesc('Favorable_score')->toArray(), 0, 3);
+        $data = [
+            'drivers' => $driver_functions_practice,
+            'drivers_functions' => $overall_per_fun,
+            'outcomes' => $outcome_function_results_1,
+            'ENPS_data_array' => $ENPS_data_array1,
+            'entity' => "AL-Zubair Group",
+            'type' => $type,
+            'type_id' => $type_id,
+            'id' => $id,
+            'driver_practice_asc' => $driver_functions_practice_asc,
+            'driver_practice_desc' => $driver_functions_practice_desc,
+            'heat_map' => $heat_map,
+            'cal_type' => 'countD'
+        ];
+        return $data;
     }
 }

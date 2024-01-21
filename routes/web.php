@@ -125,13 +125,15 @@ Route::get('survey-answers/freeSurveyResult/{id}', [SurveyAnswersController::cla
 Route::resource('survey-answers', SurveyAnswersController::class)->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/result/{id}', [SurveyAnswersController::class, 'result'])->name('survey-answers.result')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/alzubair_result/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_result'])->name('survey-answers.alzubair_result')->middleware(['auth', 'role:admin']);
+Route::get('/survey-answers/alzubair_resultC/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_resultC'])->name('survey-answers.alzubair_resultC')->middleware(['auth', 'role:admin']);
+Route::get('/survey-answers/alzubair_resultD/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_resultD'])->name('survey-answers.alzubair_resultD')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/statistics/{id}/{Clientid}', [SurveyAnswersController::class, 'statistics'])->name('survey-answers.statistics')->middleware(['auth', 'role:admin']);
 Route::get('/statistics/{id}/{Clientid}', [StatisticsController::class, 'index'])->name('survey.statistics')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('/Client/AddEmail/{Clientid}/{Surveyid}', [StatisticsController::class, 'AddNewEmails'])->name('Client.AddEmail')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('Client/getDepForSelect/{id}',[StatisticsController::class,'GetDepForSelect'])->name('client.departmentsGetSelect')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('Client/getCompForSelect/{id}',[StatisticsController::class,'GetCompForSelect'])->name('client.companiesGetSelect')->middleware(['auth', 'role:statisticsViewer']);
 Route::post('Client/saveEamil',[StatisticsController::class,'saveEamil'])->name('client.saveEamil')->middleware(['auth', 'role:statisticsViewer']);
-Route::get('/survey-answers/resultPDF/{id}', [SurveyAnswersController::class, 'resultPDF'])->name('survey-answers.resultPDF')->middleware(['auth', 'role:admin']);
+Route::get('/survey-answers/resultPDF/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'resultPDF'])->name('survey-answers.resultPDF')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/SectorResult/{id}/{sctor}', [SurveyAnswersController::class, 'SectorResult'])->name('survey-answers.SectorResult')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/CompanyResult/{id}/{company}', [SurveyAnswersController::class, 'CompanyResult'])->name('survey-answers.CompanyResult')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/DepartmentResult/{id}/{dep}', [SurveyAnswersController::class, 'DepartmentResult'])->name('survey-answers.DepartmentResult')->middleware(['auth', 'role:admin']);

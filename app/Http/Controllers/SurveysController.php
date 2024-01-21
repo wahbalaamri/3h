@@ -6,8 +6,10 @@ use App\Exports\PrioritiesAnswersExport;
 use App\Exports\SurveyAnswersExport;
 use App\Http\Requests\SurveyStoreRequest;
 use App\Http\Requests\SurveyUpdateRequest;
+use App\Models\Companies;
 use App\Models\EmailContent;
 use App\Models\PrioritiesAnswers;
+use App\Models\Sectors;
 use App\Models\SurveyAnswers;
 use App\Models\Surveys;
 use Illuminate\Http\Request;
@@ -118,8 +120,10 @@ class SurveysController extends Controller
     }
     public function DownloadSurvey($id , $type, $type_id = null)
     {
-
-        return Excel::download(new SurveyAnswersExport($id, $type, $type_id), 'SurveyAnswersExport.xlsx');
+        $job = (new \App\Jobs\ExportSurveyResultsJob($id, $type,$type_id));
+        dispatch($job);
+        Log::info('test');
+        return redirect()->route('survey-answers.alzubair_result',[$id,$type,$type_id]);
     }
     public function DownloadPriorities($id)
     {

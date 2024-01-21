@@ -34813,7 +34813,7 @@ ul.releaseRow li {
 }
 
 .progressbar::before,
-.progress {
+.progress-a {
     content: "";
     position: absolute;
     top: 50%;
@@ -34824,7 +34824,7 @@ ul.releaseRow li {
     z-index: -1;
 }
 
-.progress {
+.progress-a {
     background-color: #0c425a !important;
     width: 0.5%;
     transition: 0.3s;
