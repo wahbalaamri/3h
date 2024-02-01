@@ -1169,6 +1169,10 @@ header#sidebar-header ul.nav-menu .mega-links-4columns ul.sub-menu-columns>li>a:
     font-family: FontAwesome
 }
 
+.main-body {
+    min-height: 37rem !important;
+}
+
 .woocommerce .single_add_to_cart_button.button {
     padding: 11px;
     margin-left: 15px

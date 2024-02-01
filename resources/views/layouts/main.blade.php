@@ -238,7 +238,7 @@
         </div>
     </header>
     <!-- // header -->
-    <div class="" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
+    <div class="main-body" dir="{{ App()->getLocale()=='ar'? 'rtl':'ltr' }}">
         @yield('content')
     </div>
     <footer class="background-footer mt-1" dir="ltr" style="">

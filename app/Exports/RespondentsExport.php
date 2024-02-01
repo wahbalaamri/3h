@@ -22,6 +22,7 @@ class RespondentsExport implements FromCollection, WithHeadings
     public function collection()
     {
         $respondent= [];
+        $exportData=[];
         foreach (Emails::where([['ClientId',$this->client_id],['SurveyId',$this->survey_id]])->get() as $email) {
             $exportData[] = [
                 'Sector' => $email->sector->sector_name_en,
