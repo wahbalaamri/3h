@@ -129,7 +129,7 @@
                                                                             }}</a>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="{{ route('survey-answers.alzubair_result',  [$survey->id,'all']) }}{{-- {{ route('survey-answers.result',  $survey->id) }} --}}"
+                                                                        <a href="{{ route('survey-answers.result',  [$survey->id,'all']) }}{{-- {{ route('survey-answers.result',  $survey->id) }} --}}"
                                                                             class="btn btn-info btn-sm">{{ __('Result')
                                                                             }}</a>
                                                                     </td>

@@ -123,10 +123,10 @@ Route::resource('surveys', SurveysController::class)->middleware(['auth', 'role:
 
 Route::get('survey-answers/freeSurveyResult/{id}', [SurveyAnswersController::class, 'ShowFreeResult'])->name('survey-answers.freeSurveyResult');
 Route::resource('survey-answers', SurveyAnswersController::class)->middleware(['auth', 'role:admin']);
-Route::get('/survey-answers/result/{id}', [SurveyAnswersController::class, 'result'])->name('survey-answers.result')->middleware(['auth', 'role:admin']);
+// Route::get('/survey-answers/result/{id}', [SurveyAnswersController::class, 'result'])->name('survey-answers.result')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/alzubair_result/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_result'])->name('survey-answers.alzubair_result')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/alzubair_resultC/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_resultC'])->name('survey-answers.alzubair_resultC')->middleware(['auth', 'role:admin']);
-Route::get('/survey-answers/alzubair_resultD/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_resultD'])->name('survey-answers.alzubair_resultD')->middleware(['auth', 'role:admin']);
+Route::get('/survey-answers/result/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'alzubair_resultD'])->name('survey-answers.result')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/statistics/{id}/{Clientid}', [SurveyAnswersController::class, 'statistics'])->name('survey-answers.statistics')->middleware(['auth', 'role:admin']);
 Route::get('/statistics/{id}/{Clientid}', [StatisticsController::class, 'index'])->name('survey.statistics')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('/Client/AddEmail/{Clientid}/{Surveyid}', [StatisticsController::class, 'AddNewEmails'])->name('Client.AddEmail')->middleware(['auth', 'role:statisticsViewer']);

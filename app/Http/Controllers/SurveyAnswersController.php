@@ -3373,7 +3373,7 @@ class SurveyAnswersController extends Controller
             'drivers_functions' => $overall_per_fun,
             'outcomes' => $outcome_function_results_1,
             'ENPS_data_array' => $ENPS_data_array1,
-            'entity' => "AL-Zubair Group",
+            'entity' => $client->ClientName,
             'type' => $type,
             'type_id' => $type_id,
             'id' => $id,

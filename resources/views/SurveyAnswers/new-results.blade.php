@@ -364,7 +364,7 @@
                                     @if ($cal_type=='sum')
                                     window.open('{{ route('survey-answers.alzubair_result',[$id,$type=='all'?'sec':'comp',$heat['entity_id']]) }}','_blank');
                                     @elseif($cal_type=='countD')
-                                    window.open('{{ route('survey-answers.alzubair_resultD',[$id,$type=='all'?'sec':'comp',$heat['entity_id']]) }}','_blank');
+                                    window.open('{{ route('survey-answers.result',[$id,$type=='all'?'sec':'comp',$heat['entity_id']]) }}','_blank');
                                     @else
                                     window.open('{{ route('survey-answers.alzubair_resultC',[$id,$type=='all'?'sec':'comp',$heat['entity_id']]) }}','_blank');
                                     @endif
