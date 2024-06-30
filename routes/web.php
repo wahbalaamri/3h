@@ -81,6 +81,7 @@ Route::post('/practice-questions/SaveNewQuestion/{id}', [PracticeQuestionsContro
 Route::post('/practice-questions/save/{id}', [PracticeQuestionsController::class, 'saveQuestions'])->name('practice-questions.save')->middleware(['auth', 'role:admin']);
 
 Route::get('/clients/getClients/{id}', [ClientsController::class, 'getClients'])->name('clients.getClients')->middleware(['auth', 'role:admin']);
+Route::get('clients/ViewClients', [ClientsController::class, 'ViewClients']);
 Route::resource('clients', ClientsController::class)->middleware(['auth', 'role:admin']);
 Route::get('users/changePassword/{id}', [UsersController::class, 'changePassword'])->name('users.changePassword')->middleware(['auth', 'role:admin']);
 Route::get('users/setupsers', [UsersController::class, 'setup_users'])->name('users.setupusers')->middleware(['auth']);
@@ -130,9 +131,9 @@ Route::get('/survey-answers/result/{id}/{type}/{type_id?}', [SurveyAnswersContro
 Route::get('/survey-answers/statistics/{id}/{Clientid}', [SurveyAnswersController::class, 'statistics'])->name('survey-answers.statistics')->middleware(['auth', 'role:admin']);
 Route::get('/statistics/{id}/{Clientid}', [StatisticsController::class, 'index'])->name('survey.statistics')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('/Client/AddEmail/{Clientid}/{Surveyid}', [StatisticsController::class, 'AddNewEmails'])->name('Client.AddEmail')->middleware(['auth', 'role:statisticsViewer']);
-Route::get('Client/getDepForSelect/{id}',[StatisticsController::class,'GetDepForSelect'])->name('client.departmentsGetSelect')->middleware(['auth', 'role:statisticsViewer']);
-Route::get('Client/getCompForSelect/{id}',[StatisticsController::class,'GetCompForSelect'])->name('client.companiesGetSelect')->middleware(['auth', 'role:statisticsViewer']);
-Route::post('Client/saveEamil',[StatisticsController::class,'saveEamil'])->name('client.saveEamil')->middleware(['auth', 'role:statisticsViewer']);
+Route::get('Client/getDepForSelect/{id}', [StatisticsController::class, 'GetDepForSelect'])->name('client.departmentsGetSelect')->middleware(['auth', 'role:statisticsViewer']);
+Route::get('Client/getCompForSelect/{id}', [StatisticsController::class, 'GetCompForSelect'])->name('client.companiesGetSelect')->middleware(['auth', 'role:statisticsViewer']);
+Route::post('Client/saveEamil', [StatisticsController::class, 'saveEamil'])->name('client.saveEamil')->middleware(['auth', 'role:statisticsViewer']);
 Route::get('/survey-answers/resultPDF/{id}/{type}/{type_id?}', [SurveyAnswersController::class, 'resultPDF'])->name('survey-answers.resultPDF')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/SectorResult/{id}/{sctor}', [SurveyAnswersController::class, 'SectorResult'])->name('survey-answers.SectorResult')->middleware(['auth', 'role:admin']);
 Route::get('/survey-answers/CompanyResult/{id}/{company}', [SurveyAnswersController::class, 'CompanyResult'])->name('survey-answers.CompanyResult')->middleware(['auth', 'role:admin']);
@@ -149,16 +150,19 @@ Route::get('sectors/getClientsSectors/{id}', [SectorsController::class, 'getClie
 Route::resource('sectors', SectorsController::class);
 //companies.getClientsCompanies
 Route::get('companies/getClientsCompanies/{id}', [CompaniesController::class, 'getClientsCompanies'])->name('companies.getClientsCompanies');
-Route::resource('companies',CompaniesController::class);
-Route::resource('departments',DepartmentsController::class);
-Route::POST('/getCompanies/{id}',[CompaniesController::class,'GetCompanies'])->name('getCompanies');
-Route::POST('/getDeps/{id}',[CompaniesController::class,'GetDeps'])->name('getDeps');
-Route::get('departments/getClientsDepartments/{id}',[DepartmentsController::class,'getClientsDepartments'])->name('departments.getClientsDepartments');
-Route::get('departments/getForSelect/{id}',[DepartmentsController::class,'GetForSelect'])->name('departments.getSelect')->middleware(['auth', 'role:admin']);
-Route::get('companies/getForSelect/{id}',[CompaniesController::class,'GetForSelect'])->name('companies.getSelect')->middleware(['auth', 'role:admin']);
+Route::resource('companies', CompaniesController::class);
+Route::resource('departments', DepartmentsController::class);
+Route::POST('/getCompanies/{id}', [CompaniesController::class, 'GetCompanies'])->name('getCompanies');
+Route::POST('/getDeps/{id}', [CompaniesController::class, 'GetDeps'])->name('getDeps');
+Route::get('departments/getClientsDepartments/{id}', [DepartmentsController::class, 'getClientsDepartments'])->name('departments.getClientsDepartments');
+Route::get('departments/getForSelect/{id}', [DepartmentsController::class, 'GetForSelect'])->name('departments.getSelect')->middleware(['auth', 'role:admin']);
+Route::get('companies/getForSelect/{id}', [CompaniesController::class, 'GetForSelect'])->name('companies.getSelect')->middleware(['auth', 'role:admin']);
+Route::get('function/getf', [FunctionsController::class, 'getF']);
+Route::get('practice/getp', [FunctionPracticeController::class, 'getP']);
+Route::get('question/getq', [PracticeQuestionsController::class, 'getq']);
+// route to change language
 // route to change language
 Route::get('lang/{locale}', function () {
-
     session()->put('locale', request()->locale);
     return redirect()->back();
 })->name('lang.swap');
@@ -168,7 +172,7 @@ Route::get('lang/{locale}', function () {
 //     dd($dd_output);
 // });
 Route::get('/testing/optimize', function () {
-    Artisan::call('optimize');
+    Artisan::call('optimize:clear');
     $dd_output = Artisan::output();
     dd($dd_output);
 });

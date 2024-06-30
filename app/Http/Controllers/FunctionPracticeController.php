@@ -184,4 +184,8 @@ class FunctionPracticeController extends Controller
             ->rawColumns(['questions'])
             ->make(true);
     }
+    function getP()
+    {
+        return FunctionPractice::all();
+    }
 }

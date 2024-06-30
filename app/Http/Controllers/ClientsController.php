@@ -53,8 +53,8 @@ class ClientsController extends Controller
     public function show(Request $request, Clients $client)
     {
         $departments = Departments::all();
-        $client_survyes=Surveys::where('ClientId', $client->id)->get();
-        return response()->view('Clients.show', compact('client', 'departments','client_survyes'));
+        $client_survyes = Surveys::where('ClientId', $client->id)->get();
+        return response()->view('Clients.show', compact('client', 'departments', 'client_survyes'));
     }
 
     /**
@@ -99,7 +99,7 @@ class ClientsController extends Controller
                 $url = route('survey-answers.result', $row->id);
                 // $data=
                 $data = '<a href="' . $url . '" class="btn btn-info btn-sm float-end">' . __('Result') . '</a>';
-                $data.='<a  data-bs-toggle="modal" href="#RespondentEmails" onclick="GetRespondentsEmails(\'' . $row->id . '\')" class="btn btn-success btn-sm float-start">' . __('Respondents') . '</a>';
+                $data .= '<a  data-bs-toggle="modal" href="#RespondentEmails" onclick="GetRespondentsEmails(\'' . $row->id . '\')" class="btn btn-success btn-sm float-start">' . __('Respondents') . '</a>';
                 return $data;
             })
             // ->addColumn('respondents', function ($row) {
@@ -168,6 +168,16 @@ class ClientsController extends Controller
                 ->rawColumns(['action'])
                 ->addIndexColumn()
                 ->make(true);
+        }
+    }
+    function ViewClients(Request $request)
+    {
+        //return all clients
+        try {
+            $clients = Clients::all();
+            return response()->json(['clients' => $clients, 'test' => 'test']);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
         }
     }
 }

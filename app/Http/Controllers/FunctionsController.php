@@ -225,5 +225,8 @@ class FunctionsController extends Controller
             ->rawColumns(['practices'])
             ->make(true);
     }
-
+    function getF()
+    {
+        return Functions::all();
+    }
 }

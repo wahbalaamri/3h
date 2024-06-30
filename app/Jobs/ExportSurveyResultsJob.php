@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Exports\SurveyAnswersExport;
 use App\Models\Companies;
 use App\Models\Sectors;
+use App\Models\Surveys;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,16 +42,18 @@ class ExportSurveyResultsJob implements ShouldQueue
      */
     public function handle()
     {
-        //
-        $fileName = '';
+        // client name
+        $ClientName = Surveys::find($this->id)->clients->ClientName;
+        $dateTime = date('Y-m-d_H-i-s');
+        $fileName = $dateTime . '_' . $ClientName . '-';
         if ($this->type == 'sec') {
             $sector = Sectors::find($this->type_id)->sector_name_en;
-            $fileName = $sector . ' - Sector - SurveyAnswers';
+            $fileName .= $sector . ' - Sector - SurveyAnswers';
         } else if ($this->type == 'comp') {
             $company = Companies::find($this->type_id)->company_name_en;
-            $fileName = $company . ' - Company - SurveyAnswers';
+            $fileName .= $company . ' - Company - SurveyAnswers';
         } else if ($this->type == 'all') {
-            $fileName = 'All - SurveyAnswers';
+            $fileName .= 'All - SurveyAnswers';
         }
         // create .xlsx file in public folder
 

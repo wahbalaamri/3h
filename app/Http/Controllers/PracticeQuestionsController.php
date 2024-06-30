@@ -191,4 +191,8 @@ class PracticeQuestionsController extends Controller
             // ->rawColumns(['action'])
             ->make(true);
     }
+    function getq()
+    {
+        return PracticeQuestions::all();
+    }
 }
